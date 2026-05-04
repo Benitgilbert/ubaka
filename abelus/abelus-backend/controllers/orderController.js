@@ -655,7 +655,7 @@ export const createPOSOrder = async (req, res) => {
 
         let productName = product.name;
 
-        if (item.variationId) {
+        if (item.variationId && item.variationId !== item.product) {
           const variation = product.variations.find(v => v.id === item.variationId || v.sku === item.variationId);
           if (!variation) throw new Error(`Variation ${item.variationId} not found`);
           
@@ -688,14 +688,14 @@ export const createPOSOrder = async (req, res) => {
         }
 
         // Update product sales count
-        if (item.variationId || product.type === 'service') {
-          const variation = item.variationId ? product.variations.find(v => v.id === item.variationId || v.sku === item.variationId) : null;
+        if ((item.variationId && item.variationId !== item.product) || product.type === 'service') {
+          const variation = (item.variationId && item.variationId !== item.product) ? product.variations.find(v => v.id === item.variationId || v.sku === item.variationId) : null;
           const decrementQty = Number(item.quantity) * (item.conversionFactor || variation?.conversionFactor || 1);
           
           await tx.product.update({
             where: { id: product.id },
             data: {
-              ...(product.type !== 'service' && item.variationId && { stock: { decrement: decrementQty } }),
+              ...(product.type !== 'service' && item.variationId && item.variationId !== item.product && { stock: { decrement: decrementQty } }),
               salesCount: { increment: decrementQty }
             }
           });
