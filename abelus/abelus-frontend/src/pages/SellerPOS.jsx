@@ -430,9 +430,8 @@ export default function SellerPOS() {
     };
 
     const confirmMomoPayment = async () => {
-        if (!phoneNumber) return alert("Please enter a phone number");
         setShowMomoModal(false);
-        handleCheckout("mtn_momo", phoneNumber);
+        handleCheckout("mtn_momo", "POS_SIMULATION");
     };
 
     const handleCheckout = async (method, phone = null, receivedAmount = null) => {
@@ -456,6 +455,10 @@ export default function SellerPOS() {
             if (method === "mtn_momo" && res.data.status === "pending") {
                 setPendingOrder(res.data.id);
                 return;
+            }
+
+            if (method === "mtn_momo" && res.data.status === "completed") {
+                toast.success("MoMo Payment Simulated Successfully");
             }
 
             const order = {
@@ -1047,23 +1050,17 @@ export default function SellerPOS() {
                     {showMomoModal && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                             <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full animate-in fade-in zoom-in duration-200">
-                                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
-                                    <FaMobileAlt className="text-yellow-500" /> MoMo Payment
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 mb-4">Enter customer's phone number to trigger payment request.</p>
+                                <h2 className="text-3xl font-black text-gray-900 dark:text-white">MoMo Payment</h2>
+                                <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">Please confirm the client has paid on their phone</p>
 
-                                <input
-                                    type="text"
-                                    placeholder="078..."
-                                    value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    autoFocus
-                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white dark:bg-gray-700 dark:text-white mb-6 text-lg"
-                                />
+                                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-2xl border border-yellow-100 dark:border-yellow-800/30 mb-8 text-center">
+                                    <p className="text-sm font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-widest mb-1">Total Amount Required</p>
+                                    <p className="text-4xl font-black text-gray-900 dark:text-white">RWF {calculateTotal().toLocaleString()}</p>
+                                </div>
 
                                 <div className="flex gap-4">
-                                    <button className="flex-1 py-3 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium transition-colors" onClick={() => setShowMomoModal(false)}>Cancel</button>
-                                    <button className="flex-1 py-3 px-4 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-bold shadow-lg shadow-yellow-500/20 transition-all" onClick={confirmMomoPayment}>Request Pay</button>
+                                    <button className="flex-1 py-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-2xl font-bold transition-all" onClick={() => setShowMomoModal(false)}>Cancel</button>
+                                    <button className="flex-2 py-4 bg-yellow-500 hover:bg-yellow-600 text-white rounded-2xl font-black shadow-xl shadow-yellow-500/20 transition-all active:scale-[0.98]" onClick={confirmMomoPayment}>Confirm Client Paid</button>
                                 </div>
                             </div>
                         </div>
