@@ -30,15 +30,37 @@ export const getDashboardAnalytics = async (req, res) => {
     // Filter Logic
     const orderFilter = isStaff ? { items: { some: { sellerId: effectiveSellerId } } } : {};
     const productFilter = isStaff ? { sellerId: effectiveSellerId } : {};
+    
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
     // Batch 1: Basic Counts
-    const [totalOrders, deliveredOrders, inProductionOrders, cancelledOrders, totalProducts] = await Promise.all([
+    const [
+      totalOrders, deliveredOrders, inProductionOrders, cancelledOrders, totalProducts,
+      todayRevenueAgg, todayExpensesAgg, allProductsForValue
+    ] = await Promise.all([
       prisma.order.count({ where: orderFilter }),
       prisma.order.count({ where: { ...orderFilter, status: "delivered" } }),
       prisma.order.count({ where: { ...orderFilter, status: "in_production" } }),
       prisma.order.count({ where: { ...orderFilter, status: "cancelled" } }),
       prisma.product.count({ where: productFilter }),
+      prisma.order.aggregate({
+        _sum: { grandTotal: true },
+        where: { ...orderFilter, createdAt: { gte: startOfToday }, OR: [{ status: "delivered" }, { paymentStatus: "completed" }] }
+      }),
+      prisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { createdAt: { gte: startOfToday } }
+      }),
+      prisma.product.findMany({
+        where: productFilter,
+        select: { stock: true, price: true }
+      })
     ]);
+    
+    const todayRevenue = todayRevenueAgg?._sum?.grandTotal || 0;
+    const todayExpenses = todayExpensesAgg?._sum?.amount || 0;
+    const totalInventoryValue = (allProductsForValue || []).reduce((sum, p) => sum + ((p.stock || 0) * (p.price || 0)), 0);
 
     // Batch 2: Inventory & Users
     const [inventoryData, totalUsers, recentOrders] = await Promise.all([
@@ -237,7 +259,12 @@ export const getDashboardAnalytics = async (req, res) => {
       monthlyRevenue,
       statusCounts,
       lowStockProducts,
-      outOfStockCount
+      outOfStockCount,
+      dailyStats: {
+        revenue: todayRevenue,
+        expenses: todayExpenses
+      },
+      totalInventoryValue
     });
   } catch (err) {
     console.error("Dashboard analytics failed:", err);

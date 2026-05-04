@@ -17,11 +17,12 @@ router.get("/:id/related", productController.getRelatedProducts);
 
 
 // Seller/Staff routes
-router.get("/seller/my-products", authMiddleware(["seller", "admin", "inventory"]), productController.getSellerProducts);
+router.get("/seller/my-products", authMiddleware(["seller", "admin", "owner", "inventory"]), productController.getSellerProducts);
+router.get("/all", authMiddleware(["admin", "owner", "inventory"]), productController.getProductsAll);
 
 // Admin/Seller/Staff routes
-router.post("/", authMiddleware(["admin", "seller", "inventory"]), upload.any(), productController.createProduct);
-router.put("/:id", authMiddleware(["admin", "seller", "inventory"]), upload.any(), productController.updateProduct);
-router.delete("/:id", authMiddleware(["admin", "seller", "inventory"]), productController.deleteProduct);
+router.post("/", authMiddleware(["admin", "owner", "seller", "inventory"]), upload.any(), productController.createProduct);
+router.put("/:id", authMiddleware(["admin", "owner", "seller", "inventory"]), upload.any(), productController.updateProduct);
+router.delete("/:id", authMiddleware(["admin", "owner", "seller", "inventory"]), productController.deleteProduct);
 
 export default router;

@@ -90,7 +90,7 @@ export const authMiddleware = (requiredRoles = []) => {
 };
 
 export const verifyToken = authMiddleware();
-export const verifyAdmin = authMiddleware(["admin"]);
+export const verifyAdmin = authMiddleware(["admin", "owner"]);
 export const verifySeller = authMiddleware(["admin", "seller"]);
 
 export const optionalAuth = async (req, res, next) => {

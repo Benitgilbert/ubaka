@@ -765,3 +765,18 @@ export const getRelatedProducts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getProductsAll = async (req, res) => {
+    try {
+        const products = await prisma.product.findMany({
+            include: { 
+                seller: { select: { id: true, name: true, storeName: true } },
+                variations: true 
+            },
+            orderBy: { name: 'asc' }
+        });
+        res.json({ success: true, data: products });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

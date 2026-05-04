@@ -21,6 +21,7 @@ import AdminAttributes from "./pages/AdminAttributes";
 import AdminSettings from "./pages/AdminSettings";
 import AdminCategories from "./pages/AdminCategories";
 import FinanceDashboard from "./pages/admin/FinanceDashboard";
+import OwnerOverview from "./pages/admin/OwnerOverview";
 import POS from "./pages/admin/POS";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
@@ -138,6 +139,7 @@ function App() {
                     </ProtectedRoute>
                   }>
                     <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin/overview" element={<OwnerOverview />} />
                     <Route path="/admin/users" element={<AdminUsers />} />
                     <Route path="/admin/orders" element={<AdminOrders />} />
                     <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />

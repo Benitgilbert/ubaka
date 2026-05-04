@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../utils/axiosInstance";
 
 function ProductCreateEditModal({ product, onClose, onSaved }) {
+  console.log("ProductCreateEditModal Rendered", { type: product?.type });
   const isEdit = !!product;
   const [activeTab, setActiveTab] = useState("general");
   const [globalAttributes, setGlobalAttributes] = useState([]);
@@ -512,6 +513,7 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
                     onChange={handleChange}
                     placeholder="0"
                     readOnly={form.type === 'variable'}
+                    style={{ border: form.type === 'variable' ? '2px solid red' : '' }}
                     className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 dark:text-white transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500 ${form.type === 'variable' ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed opacity-80' : ''}`}
                   />
                 </div>

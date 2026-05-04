@@ -10,8 +10,8 @@ function Sidebar({ isOpen, onClose }) {
   const sidebarRef = useRef(null);
   const { user } = useAuth();
   const role = user?.role || 'customer';
-  const isAdmin = role === 'admin';
-  const isStaff = role === 'admin' || role === 'cashier' || role === 'inventory';
+  const isAdmin = role === 'admin' || role === 'owner';
+  const isStaff = role === 'admin' || role === 'owner' || role === 'cashier' || role === 'inventory';
 
   // Restore scroll position immediately after DOM updates
   useLayoutEffect(() => {
@@ -116,8 +116,11 @@ function Sidebar({ isOpen, onClose }) {
         {/* Navigation */}
         <nav className="flex-1 pb-4">
           <NavSection label="Overview">
+            <NavLink to="/admin/overview" icon={FaChartLine} iconColor="text-indigo-400">
+              Owner Overview
+            </NavLink>
             <NavLink to="/admin" icon={FaChartBar} iconColor="text-terracotta-400">
-              Dashboard
+              Admin Dashboard
             </NavLink>
           </NavSection>
 

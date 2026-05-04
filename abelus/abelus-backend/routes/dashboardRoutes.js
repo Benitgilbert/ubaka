@@ -10,11 +10,11 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/analytics", authMiddleware(["admin", "seller", "cashier"]), getDashboardAnalytics);
-router.get("/forecast", authMiddleware(["admin", "seller", "cashier"]), getForecast);
-router.get("/recommendations", authMiddleware(["admin", "seller", "cashier"]), getProductRecommendations);
-router.get("/anomalies", authMiddleware(["admin", "seller", "cashier"]), getAnomalies);
+router.get("/analytics", authMiddleware(["admin", "owner", "seller", "cashier"]), getDashboardAnalytics);
+router.get("/forecast", authMiddleware(["admin", "owner", "seller", "cashier"]), getForecast);
+router.get("/recommendations", authMiddleware(["admin", "owner", "seller", "cashier"]), getProductRecommendations);
+router.get("/anomalies", authMiddleware(["admin", "owner", "seller", "cashier"]), getAnomalies);
 
-router.post("/chatbot", authMiddleware(["admin", "seller"]), handleChatbotQueryLLM); // ✅ single chatbot route
+router.post("/chatbot", authMiddleware(["admin", "owner", "seller"]), handleChatbotQueryLLM); // ✅ single chatbot route
 
 export default router;

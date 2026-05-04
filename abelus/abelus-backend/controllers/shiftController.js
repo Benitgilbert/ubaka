@@ -166,6 +166,32 @@ export const getActiveShiftStats = async (req, res) => {
 };
 
 /**
+ * 🕒 Get any active shift for owner monitoring
+ */
+export const getActiveShiftForOwner = async (req, res) => {
+    try {
+        const shift = await prisma.shift.findFirst({
+            where: { status: "open" },
+            include: { user: { select: { id: true, name: true } } },
+            orderBy: { startTime: 'desc' }
+        });
+
+        if (!shift) {
+            return res.status(200).json({ success: true, data: null });
+        }
+
+        res.status(200).json({ success: true, data: {
+            ...shift,
+            staff: shift.user,
+            currentBalance: shift.expectedEndingDrawerAmount
+        }});
+    } catch (error) {
+        logger.error({ err: error }, "Failed to get any active shift");
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+/**
  * 🕒 Get list of shifts for the logged-in user
  */
 export const getMyShifts = async (req, res) => {

@@ -9,7 +9,8 @@ router.get("/current", authMiddleware(["admin", "seller", "cashier"]), getCurren
 router.get("/my-shifts", authMiddleware(["admin", "seller", "cashier"]), getMyShifts);
 router.get("/active-stats", authMiddleware(["admin", "seller", "cashier"]), getActiveShiftStats);
 router.post("/close", authMiddleware(["admin", "seller", "cashier"]), closeShift);
-router.get("/all", authMiddleware(["admin"]), getMyShifts); // Reusing getMyShifts which handles logic, but I should probably check if it needs a role-based override
-router.get("/:id/report", authMiddleware(["admin", "seller", "cashier"]), getShiftReport);
+router.get("/all", authMiddleware(["admin", "owner"]), getMyShifts);
+router.get("/active", authMiddleware(["admin", "owner"]), getActiveShiftForOwner);
+router.get("/:id/report", authMiddleware(["admin", "owner", "seller", "cashier"]), getShiftReport);
 
 export default router;

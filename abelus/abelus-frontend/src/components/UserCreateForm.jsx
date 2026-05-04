@@ -84,7 +84,7 @@ function UserCreateForm({ onSuccess, onCancel }) {
           onChange={handleChange}
           className="w-full px-4 py-2.5 bg-cream-100 dark:bg-charcoal-700 border border-transparent focus:border-terracotta-500 rounded-xl text-charcoal-800 dark:text-white outline-none transition-colors"
         >
-          {["customer", "cashier", "inventory", "delivery", "admin"].map(role => (
+          {["customer", "cashier", "inventory", "delivery", "owner", "admin"].map(role => (
             <option key={role} value={role}>
               {role.charAt(0).toUpperCase() + role.slice(1)}
             </option>
