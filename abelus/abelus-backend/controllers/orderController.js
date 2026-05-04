@@ -643,7 +643,7 @@ export const createPOSOrder = async (req, res) => {
         let productName = product.name;
 
         if (item.variationId) {
-          const variation = product.variations.find(v => v.sku === item.variationId);
+          const variation = product.variations.find(v => v.id === item.variationId || v.sku === item.variationId);
           if (!variation) throw new Error(`Variation ${item.variationId} not found`);
           
           // 📦 Multi-unit Stock Logic:
@@ -676,7 +676,7 @@ export const createPOSOrder = async (req, res) => {
 
         // Update product sales count
         if (item.variationId || product.type === 'service') {
-          const variation = item.variationId ? product.variations.find(v => v.sku === item.variationId) : null;
+          const variation = item.variationId ? product.variations.find(v => v.id === item.variationId || v.sku === item.variationId) : null;
           const decrementQty = Number(item.quantity) * (item.conversionFactor || variation?.conversionFactor || 1);
           
           await tx.product.update({
