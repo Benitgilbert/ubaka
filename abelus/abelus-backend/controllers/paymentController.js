@@ -31,10 +31,32 @@ export const processPayment = async (req, res, next) => {
       }
 
       // Initiate MoMo Payment
+      // Instant Success for POS (Simulation Mode)
+      if (order.orderType === "pos") {
+        await prisma.order.update({
+          where: { id: orderId },
+          data: {
+            paymentMethod: "mtn_momo",
+            paymentStatus: "completed",
+            paidAt: new Date()
+          }
+        });
+
+        return res.json({
+          success: true,
+          data: {
+            status: "completed",
+            message: "MoMo Payment Recorded Successfully (POS Instant Success)",
+            transactionId: `POS-MOMO-${Date.now()}`
+          },
+        });
+      }
+
+      // Normal behavior for online orders
       const result = await requestToPay({
         amount: order.grandTotal,
         phone,
-        orderId: order.publicId, // Use public ID for external reference
+        orderId: order.publicId,
       });
 
       await prisma.order.update({
