@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from "../utils/axiosInstance";
 import DashboardCards from "../components/DashboardCards";
 import RevenueChart from "../components/RevenueChart";
 import WeeklyProfitChart from "../components/WeeklyProfitChart";
@@ -11,24 +12,37 @@ import PendingApprovalsWidget from "../components/PendingApprovalsWidget";
 import OrderStatusChart from "../components/OrderStatusChart";
 
 function AdminDashboard() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const fetchDashboardData = async () => {
+    try {
+      const res = await api.get("/dashboard/analytics");
+      setData(res.data);
+    } catch (err) {
+      console.error("Failed to fetch dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Poll every 15 seconds
+    fetchDashboardData();
+    // Poll every 30 seconds instead of 15 to be safer
     const interval = setInterval(() => {
-      setRefreshKey(prev => prev + 1);
-    }, 15000);
+      fetchDashboardData();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col transition-all duration-300">
-      {/* Dashboard Content */}
       <main className="flex-1 p-4 lg:p-6 max-w-[1600px] w-full mx-auto">
 
           {/* Metrics Cards */}
           <section className="mb-8">
-            <DashboardCards refreshKey={refreshKey} setRefreshKey={setRefreshKey} />
+            <DashboardCards data={data} loading={loading} setRefreshKey={() => fetchDashboardData()} />
           </section>
 
           {/* Performance Analytics */}
@@ -38,10 +52,10 @@ function AdminDashboard() {
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <RevenueChart refreshKey={refreshKey} />
+                <RevenueChart data={data?.monthlyRevenue} loading={loading} />
               </div>
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <WeeklyProfitChart refreshKey={refreshKey} />
+                <WeeklyProfitChart data={data?.weeklyProfit} loading={loading} />
               </div>
             </div>
           </section>
@@ -53,13 +67,13 @@ function AdminDashboard() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <TopSellersWidget refreshKey={refreshKey} />
+                <TopSellersWidget sellers={data?.topSellers} loading={loading} />
               </div>
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <PendingApprovalsWidget refreshKey={refreshKey} />
+                <PendingApprovalsWidget approvals={data?.pendingSellerApprovals} loading={loading} />
               </div>
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow md:col-span-2 lg:col-span-1">
-                <OrderStatusChart refreshKey={refreshKey} />
+                <OrderStatusChart statusCounts={data?.statusCounts} loading={loading} />
               </div>
             </div>
           </section>
@@ -68,10 +82,10 @@ function AdminDashboard() {
           <section className="mb-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <LowStockWidget refreshKey={refreshKey} />
+                <LowStockWidget products={data?.lowStockProducts} outOfStockCount={data?.outOfStockCount} loading={loading} />
               </div>
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <RecentOrderTable refreshKey={refreshKey} />
+                <RecentOrderTable orders={data?.recentOrders} loading={loading} />
               </div>
             </div>
           </section>
@@ -80,10 +94,10 @@ function AdminDashboard() {
           <section>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <TopOrderedProductsTable refreshKey={refreshKey} />
+                <TopOrderedProductsTable products={data?.topProducts} loading={loading} />
               </div>
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700 hover:shadow-lg transition-shadow">
-                <CustomizationDemandTable refreshKey={refreshKey} />
+                <CustomizationDemandTable data={data} loading={loading} />
               </div>
             </div>
           </section>

@@ -1,51 +1,32 @@
-import { useEffect, useState } from "react";
-import api from "../utils/axiosInstance";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function OrderStatusChart({ refreshKey }) {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+function OrderStatusChart({ statusCounts = [], loading }) {
+    // Map status to colors
+    const statusColors = {
+        pending: '#f59e0b',    // amber-500
+        processing: '#3b82f6', // blue-500
+        shipped: '#8b5cf6',    // violet-500
+        delivered: '#10b981',  // emerald-500
+        cancelled: '#ef4444',  // red-500
+        refunded: '#6b7280'    // gray-500
+    };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await api.get("/dashboard/analytics");
-                const statusCounts = res.data.statusCounts || [];
+    const labels = statusCounts.map(s => s.id?.charAt(0).toUpperCase() + s.id?.slice(1) || 'Unknown');
+    const values = statusCounts.map(s => s.count);
+    const colors = statusCounts.map(s => statusColors[s.id] || '#9ca3af');
 
-                // Map status to colors
-                const statusColors = {
-                    pending: '#f59e0b',    // amber-500
-                    processing: '#3b82f6', // blue-500
-                    shipped: '#8b5cf6',    // violet-500
-                    delivered: '#10b981',  // emerald-500
-                    cancelled: '#ef4444',  // red-500
-                    refunded: '#6b7280'    // gray-500
-                };
-
-                const labels = statusCounts.map(s => s.id?.charAt(0).toUpperCase() + s.id?.slice(1) || 'Unknown');
-                const values = statusCounts.map(s => s.count);
-                const colors = statusCounts.map(s => statusColors[s.id] || '#9ca3af');
-
-                setData({
-                    labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: colors,
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                });
-            } catch (err) {
-                console.error("Failed to fetch status data:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [refreshKey]);
+    const data = {
+        labels,
+        datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderWidth: 0,
+            hoverOffset: 4
+        }]
+    };
 
     const options = {
         responsive: true,
@@ -88,7 +69,7 @@ function OrderStatusChart({ refreshKey }) {
         );
     }
 
-    if (!data || data.labels.length === 0) {
+    if (!statusCounts || statusCounts.length === 0) {
         return (
             <div className="bg-white dark:bg-charcoal-800 rounded-xl shadow-sm border border-cream-100 dark:border-charcoal-700 p-6 h-full">
                 <h3 className="text-lg font-bold text-charcoal-800 dark:text-white mb-4">Order Status Distribution</h3>

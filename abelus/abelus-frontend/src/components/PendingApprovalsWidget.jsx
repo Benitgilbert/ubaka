@@ -1,28 +1,7 @@
-import { useEffect, useState } from "react";
-import api from "../utils/axiosInstance";
 import { FaUserPlus, FaCheck, FaEye } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-function PendingApprovalsWidget({ refreshKey }) {
-    const [approvals, setApprovals] = useState([]);
-    const [stats, setStats] = useState({ pending: 0, total: 0, active: 0 });
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await api.get("/dashboard/analytics");
-                setApprovals(res.data.pendingSellerApprovals || []);
-                setStats(res.data.sellerStats || { pending: 0, total: 0, active: 0 });
-            } catch (err) {
-                console.error("Failed to fetch pending approvals:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [refreshKey]);
-
+function PendingApprovalsWidget({ approvals = [], stats = { pending: 0, total: 0, active: 0 }, loading }) {
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString('en-US', {
             month: 'short',

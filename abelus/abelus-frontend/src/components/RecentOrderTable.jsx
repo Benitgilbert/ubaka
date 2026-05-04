@@ -1,28 +1,4 @@
-import { useEffect, useState } from "react";
-import axios from "../utils/axiosInstance";
-
-function RecentOrderTable({ endpoint = "/analytics/recent-orders", refreshKey }) {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchRecentOrders = async (isPolling = false) => {
-      try {
-        if (!isPolling) setLoading(true);
-        const res = await axios.get(endpoint);
-        setOrders(res.data);
-      } catch (err) {
-        console.error("Failed to fetch recent orders:", err?.response?.data || err.message);
-        setError(err?.response?.data?.message || "Failed to load recent orders.");
-      } finally {
-        if (!isPolling) setLoading(false);
-      }
-    };
-
-    fetchRecentOrders(!!refreshKey);
-  }, [endpoint, refreshKey]);
-
+function RecentOrderTable({ orders = [], loading }) {
   if (loading) return (
     <div className="h-full flex items-center justify-center p-4">
       <div className="animate-pulse text-gray-400 dark:text-gray-500 text-sm">Loading recent orders...</div>
@@ -37,12 +13,6 @@ function RecentOrderTable({ endpoint = "/analytics/recent-orders", refreshKey })
           {orders.length} items
         </span>
       </div>
-
-      {error && (
-        <div className="mb-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-2 rounded">
-          {error}
-        </div>
-      )}
 
       <div className="flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-charcoal-600">
         <table className="w-full text-left border-collapse">
@@ -70,7 +40,7 @@ function RecentOrderTable({ endpoint = "/analytics/recent-orders", refreshKey })
                   #{order.publicId || order.id.slice(-6).toUpperCase()}
                 </td>
                 <td className="py-3 text-sm text-charcoal-800 dark:text-gray-200 font-medium">
-                  {order.customer?.name || order.guestInfo?.name || "Guest"}
+                  {order.customer?.name || "Guest"}
                 </td>
                 <td className="py-3 text-sm text-charcoal-600 dark:text-gray-400 max-w-[150px] truncate" title={order.items?.map(i => i.productName).join(", ")}>
                   {order.items?.map(i => i.productName).join(", ") || "N/A"}

@@ -1,27 +1,6 @@
-import { useEffect, useState } from "react";
-import api from "../utils/axiosInstance";
 import { FaExclamationTriangle, FaBox } from "react-icons/fa";
 
-function LowStockWidget({ refreshKey }) {
-    const [products, setProducts] = useState([]);
-    const [outOfStock, setOutOfStock] = useState(0);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await api.get("/dashboard/analytics");
-                setProducts(res.data.lowStockProducts || []);
-                setOutOfStock(res.data.outOfStockCount || 0);
-            } catch (err) {
-                console.error("Failed to fetch low stock:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [refreshKey]);
-
+function LowStockWidget({ products = [], outOfStockCount = 0, loading }) {
     const getStockClass = (stock) => {
         if (stock <= 3) return 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400';
         if (stock <= 5) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
@@ -32,7 +11,6 @@ function LowStockWidget({ refreshKey }) {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
 
-        // Ensure we don't have double slashes or missing slashes
         const baseUrl = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000';
         const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
 
@@ -55,14 +33,14 @@ function LowStockWidget({ refreshKey }) {
                     <FaExclamationTriangle className="text-terracotta-500" />
                     Inventory Alerts
                 </h3>
-                {outOfStock > 0 && (
+                {outOfStockCount > 0 && (
                     <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
-                        {outOfStock} out of stock
+                        {outOfStockCount} out of stock
                     </span>
                 )}
             </div>
 
-            {products.length === 0 && outOfStock === 0 ? (
+            {products.length === 0 && outOfStockCount === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
                     <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-3">
                         <FaBox className="text-green-600 dark:text-green-400 text-xl" />

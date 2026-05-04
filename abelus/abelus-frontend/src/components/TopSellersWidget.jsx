@@ -1,25 +1,6 @@
-import { useEffect, useState } from "react";
-import api from "../utils/axiosInstance";
 import { FaStore, FaMedal, FaChartLine } from "react-icons/fa";
 
-function TopSellersWidget({ refreshKey }) {
-    const [sellers, setSellers] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await api.get("/dashboard/analytics");
-                setSellers(res.data.topSellers || []);
-            } catch (err) {
-                console.error("Failed to fetch top sellers:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [refreshKey]);
-
+function TopSellersWidget({ sellers = [], loading }) {
     const getMedalColor = (index) => {
         switch (index) {
             case 0: return 'text-yellow-500 drop-shadow-sm'; // Gold
@@ -58,7 +39,7 @@ function TopSellersWidget({ refreshKey }) {
             ) : (
                 <div className="space-y-4">
                     {sellers.map((seller, idx) => (
-                        <div key={seller.sellerId} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-charcoal-700/50 hover:bg-gray-100 dark:hover:bg-charcoal-700 transition-colors">
+                        <div key={seller.sellerId || idx} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-charcoal-700/50 hover:bg-gray-100 dark:hover:bg-charcoal-700 transition-colors">
                             <div className={`text-xl flex-shrink-0 w-8 text-center ${getMedalColor(idx)}`}>
                                 {idx < 3 ? <FaMedal /> : <span className="font-bold text-sm text-gray-400">#{idx + 1}</span>}
                             </div>
