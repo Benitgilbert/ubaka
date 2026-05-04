@@ -54,6 +54,7 @@ import violationRoutes from "./routes/violationRoutes.js";
 import chatbotRoutes from "./routes/chatbotRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -181,6 +182,7 @@ app.use("/api/violations", violationRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/api", (req, res) => {
   res.json({
