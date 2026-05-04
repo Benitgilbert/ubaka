@@ -100,8 +100,14 @@ export const generateReport = async (req, res) => {
             return res.send(csv);
         }
 
-        // Export as PDF
-        const logoBuffer = await getLogoBuffer(user.storeLogo || settings?.logo || "assets/logo.png");
+        // Export as PDF with enhanced safety
+        let logoBuffer = null;
+        try {
+            const logoPath = user.storeLogo || settings?.logo || "assets/logo.png";
+            logoBuffer = await getLogoBuffer(logoPath);
+        } catch (e) {
+            console.warn("Logo loading failed, continuing without logo");
+        }
 
         // Better title formatting including dates with safety checks
         let reportDateTitle = "";
@@ -127,17 +133,21 @@ export const generateReport = async (req, res) => {
         const diffSign = cashDiscrepancy > 0 ? "+" : (cashDiscrepancy < 0 ? "-" : "");
         const diffValue = `${diffSign}RWF ${Math.abs(cashDiscrepancy).toLocaleString()}`;
 
+        const dateStr = new Date().toISOString().split('T')[0];
+        // Clean filename (remove special characters that might break headers)
+        const cleanTitle = performanceTitle.replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, '_');
+        const filename = `${cleanTitle}_${dateStr}.pdf`;
+
         const doc = createabelusPDF({
             title: performanceTitle,
             companyName: "PAPETERIE ABELUS",
             subtitle: "PASTORT BONUS CO.LTD",
             contentBuilder: (pdfDoc, helpers) => {
-                // 1. Strategic AI Insights (Top)
+                // ... (rest of the builder logic)
                 if (aiSummary) {
                     helpers.infoBox("Strategic AI Insights", aiSummary);
                 }
 
-                // 2. Financial Summary (4 Metric Cards)
                 helpers.metricCards([
                     { label: "Total Revenue", value: `RWF ${(summary?.totalRevenue ?? 0).toLocaleString()}`, color: "#1E3A8A" },
                     { label: "Total Expenses", value: `RWF ${(summary?.totalExpenses ?? 0).toLocaleString()}`, color: "#1F2937" },
@@ -145,9 +155,6 @@ export const generateReport = async (req, res) => {
                     { label: "Difference", value: diffValue, color: cashDiscrepancy === 0 ? "#059669" : (cashDiscrepancy > 0 ? "#059669" : "#B91C1C") }
                 ]);
 
-                // 3. (Alert box removed as requested)
-
-                // 4. Shift Activity Overview
                 if (type === "daily" && filters.shifts && filters.shifts.length > 0) {
                     helpers.section("Shift Activity Overview");
                     helpers.table({
@@ -161,19 +168,18 @@ export const generateReport = async (req, res) => {
                         rows: filters.shifts.map((shift, idx) => ({
                             index: idx + 1,
                             period: `${new Date(shift.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${shift.endTime ? new Date(shift.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "STILL OPEN"}`,
-                            opening: `RWF ${shift.startingDrawerAmount?.toLocaleString()}`,
-                            closing: `RWF ${(shift.actualEndingDrawerAmount || shift.expectedEndingDrawerAmount)?.toLocaleString()}`,
+                            opening: `RWF ${(shift.startingDrawerAmount ?? 0).toLocaleString()}`,
+                            closing: `RWF ${(shift.actualEndingDrawerAmount || shift.expectedEndingDrawerAmount || 0).toLocaleString()}`,
                             status: shift.status
                         }))
                     });
                 }
 
-                // 5. Transaction Detail
                 helpers.section("Transaction Detail");
-                const flattenedItems = orders.flatMap(o => o.items.map(i => ({
+                const flattenedItems = (orders || []).flatMap(o => (o.items || []).map(i => ({
                     ...i,
                     orderDate: new Date(o.createdAt).toLocaleDateString(),
-                    paymentMethod: (o.paymentMethod || "Cash").toLowerCase()
+                    paymentMethod: String(o.paymentMethod || "cash").toLowerCase()
                 })));
 
                 helpers.table({
@@ -201,7 +207,6 @@ export const generateReport = async (req, res) => {
                     }
                 });
 
-                // 6. Expenses Breakdown
                 if (filters.expenses && filters.expenses.length > 0) {
                     helpers.section("Expenses Breakdown");
                     helpers.table({
@@ -215,30 +220,19 @@ export const generateReport = async (req, res) => {
                             description: e.description,
                             category: e.category,
                             date: new Date(e.date).toLocaleDateString(),
-                            amount: `RWF ${e.amount.toLocaleString()}`
+                            amount: `RWF ${(e.amount ?? 0).toLocaleString()}`
                         }))
                     });
                 }
 
-                // 7. Signatory Section (Streamlined)
                 pdfDoc.moveDown(3);
                 pdfDoc.save().moveTo(pdfDoc.page.margins.left, pdfDoc.y).lineTo(pdfDoc.page.width - pdfDoc.page.margins.right, pdfDoc.y).strokeColor("#E2E8F0").lineWidth(0.5).stroke().restore();
                 pdfDoc.moveDown(1);
-
                 pdfDoc.fillColor("#1E293B").fontSize(10).font("Helvetica-Bold").text(`Prepared by: `, { lineBreak: false });
                 pdfDoc.font("Helvetica").fillColor("#475569").text(user.name);
             },
-            signatory: {
-                name: user.name,
-                title: user.role.toUpperCase(),
-                signatureImage: user.signatureImage,
-                stampImage: user.stampImage
-            },
             logoPath: logoBuffer
         });
-
-        const dateStr = new Date().toISOString().split('T')[0];
-        const filename = `${performanceTitle.replace(/\s+/g, '_')}_${dateStr}.pdf`;
 
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
@@ -248,7 +242,13 @@ export const generateReport = async (req, res) => {
     } catch (err) {
         console.error(`${req.query.type} report generation failed:`, err);
         if (!res.headersSent) {
-            res.status(500).json({ message: "Failed to generate report." });
+            res.status(500).json({ 
+                message: "Failed to generate report.", 
+                error: err.message,
+                stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+            });
         }
+    }
+};}
     }
 };
