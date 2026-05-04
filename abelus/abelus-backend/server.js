@@ -80,9 +80,10 @@ app.use(cors({
     const normalizedOrigin = origin.toLowerCase().trim();
     
     // Check if origin is in whitelist or is a vercel sub-domain
+    // Using a more robust regex for Vercel preview and production domains
     const isAllowed = allowedOrigins.some(ao => ao && ao.toLowerCase() === normalizedOrigin) || 
-                      normalizedOrigin.endsWith('.vercel.app') || 
-                      normalizedOrigin.endsWith('.vercel.dev') ||
+                      /\.vercel\.app$/.test(normalizedOrigin) || 
+                      /\.vercel\.dev$/.test(normalizedOrigin) ||
                       normalizedOrigin.endsWith('.amplifyapp.com');
                       
     if (isAllowed) {
