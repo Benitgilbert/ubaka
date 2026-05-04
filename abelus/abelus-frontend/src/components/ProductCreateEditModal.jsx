@@ -278,15 +278,12 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
         }
 
         // 2. Calculate Total Stock from Variations
-        // If conversion factors are used, we look for the "Base Unit" (Factor 1)
-        // as the master stock. If multiple variations have factor 1, we sum them.
-        // If no factor 1 exists, we sum (stock * factor).
-        const baseVariations = form.variations.filter(v => (v.conversionFactor || 1) === 1);
-        if (baseVariations.length > 0) {
-          finalStock = baseVariations.reduce((a, b) => a + Number(b.stock || 0), 0);
-        } else {
-          finalStock = form.variations.reduce((a, b) => a + (Number(b.stock || 0) * (b.conversionFactor || 1)), 0);
-        }
+        // Total Stock = Sum of (Variation Stock * Conversion Factor)
+        finalStock = form.variations.reduce((a, b) => {
+          const qty = Number(b.stock || 0);
+          const factor = Number(b.conversionFactor || 1);
+          return a + (qty * factor);
+        }, 0);
       }
 
       if (finalPrice !== "" && finalPrice !== null && finalPrice !== undefined) {
@@ -500,14 +497,22 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
 
               {form.type !== 'service' && (
                 <div className="md:col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Stock (Total)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Stock (Total)
+                    {form.type === 'variable' && (
+                      <span className="ml-2 text-[10px] text-indigo-600 dark:text-indigo-400 font-normal italic">(Auto-calculated)</span>
+                    )}
+                  </label>
                   <input
                     type="number"
                     name="stock"
-                    value={form.stock}
+                    value={form.type === 'variable' ? 
+                      form.variations.reduce((sum, v) => sum + (Number(v.stock || 0) * Number(v.conversionFactor || 1)), 0) 
+                      : form.stock}
                     onChange={handleChange}
                     placeholder="0"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 dark:text-white transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500"
+                    readOnly={form.type === 'variable'}
+                    className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 dark:text-white transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500 ${form.type === 'variable' ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed opacity-80' : ''}`}
                   />
                 </div>
               )}

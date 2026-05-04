@@ -265,6 +265,15 @@ export const createProduct = async (req, res) => {
       body.price = Number(body.price);
     }
 
+    // Calculate total stock for variable products
+    if (body.type === 'variable' && variations.length > 0) {
+      body.stock = variations.reduce((sum, v) => {
+        const qty = Number(v.stock) || 0;
+        const factor = Number(v.conversionFactor) || 1;
+        return sum + (qty * factor);
+      }, 0);
+    }
+
     const product = await prisma.product.create({
       data: {
         ...body,
@@ -643,6 +652,22 @@ export const updateProduct = async (req, res) => {
     }
     delete body.categories;
     delete body.category;
+
+    // Calculate total stock for variable products
+    if (body.type === 'variable' && variations.length > 0) {
+      body.stock = variations.reduce((sum, v) => {
+        const qty = Number(v.stock) || 0;
+        const factor = Number(v.conversionFactor) || 1;
+        return sum + (qty * factor);
+      }, 0);
+    } else if (existing.type === 'variable' && variations.length > 0) {
+        // Even if type is not in body, if existing is variable
+        body.stock = variations.reduce((sum, v) => {
+          const qty = Number(v.stock) || 0;
+          const factor = Number(v.conversionFactor) || 1;
+          return sum + (qty * factor);
+        }, 0);
+    }
 
     const product = await prisma.product.update({
       where: { id: req.params.id },
