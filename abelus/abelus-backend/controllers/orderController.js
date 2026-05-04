@@ -609,7 +609,9 @@ export const createPOSOrder = async (req, res) => {
     }
 
     const settings = await getCommissionSettings();
-    const appliedRate = settings.posRate ?? settings.defaultRate ?? 10;
+    const appliedRate = Number(settings.posRate ?? settings.defaultRate ?? 10);
+
+    console.log(`[POS] Starting order for user ${userId} (${userRole}). Applied rate: ${appliedRate}%`);
 
     // 🔒 Atomic transaction: stock validation + decrement + order creation
     const { order, orderItemsData, subtotal } = await prisma.$transaction(async (tx) => {
@@ -791,6 +793,8 @@ export const createPOSOrder = async (req, res) => {
       const cashAccId = await ensureAccount("Cash on Hand", "Asset", "1000");
       const salesAccId = await ensureAccount("Sales Revenue", "Revenue", "4000");
 
+      const effectiveEarningUserId = userRole === "cashier" ? req.user.managedById : userId;
+
       if (userRole === "admin") {
         const productNames = orderItemsData.map(i => i.productName).join(", ");
         const desc = `POS Sale (Admin): ${productNames.length > 40 ? productNames.substring(0, 37) + "..." : productNames}`;
@@ -829,15 +833,18 @@ export const createPOSOrder = async (req, res) => {
             });
           }
         }
-      } else if (userRole === "seller") {
-        const commissionAmount = subtotal * (appliedRate / 100);
+      } else if (userRole === "seller" || userRole === "cashier") {
+        const earningSellerId = userRole === "cashier" ? req.user.managedById : userId;
+        console.log(`[POS] Recording earnings for seller ${earningSellerId} (Processed by ${userRole})`);
+
+        const commissionAmount = (subtotal || 0) * (appliedRate / 100);
         for (const item of orderItemsData) {
-          const gross = item.subtotal;
+          const gross = item.subtotal || 0;
           const commAmt = gross * (appliedRate / 100);
           const net = gross - commAmt;
           await prisma.sellerEarning.create({
             data: {
-              sellerId: userId,
+              sellerId: earningSellerId,
               orderId: order.id,
               orderPublicId: order.publicId,
               productId: item.productId,
@@ -871,13 +878,18 @@ export const createPOSOrder = async (req, res) => {
         }
       }
     } catch (finErr) {
-      console.error("POS Finance Error:", finErr);
+      console.error("[POS] Financial recording failed:", finErr);
     }
 
+    console.log(`[POS] Order ${order.publicId} created successfully`);
     res.status(201).json(order);
   } catch (err) {
-    console.error("POS Order failed:", err);
-    res.status(500).json({ message: err.message || "Failed to process POS order" });
+    console.error("[POS] CRITICAL FAILURE:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Failed to process POS order",
+      errorDetails: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 };
 
