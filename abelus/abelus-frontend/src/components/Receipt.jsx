@@ -21,48 +21,73 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
 
     const handlePrint = () => {
         const printContent = receiptRef.current.innerHTML;
-        const printWindow = window.open('', '', 'width=300,height=600');
+        const printWindow = window.open('', '', 'width=400,height=600');
         printWindow.document.write(`
             <html>
             <head>
-                <title>Receipt</title>
+                <title>Receipt - ${order.publicId}</title>
                 <style>
+                    @page { margin: 0; }
                     body {
-                        font-family: 'Courier New', monospace;
-                        font-size: 12px;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 13px;
                         width: 80mm;
                         margin: 0 auto;
                         padding: 10px;
+                        color: #000;
                     }
-                    .receipt-header { text-align: center; margin-bottom: 10px; }
-                    .store-name { font-size: 16px; font-weight: bold; }
-                    .store-info { font-size: 10px; color: #666; }
-                    .divider { border-top: 1px dashed #333; margin: 8px 0; }
-                    .receipt-meta { font-size: 10px; }
-                    .items-table { width: 100%; }
-                    .items-table td { padding: 2px 0; }
-                    .item-name { max-width: 150px; }
-                    .item-qty { text-align: center; width: 30px; }
-                    .item-price { text-align: right; }
-                    .totals { margin-top: 10px; }
-                    .total-row { display: flex; justify-content: space-between; }
-                    .grand-total { font-size: 14px; font-weight: bold; }
-                    .payment-info { margin-top: 10px; font-size: 10px; }
-                    .thank-you { text-align: center; margin-top: 15px; font-style: italic; }
+                    /* Map Tailwind classes for the print window */
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    .text-lg { font-size: 18px; }
+                    .text-sm { font-size: 14px; }
+                    .text-xs { font-size: 11px; }
+                    .font-bold { font-weight: bold; }
+                    .font-mono { font-family: 'Courier New', monospace; }
+                    .italic { font-style: italic; }
+                    .mb-4 { margin-bottom: 16px; }
+                    .mb-2 { margin-bottom: 8px; }
+                    .mt-1 { margin-top: 4px; }
+                    .mt-2 { margin-top: 8px; }
+                    .mt-6 { margin-top: 24px; }
+                    .my-3 { margin: 12px 0; }
+                    .flex { display: flex; }
+                    .justify-between { justify-content: space-between; }
+                    .w-full { width: 100%; }
+                    .space-y-0\\.5 > * + * { margin-top: 2px; }
+                    .space-y-1 > * + * { margin-top: 4px; }
+                    
+                    /* Divider styling */
+                    .border-t { border-top: 1px solid #000; }
+                    .border-dashed { border-style: dashed; }
+                    
+                    /* Table styling */
+                    table { width: 100%; border-collapse: collapse; }
+                    td { vertical-align: top; }
+                    
+                    /* Hide scrollbars and UI elements */
+                    img { max-height: 50px; display: block; margin: 0 auto 8px; }
+
                     @media print {
-                        body { width: 80mm; }
+                        body { width: 72mm; margin: 0; padding: 5mm; }
+                        .no-print { display: none; }
                     }
                 </style>
             </head>
             <body>
-                ${printContent}
+                <div class="receipt-container">
+                    ${printContent}
+                </div>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        setTimeout(function() { window.close(); }, 500);
+                    };
+                </script>
             </body>
             </html>
         `);
         printWindow.document.close();
-        printWindow.print();
-        printWindow.close();
-        if (onPrint) onPrint();
     };
 
     const formatDate = (date) => {
