@@ -104,7 +104,6 @@ export default function SellerPOS() {
 
     // Modals
     const [showMomoModal, setShowMomoModal] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState("");
     const [pendingOrder, setPendingOrder] = useState(null);
 
     const [showCashConfirm, setShowCashConfirm] = useState(false);
