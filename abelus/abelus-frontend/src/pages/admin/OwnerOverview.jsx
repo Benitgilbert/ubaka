@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { 
   FaChartLine, FaWallet, FaBox, FaShoppingCart, FaUserTie, 
   FaArrowDown, FaSync, FaDownload, FaHistory,
-  FaExclamationTriangle, FaCheckCircle, FaSearch, FaArrowRight
+  FaCheckCircle, FaSearch, FaArrowRight
 } from "react-icons/fa";
 import api from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
