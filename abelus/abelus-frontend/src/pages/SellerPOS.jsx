@@ -50,6 +50,7 @@ export default function SellerPOS() {
     const [shiftReport, setShiftReport] = useState(null);
     const [showAbonneSplitModal, setShowAbonneSplitModal] = useState(false);
     const [abonneUpfrontCash, setAbonneUpfrontCash] = useState("");
+    const [collectedBy, setCollectedBy] = useState("");
 
     // Expenses
     const [showExpenseModal, setShowExpenseModal] = useState(false);
@@ -75,7 +76,8 @@ export default function SellerPOS() {
                 })),
                 paymentMethod: "client_abonne",
                 clientId: selectedClient.id,
-                upfrontCashPaid: Number(abonneUpfrontCash) || 0
+                upfrontCashPaid: Number(abonneUpfrontCash) || 0,
+                collectedBy: collectedBy
             });
 
             const order = {
@@ -92,6 +94,7 @@ export default function SellerPOS() {
             setShowReceipt(true);
             setShowAbonneSplitModal(false);
             setAbonneUpfrontCash("");
+            setCollectedBy("");
             setCart([]);
             fetchProducts();
         } catch (err) {
@@ -1408,6 +1411,18 @@ export default function SellerPOS() {
                                                 />
                                             </div>
                                             <p className="text-[10px] text-gray-400 font-medium ml-1">Remaining RWF {(calculateTotal() - (Number(abonneUpfrontCash) || 0)).toLocaleString()} will be added to debt.</p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Collected By (Worker Name)</label>
+                                            <input
+                                                type="text"
+                                                className="w-full px-4 py-4 bg-gray-50 dark:bg-gray-700/50 border-2 border-gray-100 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-bold dark:text-white"
+                                                placeholder="e.g. Jean Pierre (Worker)"
+                                                value={collectedBy}
+                                                onChange={(e) => setCollectedBy(e.target.value)}
+                                            />
+                                            <p className="text-[10px] text-gray-400 font-medium ml-1">Who is physically taking the items today?</p>
                                         </div>
 
                                         <div className="flex gap-4">

@@ -47,10 +47,12 @@ const getRangeReport = async (start, end, sellerId) => {
   }
 
   const abonneTransactions = await prisma.abonneTransaction.findMany({
-    where: {
-        ...abonneWhere,
-        amountPaid: { gt: 0 } // Only payments
-    }
+    where: abonneWhere,
+    include: {
+      client: { select: { name: true } },
+      responsible: { select: { name: true } }
+    },
+    orderBy: { date: 'desc' }
   });
 
   const productCount = {};
@@ -137,7 +139,7 @@ const getRangeReport = async (start, end, sellerId) => {
     topCustomization,
   };
 
-  return { orders, summary, expenses, shifts };
+  return { orders, summary, expenses, shifts, abonneTransactions };
 };
 
 /**

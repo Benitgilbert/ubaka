@@ -63,6 +63,7 @@ export const generateReport = async (req, res) => {
             summary = result.summary;
             filters.expenses = result.expenses;
             filters.shifts = result.shifts;
+            filters.abonneTransactions = result.abonneTransactions;
         } catch (buildError) {
             console.error("buildReportData error:", buildError);
             return res.status(500).json({ message: `Failed to build report data: ${buildError.message}` });
@@ -221,6 +222,28 @@ export const generateReport = async (req, res) => {
                             category: e.category,
                             date: new Date(e.date).toLocaleDateString('en-GB', { timeZone: 'Africa/Kigali' }),
                             amount: `RWF ${(e.amount ?? 0).toLocaleString()}`
+                        }))
+                    });
+                }
+
+                if (filters.abonneTransactions && filters.abonneTransactions.length > 0) {
+                    helpers.section("Client Abonne (Credit/Debt) Transactions");
+                    helpers.table({
+                        columns: [
+                            { header: "Date", key: "date", width: 60 },
+                            { header: "Client", key: "client", width: 100 },
+                            { header: "Representative", key: "rep", width: 100 },
+                            { header: "Item/Service", key: "designation", width: 120 },
+                            { header: "Qty", key: "quantity", width: 30, align: "center" },
+                            { header: "Total Value", key: "pt", width: 70, align: "right" }
+                        ],
+                        rows: filters.abonneTransactions.map(tx => ({
+                            date: new Date(tx.date).toLocaleDateString('en-GB', { timeZone: 'Africa/Kigali' }),
+                            client: tx.client?.name || "Unknown",
+                            rep: tx.collectedBy || "N/A",
+                            designation: tx.designation,
+                            quantity: tx.quantity,
+                            pt: `RWF ${(tx.pt ?? 0).toLocaleString()}`
                         }))
                     });
                 }

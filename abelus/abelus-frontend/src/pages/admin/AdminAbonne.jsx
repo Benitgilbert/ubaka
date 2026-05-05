@@ -575,6 +575,7 @@ const AdminAbonne = () => {
                                                     <th className="border border-black p-2 text-right">PU (RWF)</th>
                                                     <th className="border border-black p-2 text-right">PT (RWF)</th>
                                                     <th className="border border-black p-2 text-right text-red-600">DEBT (RWF)</th>
+                                                    <th className="border border-black p-2">COLLECTED BY</th>
                                                     <th className="border border-black p-2">RESPONSIBLE</th>
                                                     <th className="border border-black p-2">SIGNATURE</th>
                                                 </tr>
@@ -588,13 +589,14 @@ const AdminAbonne = () => {
                                                         <td className="border border-black p-2 text-right">{tx.pu.toLocaleString()}</td>
                                                         <td className="border border-black p-2 text-right">{tx.pt.toLocaleString()}</td>
                                                         <td className="border border-black p-2 text-right font-bold text-red-600">{tx.debtAmount.toLocaleString()}</td>
+                                                        <td className="border border-black p-2 text-[10px] font-bold">{tx.collectedBy || "-"}</td>
                                                         <td className="border border-black p-2 text-xs">{tx.responsible?.name || "System"}</td>
                                                         <td className="border border-black p-2"></td>
                                                     </tr>
                                                 ))}
                                                 {clientFiche.length === 0 && (
                                                     <tr>
-                                                        <td colSpan="8" className="p-8 text-center text-gray-500 italic">No unpaid transactions recorded.</td>
+                                                        <td colSpan="9" className="p-8 text-center text-gray-500 italic">No unpaid transactions recorded.</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -604,7 +606,7 @@ const AdminAbonne = () => {
                                                         <td colSpan="4" className="border border-black p-3 text-right text-xs">TOTAL GLOBAL (TG):</td>
                                                         <td className="border border-black p-3 text-right">{clientFiche.reduce((sum, tx) => sum + tx.pt, 0).toLocaleString()}</td>
                                                         <td className="border border-black p-3 text-right text-red-600">RWF {selectedClient.totalDebt.toLocaleString()}</td>
-                                                        <td colSpan="2" className="border border-black p-3 bg-white"></td>
+                                                        <td colSpan="3" className="border border-black p-3 bg-white"></td>
                                                     </tr>
                                                 </tfoot>
                                             )}

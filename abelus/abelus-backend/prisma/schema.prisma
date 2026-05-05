@@ -404,8 +404,9 @@ model AbonneTransaction {
   orderId       String?
   order         Order?   @relation(fields: [orderId], references: [id])
 
-  responsibleId String
-  responsible   User     @relation(fields: [responsibleId], references: [id])
+  collectedBy   String?  // Name of the client's representative (worker) who took the product
+  responsibleId String?
+  responsible   User?    @relation(fields: [responsibleId], references: [id])
 
   shiftId       String?
   shift         Shift?   @relation(fields: [shiftId], references: [id])

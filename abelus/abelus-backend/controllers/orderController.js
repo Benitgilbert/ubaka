@@ -757,6 +757,7 @@ export const createPOSOrder = async (req, res) => {
             orderId: txOrder.id,
             responsibleId: userId,
             shiftId: activeShift.id, // Linked during creation
+            collectedBy: req.body.collectedBy || null,
             designation: item.productName,
             quantity: item.quantity,
             pu: item.price,
