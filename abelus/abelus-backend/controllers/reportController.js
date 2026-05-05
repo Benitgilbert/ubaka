@@ -233,20 +233,18 @@ export const generateReport = async (req, res) => {
                     helpers.table({
                         columns: [
                             { header: "Date", key: "date", width: 55 },
-                            { header: "Client", key: "client", width: 75 },
-                            { header: "CASHIER", key: "staff", width: 60 },
-                            { header: "RESPONSIBLE", key: "rep", width: 60 },
-                            { header: "Item/Service", key: "designation", width: 70 },
+                            { header: "Client", key: "client", width: 105 },
+                            { header: "RESPONSIBLE", key: "rep", width: 70 },
+                            { header: "Item/Service", key: "designation", width: 100 },
                             { header: "Qty", key: "quantity", width: 25, align: "center" },
-                            { header: "Total", key: "pt", width: 60, align: "right" },
-                            { header: "Balance", key: "owed", width: 60, align: "right" },
+                            { header: "Total", key: "pt", width: 55, align: "right" },
+                            { header: "Balance", key: "owed", width: 55, align: "right" },
                             { header: "Status", key: "status", width: 30, align: "center" }
                         ],
                         rows: filters.abonneTransactions.map(tx => ({
                             date: new Date(tx.date).toLocaleDateString('en-GB', { timeZone: 'Africa/Kigali' }),
                             client: tx.client?.name || "Unknown",
                             rep: tx.collectedBy || "N/A",
-                            staff: tx.responsible?.name || "System",
                             designation: tx.designation,
                             quantity: tx.quantity,
                             pt: `RWF ${(tx.pt ?? 0).toLocaleString()}`,
