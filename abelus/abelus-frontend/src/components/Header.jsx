@@ -311,9 +311,9 @@ export default function Header() {
                     </div>
                     <div className="p-1">
                       {/* Unified Dashboard Link */}
-                      {user?.role === 'admin' && (
-                        <Link to="/admin" className="flex items-center gap-3 px-4 py-2.5 text-sm text-terracotta-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
-                          <LuShieldAlert className="w-4 h-4" /> Admin Panel
+                      {(user?.role === 'admin' || user?.role === 'owner') && (
+                        <Link to="/admin/overview" className="flex items-center gap-3 px-4 py-2.5 text-sm text-terracotta-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
+                          <LuShieldAlert className="w-4 h-4" /> {user?.role === 'owner' ? 'Owner Overview' : 'Admin Panel'}
                         </Link>
                       )}
                       

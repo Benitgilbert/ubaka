@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     // If roles are specified, check if user has permission
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
         // Redirect logic based on role
-        if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+        if (user?.role === 'admin' || user?.role === 'owner') return <Navigate to="/admin/overview" replace />;
         if (user?.role === 'seller') return <Navigate to="/seller/dashboard" replace />;
         return <Navigate to="/" replace />; // Default for user
     }

@@ -38,14 +38,13 @@ function Login() {
       try { await mergeCart(); } catch (e) { console.error("Cart merge failed", e); }
 
       // Smart redirection based on role
-      // Note: We might need to fetch the role from the backend if not in metadata
       const from = location.state?.from?.pathname;
       const role = localStorage.getItem('userRole') || 'customer';
 
       if (from) {
         navigate(from, { replace: true });
-      } else if (role === "admin") {
-        navigate("/admin");
+      } else if (role === "admin" || role === "owner") {
+        navigate("/admin/overview");
       } else if (role === "seller" || role === "cashier") {
         navigate("/seller/dashboard");
       } else {
@@ -179,6 +178,11 @@ function Login() {
             </div>
 
             <p className="mt-8 text-center text-sm font-medium text-charcoal-500 dark:text-charcoal-400">
+              {(user?.role === 'admin' || user?.role === 'owner') && (
+                <Link to="/admin/overview" className="flex items-center gap-3 px-4 py-2.5 text-sm text-terracotta-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
+                  <LuShieldAlert className="w-4 h-4" /> {user?.role === 'owner' ? 'Owner Overview' : 'Admin Panel'}
+                </Link>
+              )}
               Don't have an account?{' '}
               <Link to="/register" className="font-black text-terracotta-500 dark:text-terracotta-400 hover:text-terracotta-400 transition-colors">
                 Create one now
