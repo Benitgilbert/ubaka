@@ -10,8 +10,15 @@ function Sidebar({ isOpen, onClose }) {
   const sidebarRef = useRef(null);
   const { user } = useAuth();
   const role = user?.role || 'customer';
-  const isAdmin = role === 'admin' || role === 'owner';
-  const isStaff = role === 'admin' || role === 'owner' || role === 'cashier' || role === 'inventory';
+  
+  const isOwner = role === 'owner';
+  const isAdminOnly = role === 'admin';
+  const isAdminOrOwner = role === 'admin' || role === 'owner';
+  const isStaff = isAdminOrOwner || role === 'cashier' || role === 'inventory';
+
+  // Navigation Logic: Owner sees Management Center, Admin sees Operational Dashboard
+  const showOwnerOverview = isOwner;
+  const showAdminDashboard = isAdminOnly;
 
   // Restore scroll position immediately after DOM updates
   useLayoutEffect(() => {
@@ -101,7 +108,7 @@ function Sidebar({ isOpen, onClose }) {
                 ABELUS
               </h1>
               <p className="text-[10px] text-charcoal-400 uppercase tracking-[0.2em] mt-0.5">
-                Admin Portal
+                {isOwner ? "Owner Portal" : "Admin Portal"}
               </p>
             </div>
             <button
@@ -116,57 +123,61 @@ function Sidebar({ isOpen, onClose }) {
         {/* Navigation */}
         <nav className="flex-1 pb-4">
           <NavSection label="Overview">
-            <NavLink to="/admin/overview" icon={FaChartLine} iconColor="text-indigo-400">
-              Owner Overview
-            </NavLink>
-            <NavLink to="/admin" icon={FaChartBar} iconColor="text-terracotta-400">
-              Admin Dashboard
-            </NavLink>
+            {showOwnerOverview && (
+              <NavLink to="/admin/overview" icon={FaChartLine} iconColor="text-indigo-400">
+                Management Center
+              </NavLink>
+            )}
+            {showAdminDashboard && (
+              <NavLink to="/admin" icon={FaChartBar} iconColor="text-terracotta-400">
+                Operational Dashboard
+              </NavLink>
+            )}
           </NavSection>
 
           <NavSection label="Management">
-            {isAdmin && <NavLink to="/admin/users" icon={FaUser}>Users</NavLink>}
-            {isAdmin && <NavLink to="/admin/sellers" icon={FaStore} iconColor="text-amber-400">Sellers</NavLink>}
-            {isAdmin && <NavLink to="/admin/violations" icon={FaExclamationTriangle} iconColor="text-red-400">Violations</NavLink>}
-            {isAdmin && <NavLink to="/admin/seller-reports" icon={FaChartLine} iconColor="text-indigo-400">Seller Reports</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/users" icon={FaUser}>Users</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/sellers" icon={FaStore} iconColor="text-amber-400">Sellers</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/violations" icon={FaExclamationTriangle} iconColor="text-red-400">Violations</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/seller-reports" icon={FaChartLine} iconColor="text-indigo-400">Seller Reports</NavLink>}
             {isStaff && <NavLink to="/admin/orders" icon={FaBox} iconColor="text-blue-400">Orders</NavLink>}
-            {isAdmin && <NavLink to="/admin/orders?status=quote_requested" icon={FaQuestionCircle} iconColor="text-teal-400">Inquiries</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/orders?status=quote_requested" icon={FaQuestionCircle} iconColor="text-teal-400">Inquiries</NavLink>}
             {isStaff && <NavLink to="/admin/products" icon={FaBox} iconColor="text-sage-400">Products</NavLink>}
-            {isAdmin && <NavLink to="/admin/product-approval" icon={FaClipboardCheck} iconColor="text-orange-400">Product Approval</NavLink>}
-            {isAdmin && <NavLink to="/admin/shifts" icon={FaHistory} iconColor="text-terracotta-400">Shifts</NavLink>}
-            {isAdmin && <NavLink to="/admin/categories" icon={FaFolder} iconColor="text-sand-400">Categories</NavLink>}
-            {isAdmin && <NavLink to="/admin/attributes" icon={FaTags} iconColor="text-purple-400">Attributes</NavLink>}
-            {isAdmin && <NavLink to="/admin/reviews" icon={FaStar} iconColor="text-yellow-400">Reviews</NavLink>}
-            {isAdmin && <NavLink to="/admin/tickets" icon={FaHeadset} iconColor="text-indigo-400">Support Tickets</NavLink>}
-            {isAdmin && <NavLink to="/admin/customer-queries" icon={FaRobot} iconColor="text-teal-400">AI Customer Queries</NavLink>}
-            {isAdmin && <NavLink to="/admin/abonnes" icon={FaUserFriends} iconColor="text-emerald-400">Abonnés</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/product-approval" icon={FaClipboardCheck} iconColor="text-orange-400">Product Approval</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/shifts" icon={FaHistory} iconColor="text-terracotta-400">Shifts</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/categories" icon={FaFolder} iconColor="text-sand-400">Categories</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/attributes" icon={FaTags} iconColor="text-purple-400">Attributes</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/reviews" icon={FaStar} iconColor="text-yellow-400">Reviews</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/tickets" icon={FaHeadset} iconColor="text-indigo-400">Support Tickets</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/customer-queries" icon={FaRobot} iconColor="text-teal-400">AI Customer Queries</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/abonnes" icon={FaUserFriends} iconColor="text-emerald-400">Abonnés</NavLink>}
           </NavSection>
 
 
           <NavSection label="Marketing">
-            <NavLink to="/admin/coupons" icon={FaTicketAlt} iconColor="text-pink-400">Coupons</NavLink>
-            <NavLink to="/admin/gift-cards" icon={FaGift} iconColor="text-orange-400">Gift Cards</NavLink>
-            <NavLink to="/admin/gift-card-products" icon={FaGift} iconColor="text-emerald-400">Gift Card Products</NavLink>
-            <NavLink to="/admin/flash-sales" icon={FaFire} iconColor="text-red-500">Flash Sales</NavLink>
-            <NavLink to="/admin/banners" icon={FaDesktop} iconColor="text-violet-400">Banners</NavLink>
-            <NavLink to="/admin/testimonials" icon={FaQuoteLeft} iconColor="text-cyan-400">Testimonials</NavLink>
-            <NavLink to="/admin/blogs" icon={FaNewspaper} iconColor="text-terracotta-400">Blogs</NavLink>
-            <NavLink to="/admin/brand-partners" icon={FaHandshake} iconColor="text-amber-400">Brand Partners</NavLink>
+            {isAdminOnly && <NavLink to="/admin/coupons" icon={FaTicketAlt} iconColor="text-pink-400">Coupons</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/gift-cards" icon={FaGift} iconColor="text-orange-400">Gift Cards</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/gift-card-products" icon={FaGift} iconColor="text-emerald-400">Gift Card Products</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/flash-sales" icon={FaFire} iconColor="text-red-500">Flash Sales</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/banners" icon={FaDesktop} iconColor="text-violet-400">Banners</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/testimonials" icon={FaQuoteLeft} iconColor="text-cyan-400">Testimonials</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/blogs" icon={FaNewspaper} iconColor="text-terracotta-400">Blogs</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/brand-partners" icon={FaHandshake} iconColor="text-amber-400">Brand Partners</NavLink>}
           </NavSection>
 
           <NavSection label="Finance">
-            {isAdmin && <NavLink to="/admin/finance" icon={FaMoneyBillWave} iconColor="text-sage-400">Finance</NavLink>}
-            {isAdmin && <NavLink to="/admin/commissions" icon={FaPercent} iconColor="text-emerald-400">Commissions</NavLink>}
-            {isAdmin && <NavLink to="/admin/payouts" icon={FaDollarSign} iconColor="text-violet-400">Payouts</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/finance" icon={FaMoneyBillWave} iconColor="text-sage-400">Finance</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/commissions" icon={FaPercent} iconColor="text-emerald-400">Commissions</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/payouts" icon={FaDollarSign} iconColor="text-violet-400">Payouts</NavLink>}
           </NavSection>
 
           <NavSection label="Configuration">
-            <NavLink to="/admin/site-settings" icon={FaGlobe} iconColor="text-sage-400">Site Settings</NavLink>
-            <NavLink to="/admin/subscribers" icon={FaEnvelope} iconColor="text-pink-400">Subscribers</NavLink>
-            <NavLink to="/admin/delivery" icon={FaTruck} iconColor="text-blue-400">Delivery</NavLink>
-            <NavLink to="/admin/taxes" icon={FaPercentage} iconColor="text-orange-400">Taxes</NavLink>
-            <NavLink to="/admin/reports" icon={FaFileAlt} iconColor="text-charcoal-400">Reports</NavLink>
-            <NavLink to="/admin/settings" icon={FaCog} iconColor="text-charcoal-400">Settings</NavLink>
+            {isAdminOnly && <NavLink to="/admin/site-settings" icon={FaGlobe} iconColor="text-sage-400">Site Settings</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/subscribers" icon={FaEnvelope} iconColor="text-pink-400">Subscribers</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/delivery" icon={FaTruck} iconColor="text-blue-400">Delivery</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/taxes" icon={FaPercentage} iconColor="text-orange-400">Taxes</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/reports" icon={FaFileAlt} iconColor="text-charcoal-400">Reports</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/settings" icon={FaCog} iconColor="text-charcoal-400">Settings</NavLink>}
           </NavSection>
         </nav>
 
