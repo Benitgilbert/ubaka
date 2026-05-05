@@ -209,12 +209,12 @@ export const generateReport = async (req, res) => {
                 });
 
                 if (filters.expenses && filters.expenses.length > 0) {
-                    helpers.section("Expenses Breakdown");
+                    helpers.section("Business Expenses Breakdown");
                     helpers.table({
                         columns: [
-                            { header: "Description", key: "description", width: 180 },
-                            { header: "Type", key: "type", width: 80 },
-                            { header: "Category", key: "category", width: 100 },
+                            { header: "Description", key: "description", width: 150 },
+                            { header: "Type", key: "type", width: 70 },
+                            { header: "Category", key: "category", width: 95 },
                             { header: "Date", key: "date", width: 80 },
                             { header: "Amount", key: "amount", width: 100, align: "right" }
                         ],
@@ -233,14 +233,14 @@ export const generateReport = async (req, res) => {
                     helpers.table({
                         columns: [
                             { header: "Date", key: "date", width: 55 },
-                            { header: "Client", key: "client", width: 90 },
-                            { header: "CASHIER", key: "staff", width: 70 },
-                            { header: "RESPONSIBLE", key: "rep", width: 80 },
-                            { header: "Item/Service", key: "designation", width: 90 },
-                            { header: "Qty", key: "quantity", width: 30, align: "center" },
-                            { header: "Total", key: "pt", width: 65, align: "right" },
-                            { header: "Balance", key: "owed", width: 65, align: "right" },
-                            { header: "Status", key: "status", width: 55, align: "center" }
+                            { header: "Client", key: "client", width: 75 },
+                            { header: "CASHIER", key: "staff", width: 60 },
+                            { header: "RESPONSIBLE", key: "rep", width: 60 },
+                            { header: "Item/Service", key: "designation", width: 70 },
+                            { header: "Qty", key: "quantity", width: 25, align: "center" },
+                            { header: "Total", key: "pt", width: 60, align: "right" },
+                            { header: "Balance", key: "owed", width: 60, align: "right" },
+                            { header: "Status", key: "status", width: 30, align: "center" }
                         ],
                         rows: filters.abonneTransactions.map(tx => ({
                             date: new Date(tx.date).toLocaleDateString('en-GB', { timeZone: 'Africa/Kigali' }),
