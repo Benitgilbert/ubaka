@@ -324,9 +324,14 @@ const MetricCard = ({ title, value, icon, color, trend, subtext }) => {
 
     return (
         <div className="bg-white dark:bg-[#1A1A1A] p-4 md:p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full group">
-            <div className="flex items-start justify-between mb-3">
-                <div className={`w-10 h-10 md:w-12 md:h-12 ${colors[color]} rounded-2xl flex items-center justify-center text-lg md:text-xl transition-transform`}>
-                    {icon}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 md:w-12 md:h-12 ${colors[color]} rounded-2xl flex items-center justify-center text-lg md:text-xl transition-transform shrink-0`}>
+                        {icon}
+                    </div>
+                    <p className="text-sm md:text-base font-black text-gray-900 dark:text-white uppercase tracking-tight leading-tight">
+                        {title}
+                    </p>
                 </div>
                 {trend && (
                     <span className="text-[8px] md:text-[9px] font-black px-2 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg uppercase tracking-widest">
@@ -335,9 +340,6 @@ const MetricCard = ({ title, value, icon, color, trend, subtext }) => {
                 )}
             </div>
             <div className="space-y-1">
-                <p className="text-[10px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
-                    {title}
-                </p>
                 <h3 className="text-2xl md:text-2xl lg:text-3xl font-black text-gray-900 dark:text-white leading-none py-1">
                     {value || "RWF 0"}
                 </h3>
