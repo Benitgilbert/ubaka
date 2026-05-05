@@ -230,20 +230,26 @@ export const generateReport = async (req, res) => {
                     helpers.section("Client Abonne (Credit/Debt) Transactions");
                     helpers.table({
                         columns: [
-                            { header: "Date", key: "date", width: 60 },
-                            { header: "Client", key: "client", width: 100 },
-                            { header: "Representative", key: "rep", width: 100 },
-                            { header: "Item/Service", key: "designation", width: 120 },
+                            { header: "Date", key: "date", width: 55 },
+                            { header: "Client", key: "client", width: 90 },
+                            { header: "Picked Up By", key: "rep", width: 80 },
+                            { header: "Staff", key: "staff", width: 70 },
+                            { header: "Item/Service", key: "designation", width: 90 },
                             { header: "Qty", key: "quantity", width: 30, align: "center" },
-                            { header: "Total Value", key: "pt", width: 70, align: "right" }
+                            { header: "Total", key: "pt", width: 65, align: "right" },
+                            { header: "Balance", key: "owed", width: 65, align: "right" },
+                            { header: "Status", key: "status", width: 55, align: "center" }
                         ],
                         rows: filters.abonneTransactions.map(tx => ({
                             date: new Date(tx.date).toLocaleDateString('en-GB', { timeZone: 'Africa/Kigali' }),
                             client: tx.client?.name || "Unknown",
                             rep: tx.collectedBy || "N/A",
+                            staff: tx.responsible?.name || "System",
                             designation: tx.designation,
                             quantity: tx.quantity,
-                            pt: `RWF ${(tx.pt ?? 0).toLocaleString()}`
+                            pt: `RWF ${(tx.pt ?? 0).toLocaleString()}`,
+                            owed: `RWF ${(tx.debtAmount ?? 0).toLocaleString()}`,
+                            status: tx.debtAmount <= 0 ? "PAID" : (tx.debtAmount < tx.pt ? "PARTIAL" : "UNPAID")
                         }))
                     });
                 }

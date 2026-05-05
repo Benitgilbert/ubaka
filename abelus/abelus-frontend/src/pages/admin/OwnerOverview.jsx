@@ -5,11 +5,13 @@ import {
   FaArrowDown, FaSync, FaDownload, FaHistory,
   FaCheckCircle, FaSearch, FaArrowRight
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import api from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
 
 const OwnerOverview = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [analytics, setAnalytics] = useState(null);
     const [activeShift, setActiveShift] = useState(null);
@@ -142,27 +144,36 @@ const OwnerOverview = () => {
                                 <h3 className="font-black text-charcoal-900 dark:text-white uppercase tracking-widest text-[10px] flex items-center gap-2">
                                     <FaHistory className="text-indigo-500" /> Recent Transactions
                                 </h3>
-                                <button className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">View All</button>
+                                <button 
+                                    onClick={() => navigate("/admin/orders")}
+                                    className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline"
+                                >
+                                    View All
+                                </button>
                             </div>
                             <div className="divide-y divide-cream-50 dark:divide-charcoal-800">
                                 {recentOrders.slice(0, 4).map(order => (
                                     <ActivityItem 
                                         key={order.id}
+                                        id={order.id}
                                         type="order"
                                         title={`Order #${order.orderNumber}`}
                                         subtitle={`${order.items?.length || 0} items • ${order.paymentStatus}`}
                                         amount={formatCurrency(order.total)}
                                         time={new Date(order.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Kigali' })}
+                                        navigate={navigate}
                                     />
                                 ))}
                                 {recentExpenses.slice(0, 2).map(expense => (
                                     <ActivityItem 
                                         key={expense.id}
+                                        id={expense.id}
                                         type="expense"
                                         title={expense.description}
                                         subtitle={expense.category}
                                         amount={`-${formatCurrency(expense.amount)}`}
                                         time={new Date(expense.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Kigali' })}
+                                        navigate={navigate}
                                     />
                                 ))}
                             </div>
@@ -199,7 +210,7 @@ const OwnerOverview = () => {
                                     </thead>
                                     <tbody className="divide-y divide-cream-50 dark:divide-charcoal-800">
                                         {filteredInventory.slice(0, 6).map(product => (
-                                            <InventoryRow key={product.id} product={product} formatCurrency={formatCurrency} />
+                                            <InventoryRow key={product.id} product={product} formatCurrency={formatCurrency} navigate={navigate} />
                                         ))}
                                     </tbody>
                                 </table>
@@ -207,12 +218,17 @@ const OwnerOverview = () => {
                             
                             <div className="md:hidden divide-y divide-cream-50 dark:divide-charcoal-800 px-4">
                                 {filteredInventory.slice(0, 6).map(product => (
-                                    <InventoryCard key={product.id} product={product} formatCurrency={formatCurrency} />
+                                    <InventoryCard key={product.id} product={product} formatCurrency={formatCurrency} navigate={navigate} />
                                 ))}
                             </div>
                             
                             <div className="p-4 border-t border-cream-50 dark:border-charcoal-800 text-center">
-                                <button className="text-[10px] font-black text-charcoal-400 uppercase tracking-widest hover:text-indigo-600 transition-colors">See Complete Inventory</button>
+                                <button 
+                                    onClick={() => navigate("/admin/products")}
+                                    className="text-[10px] font-black text-charcoal-400 uppercase tracking-widest hover:text-indigo-600 transition-colors"
+                                >
+                                    See Complete Inventory
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -230,7 +246,10 @@ const OwnerOverview = () => {
                             
                             <div className="space-y-3">
                                 {analytics?.lowStockProducts?.length > 0 ? (
-                                    <div className="p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-100/50 dark:border-red-900/20 rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-red-50 transition-colors">
+                                    <div 
+                                        onClick={() => navigate("/admin/products")}
+                                        className="p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-100/50 dark:border-red-900/20 rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-red-50 transition-colors"
+                                    >
                                         <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
                                             <FaBox size={14} />
                                         </div>
@@ -253,7 +272,10 @@ const OwnerOverview = () => {
                                 )}
                                 
                                 {analytics?.pendingOrders > 0 && (
-                                    <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/20 rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-indigo-50 transition-colors">
+                                    <div 
+                                        onClick={() => navigate("/admin/orders")}
+                                        className="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100/50 dark:border-indigo-900/20 rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-indigo-50 transition-colors"
+                                    >
                                         <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                                             <FaShoppingCart size={14} />
                                         </div>
@@ -353,10 +375,13 @@ const MetricCard = ({ title, value, icon, color, trend, subtext }) => {
     );
 };
 
-const ActivityItem = ({ type, title, subtitle, amount, time }) => {
+const ActivityItem = ({ id, type, title, subtitle, amount, time, navigate }) => {
     const isOrder = type === 'order';
     return (
-        <div className="px-6 py-5 flex items-center justify-between hover:bg-cream-50/30 dark:hover:bg-charcoal-800/20 transition-colors group cursor-pointer">
+        <div 
+            onClick={() => isOrder ? navigate(`/admin/orders/${id}`) : navigate("/admin/reports")}
+            className="px-6 py-5 flex items-center justify-between hover:bg-cream-50/30 dark:hover:bg-charcoal-800/20 transition-colors group cursor-pointer"
+        >
             <div className="flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${isOrder ? 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20' : 'bg-red-50 text-red-500 dark:bg-red-900/20'}`}>
                     {isOrder ? <FaShoppingCart size={14} /> : <FaArrowDown size={14} />}
@@ -374,10 +399,13 @@ const ActivityItem = ({ type, title, subtitle, amount, time }) => {
     );
 };
 
-const InventoryRow = ({ product, formatCurrency }) => {
+const InventoryRow = ({ product, formatCurrency, navigate }) => {
     const isLow = product.stock <= (product.lowStockThreshold || 5);
     return (
-        <tr className="hover:bg-cream-50/30 dark:hover:bg-charcoal-800/20 transition-colors group">
+        <tr 
+            onClick={() => navigate("/admin/products")}
+            className="hover:bg-cream-50/30 dark:hover:bg-charcoal-800/20 transition-colors group cursor-pointer"
+        >
             <td className="px-6 py-5">
                 <div className="font-black text-charcoal-900 dark:text-white group-hover:text-indigo-600 transition-colors text-sm">{product.name}</div>
                 <div className="text-[9px] text-charcoal-400 uppercase font-black tracking-[0.2em] mt-1">{product.sku || 'No SKU'}</div>
@@ -401,10 +429,13 @@ const InventoryRow = ({ product, formatCurrency }) => {
     );
 };
 
-const InventoryCard = ({ product, formatCurrency }) => {
+const InventoryCard = ({ product, formatCurrency, navigate }) => {
     const isLow = product.stock <= (product.lowStockThreshold || 5);
     return (
-        <div className="py-4 flex items-center justify-between group active:bg-cream-50 transition-colors">
+        <div 
+            onClick={() => navigate("/admin/products")}
+            className="py-4 flex items-center justify-between group active:bg-cream-50 transition-colors cursor-pointer"
+        >
             <div className="min-w-0 flex-1 pr-4">
                 <p className="font-black text-charcoal-900 dark:text-white text-sm truncate">{product.name}</p>
                 <div className="flex items-center gap-2 mt-1">

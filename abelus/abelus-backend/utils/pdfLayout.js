@@ -205,7 +205,7 @@ export const createabelusPDF = ({ title, companyName, subtitle, contentBuilder }
         columns.forEach(c => {
           let val = row[c.key];
           if (c.key === "status") {
-            const isSuccess = String(val).toLowerCase().includes("closed") || String(val).toLowerCase().includes("delivered");
+            const isSuccess = String(val).toLowerCase().includes("closed") || String(val).toLowerCase().includes("delivered") || String(val).toLowerCase().includes("paid");
             doc.save();
             const badgeWidth = 48;
             const badgeX = x + ((c.width || 100) - badgeWidth - 16);
