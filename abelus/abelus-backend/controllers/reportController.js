@@ -130,7 +130,7 @@ export const generateReport = async (req, res) => {
         const expectedAmt = summary?.expectedDrawerAmount ?? 0;
         const verificationAmount = req.query.verificationAmount ? Number(req.query.verificationAmount) : expectedAmt;
         const cashDiscrepancy = (verificationAmount - expectedAmt);
-        
+
         const diffSign = cashDiscrepancy > 0 ? "+" : (cashDiscrepancy < 0 ? "-" : "");
         const diffValue = `${diffSign}RWF ${Math.abs(cashDiscrepancy).toLocaleString()}`;
 
@@ -235,10 +235,10 @@ export const generateReport = async (req, res) => {
                             { header: "Date", key: "date", width: 55 },
                             { header: "Client", key: "client", width: 100 },
                             { header: "Item/Service", key: "designation", width: 100 },
-                            { header: "Qty", key: "quantity", width: 25, align: "center" },
-                            { header: "Total", key: "pt", width: 55, align: "right" },
-                            { header: "Balance", key: "owed", width: 55, align: "right" },
-                            { header: "Status", key: "status", width: 30, align: "center" }
+                            { header: "Qty", key: "quantity", width: 30, align: "center" },
+                            { header: "Total", key: "pt", width: 60, align: "right" },
+                            { header: "Balance", key: "owed", width: 60, align: "right" },
+                            { header: "Status", key: "status", width: 50, align: "center" }
                         ],
                         rows: filters.abonneTransactions.map(tx => ({
                             date: new Date(tx.date).toLocaleDateString('en-GB', { timeZone: 'Africa/Kigali' }),
@@ -269,8 +269,8 @@ export const generateReport = async (req, res) => {
     } catch (err) {
         console.error(`${req.query.type} report generation failed:`, err);
         if (!res.headersSent) {
-            res.status(500).json({ 
-                message: "Failed to generate report.", 
+            res.status(500).json({
+                message: "Failed to generate report.",
                 error: err.message,
                 stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
             });
