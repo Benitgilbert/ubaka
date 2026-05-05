@@ -233,8 +233,8 @@ export const generateReport = async (req, res) => {
                     helpers.table({
                         columns: [
                             { header: "Date", key: "date", width: 55 },
-                            { header: "Client", key: "client", width: 140 },
-                            { header: "Item/Service", key: "designation", width: 135 },
+                            { header: "Client", key: "client", width: 100 },
+                            { header: "Item/Service", key: "designation", width: 100 },
                             { header: "Qty", key: "quantity", width: 25, align: "center" },
                             { header: "Total", key: "pt", width: 55, align: "right" },
                             { header: "Balance", key: "owed", width: 55, align: "right" },
