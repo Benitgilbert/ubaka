@@ -232,8 +232,8 @@ export const generateReport = async (req, res) => {
                         columns: [
                             { header: "Date", key: "date", width: 55 },
                             { header: "Client", key: "client", width: 90 },
-                            { header: "Picked Up By", key: "rep", width: 80 },
-                            { header: "Staff", key: "staff", width: 70 },
+                            { header: "CASHIER", key: "staff", width: 70 },
+                            { header: "RESPONSIBLE", key: "rep", width: 80 },
                             { header: "Item/Service", key: "designation", width: 90 },
                             { header: "Qty", key: "quantity", width: 30, align: "center" },
                             { header: "Total", key: "pt", width: 65, align: "right" },

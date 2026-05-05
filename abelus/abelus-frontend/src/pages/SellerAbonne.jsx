@@ -406,7 +406,7 @@ const SellerAbonne = () => {
                                             <th className="border border-black p-2 text-right">PU (RWF)</th>
                                             <th className="border border-black p-2 text-right">PT (RWF)</th>
                                             <th className="border border-black p-2 text-right text-red-600">DEBT (RWF)</th>
-                                            <th className="border border-black p-2">COLLECTED BY</th>
+                                            <th className="border border-black p-2">CASHIER</th>
                                             <th className="border border-black p-2">RESPONSIBLE</th>
                                             <th className="border border-black p-2">SIGNATURE</th>
                                         </tr>
@@ -420,8 +420,8 @@ const SellerAbonne = () => {
                                                 <td className="border border-black p-2 text-right">{tx.pu.toLocaleString()}</td>
                                                 <td className="border border-black p-2 text-right">{tx.pt.toLocaleString()}</td>
                                                 <td className="border border-black p-2 text-right font-bold text-red-600">{tx.debtAmount.toLocaleString()}</td>
-                                                <td className="border border-black p-2 text-[10px] font-bold">{tx.collectedBy || "-"}</td>
                                                 <td className="border border-black p-2 text-xs">{tx.responsible?.name || "System"}</td>
+                                                <td className="border border-black p-2 text-[10px] font-bold">{tx.collectedBy || "-"}</td>
                                                 <td className="border border-black p-2"></td>
                                             </tr>
                                         ))}
