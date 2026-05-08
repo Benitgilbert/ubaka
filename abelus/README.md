@@ -1,136 +1,47 @@
-# Abelus E-Commerce Platform
+# ABELUS - Technical Overview
 
-A full-stack multi-vendor e-commerce platform built with React and Node.js, specifically designed for Rwanda.
+This directory contains the core implementation of the Abelus Platform, divided into a high-performance backend and a modern React-based frontend.
 
-## 🚀 Features
+## 🏗️ Architecture
 
-- Multi-vendor marketplace
-- Rwanda-specific addressing (Province → District → Sector → Cell)
-- MTN Mobile Money payment integration
-- Real-time order tracking
-- Admin dashboard with analytics
-- Responsive dark mode UI
-- Guest checkout support
+The project follows a decoupled client-server architecture:
 
-## 📋 Tech Stack
+- **Frontend (`abelus-frontend`)**: A React 19 single-page application (SPA) optimized for both desktop POS usage and mobile customer browsing.
+- **Backend (`abelus-backend`)**: An Express 5 REST API utilizing Prisma ORM for type-safe database interactions with Supabase (PostgreSQL).
 
-**Frontend:**
-- React 18
-- React Router v6
-- Context API for state management
-- Pure CSS (no Tailwind)
+## 🚀 Key Modules
 
-**Backend:**
-- Node.js + Express
-- MongoDB Atlas
-- JWT Authentication
-- Bcrypt for password hashing
+### 1. Unified POS & Shift Management
+Located in `abelus-frontend/src/pages/SellerPOS.jsx` and `abelus-backend/routes/shiftRoutes.js`.
+- Implements strict cash control.
+- Integrates expense recording within active shifts.
+- Provides real-time reconciliation reports.
 
-## 🛠️ Local Development
+### 2. Abonne & Credit System
+Located in `abelus-frontend/src/pages/SellerAbonne.jsx` and `abelus-backend/routes/abonneRoutes.js`.
+- Manages customer credits and subscriptions.
+- Features detailed transaction logs and "Collected By" auditing.
 
-### Prerequisites
-- Node.js 16+
-- MongoDB Atlas account
-- npm or yarn
+### 3. Professional Reporting Engine
+Located in `abelus-backend/controllers/reportController.js`.
+- Generates high-fidelity PDF reports for shifts, orders, and finance.
+- Uses `pdfkit` for precise layout control.
 
-### Setup
+### 4. Strategic Owner Dashboard
+Located in `abelus-frontend/src/pages/admin/OwnerOverview.jsx`.
+- Aggregates multi-vendor data into actionable business intelligence.
+- Features complex chart visualizations via `Chart.js`.
 
-1. **Clone the repository**
-```bash
-git clone <your-repo-url>
-cd abelus
-```
+## 🛠️ Tech Stack Refresher
 
-2. **Install dependencies**
-```bash
-# Backend
-cd abelus/abelus-backend
-npm install
+- **Frontend**: React 19, React Router 7, Tailwind CSS, Chart.js.
+- **Backend**: Express 5, Prisma, Pino Logging.
+- **Database**: Supabase (PostgreSQL).
+- **Media**: Cloudinary.
 
-# Frontend
-cd ../abelus-frontend
-npm install
-```
+## 📖 Related Documentation
+- [Root README](../README.md) - For a high-level project overview and setup instructions.
+- [Prisma Schema](./abelus-backend/prisma/schema.prisma) - For the database structure.
 
-3. **Configure environment variables**
-```bash
-# Backend: Create .env in abelus-backend/
-cp env.example .env
-# Edit .env with your MongoDB URI and secrets
-```
-
-4. **Run development servers**
-```bash
-# Backend (http://localhost:5000)
-cd abelus-backend
-npm start
-
-# Frontend (http://localhost:3000)
-cd abelus-frontend
-npm start
-```
-
-## 🌐 Deployment
-
-### Quick Deploy (Free Tier)
-
-**Frontend** → [Vercel](https://vercel.com)
-**Backend** → [Render](https://render.com)
-**Database** → [MongoDB Atlas](https://mongodb.com/cloud/atlas)
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
-
-## 📁 Project Structure
-
-```
-abelus/
-├── abelus-backend/       # Node.js API
-│   ├── controllers/        # Route logic
-│   ├── models/            # MongoDB schemas
-│   ├── routes/            # API routes
-│   ├── middleware/        # Auth, error handling
-│   └── utils/             # Helper functions
-│
-└── abelus-frontend/     # React app
-    ├── src/
-    │   ├── components/    # Reusable UI components
-    │   ├── pages/         # Page components
-    │   ├── context/       # React Context
-    │   ├── utils/         # Utilities
-    │   └── styles/        # Global styles
-    └── public/           # Static assets
-```
-
-## 🔑 Key Features
-
-### Rwanda-Specific
-- Hierarchical address system (Province/District/Sector/Cell)
-- MTN Mobile Money integration
-- Localized shipping zones
-- Rwanda VAT (18%) calculation
-
-### User Features
-- Product browsing and search
-- Shopping cart
-- Guest and authenticated checkout
-- Order tracking
-- User profile management
-
-### Admin Features
-- Product management (CRUD)
-- Order processing
-- Shipping zone configuration
-- Tax rate management
-- Analytics dashboard
-
-## 📄 License
-
-This project is part of a Final Year Project (FYP).
-
-## 👥 Contributors
-
-[Your Name] - Developer
-
-## 🎯 Demo
-
-Live Demo: [Coming Soon]
+---
+*Abelus: Scaling Business with Intelligence.*
