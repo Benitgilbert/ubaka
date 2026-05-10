@@ -1,6 +1,6 @@
 # IMPRESSA - Unified Commerce & Business Management Platform
 
-![Impressa Banner](abelus_banner.png)
+![Impressa Banner](impressa_banner.png)
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Framework: React 19](https://img.shields.io/badge/Frontend-React%2019-blue.svg)](https://react.dev/)
@@ -99,13 +99,13 @@ impressa/
 
 1. **Clone & Setup Environment**
    ```bash
-   git clone https://github.com/Benitgilbert/abeluss.git
-   cd abeluss/abelus
+   git clone https://github.com/Benitgilbert/impressas.git
+   cd impressas/impressa
    ```
 
 2. **Backend Configuration**
    ```bash
-   cd abelus-backend
+   cd impressa-backend
    npm install
    # Create .env with MONGO_URI, SUPABASE_URL, SUPABASE_KEY, etc.
    npx prisma generate
@@ -114,7 +114,7 @@ impressa/
 
 3. **Frontend Configuration**
    ```bash
-   cd ../abelus-frontend
+   cd ../impressa-frontend
    npm install
    npm start
    ```

@@ -107,7 +107,7 @@ const applyToPos = (filePath) => {
                                 </div>
                             )}
                         </div>`;
-    
+
     if (!content.includes('Client Type Selector')) {
         content = content.replace(cartHeaderTarget, cartHeaderReplacement);
     }
@@ -131,7 +131,7 @@ const applyToPos = (filePath) => {
                                     <span className="text-sm">MoMo</span>
                                 </button>
                             </div>`;
-    
+
     const checkoutButtonsReplacement = `{clientType === "normal" ? (
                             <div className="flex gap-3">
                                 <button
@@ -258,7 +258,7 @@ const applyToPos = (filePath) => {
     fs.writeFileSync(filePath, content, 'utf8');
 }
 
-applyToPos(path.join(__dirname, 'impressa-frontend/src/pages/admin/POS.jsx'));
-applyToPos(path.join(__dirname, 'impressa-frontend/src/pages/SellerPOS.jsx'));
+applyToPos(path.join(__dirname, 'impressasa-frontend/src/pages/admin/POS.jsx'));
+applyToPos(path.join(__dirname, 'impressasa-frontend/src/pages/SellerPOS.jsx'));
 
 console.log("Patched POS files with Abonné features");

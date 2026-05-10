@@ -55,7 +55,7 @@ router.post("/submit-quote", authMiddleware(["admin", "owner", "seller", "cashie
 // Get seller's POS products (inventory for seller/cashier)
 router.get("/seller/pos-products", authMiddleware(["admin", "owner", "seller", "cashier"]), orderController.getSellerPOSProducts);
 
-// Get admin/Abelus's POS products (only company inventory)
+// Get admin/impressa's POS products (only company inventory)
 router.get("/admin/pos-products", authMiddleware(["admin", "owner"]), orderController.getAdminPOSProducts);
 
 // Get seller's orders

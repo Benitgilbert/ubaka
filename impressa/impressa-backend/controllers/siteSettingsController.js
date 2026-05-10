@@ -8,7 +8,7 @@ const getSettingsHelper = async () => {
     if (!settings) {
         settings = await prisma.siteSettings.create({
             data: {
-                siteName: "Abelus",
+                siteName: "impressa",
                 tagline: "Your Marketplace",
                 trustBadges: [
                     { icon: 'truck', title: 'Free Delivery', description: 'On orders over 50,000 Rwf', isActive: true, order: 0 },

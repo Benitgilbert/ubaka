@@ -1,4 +1,4 @@
-﻿# Abelus Backend (Node/Express)
+﻿# impressa Backend (Node/Express)
 
 Secure, scalable backend for products, orders, analytics, and reporting.
 
@@ -19,7 +19,7 @@ Secure, scalable backend for products, orders, analytics, and reporting.
 
 ## Quick start
 ```
-cd abelus/impressa-backend
+cd impressa/impressa-backend
 npm install
 npm run dev
 ```
@@ -83,4 +83,4 @@ server.js
 - See ../../REPORT_TROUBLESHOOTING.md for common issues
 
 ## License
-Proprietary to Abelus Custom Solutions. All rights reserved.
+Proprietary to impressa Custom Solutions. All rights reserved.

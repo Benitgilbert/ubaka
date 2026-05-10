@@ -186,7 +186,7 @@ export const sendReportEmail = async (reportId) => {
 
     const result = await sendEmail({
         to: seller.email,
-        subject: `📊 Your ${monthName} Performance Report - Abelus`,
+        subject: `📊 Your ${monthName} Performance Report - impressa`,
         html
     });
 

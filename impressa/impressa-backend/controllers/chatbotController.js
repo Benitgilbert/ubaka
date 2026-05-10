@@ -53,7 +53,7 @@ export const handlePublicChatbot = async (req, res) => {
             .join("\n");
 
         const prompt = `
-You are the Sales & Support AI Assistant for Abelus Marketplace.
+You are the Sales & Support AI Assistant for impressa Marketplace.
 Use the PRODUCT DATA, ACTIVE DEALS, and CHAT HISTORY to answer the Customer.
 
 PRODUCT DATA:

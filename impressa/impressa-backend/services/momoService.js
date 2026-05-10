@@ -73,7 +73,7 @@ export const requestToPay = async ({ amount, currency = "RWF", phone, orderId })
                 partyId: phone,
             },
             payerMessage: `Payment for Order #${orderId}`,
-            payeeNote: "Abelus Payment",
+            payeeNote: "impressa Payment",
         };
 
         const response = await momoClient.post("/collection/v1_0/requesttopay", payload, {

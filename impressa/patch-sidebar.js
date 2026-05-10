@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const applyToSidebar = (name, linkTarget, linkText) => {
-    const p = path.join(__dirname, 'impressa-frontend/src/components', name + '.jsx');
+    const p = path.join(__dirname, 'impressasa-frontend/src/components', name + '.jsx');
     if (!fs.existsSync(p)) return;
     let c = fs.readFileSync(p, 'utf8');
 
@@ -14,7 +14,7 @@ const applyToSidebar = (name, linkTarget, linkText) => {
     if (!c.includes(newLink)) {
         c = c.replace(new RegExp(linkTarget), newLink + '\\n            ' + linkTarget);
     }
-    
+
     if (!c.includes('FaUserFriends')) {
         c = c.replace('import { ', 'import { FaUserFriends, ');
     }

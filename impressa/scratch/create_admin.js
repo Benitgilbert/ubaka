@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '../../impressa-backend/.env') });
+dotenv.config({ path: path.join(__dirname, '../../impressasa-backend/.env') });
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -21,7 +21,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 async function createAdmin() {
   console.log(`Connecting to ${supabaseUrl}...`);
   const { data, error } = await supabase.auth.admin.createUser({
-    email: 'admin@impressa.rw',
+    email: 'admin@impressasa.rw',
     password: 'Password123!', // Temporary password
     email_confirm: true,
     user_metadata: { name: 'Admin User', role: 'admin' }

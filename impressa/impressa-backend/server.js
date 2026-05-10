@@ -77,16 +77,16 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-    
+
     const normalizedOrigin = origin.toLowerCase().trim();
-    
+
     // Check if origin is in whitelist or is a vercel sub-domain
     // Using a more robust regex for Vercel preview and production domains
-    const isAllowed = allowedOrigins.some(ao => ao && ao.toLowerCase() === normalizedOrigin) || 
-                      /\.vercel\.app$/.test(normalizedOrigin) || 
-                      /\.vercel\.dev$/.test(normalizedOrigin) ||
-                      normalizedOrigin.endsWith('.amplifyapp.com');
-                      
+    const isAllowed = allowedOrigins.some(ao => ao && ao.toLowerCase() === normalizedOrigin) ||
+      /\.vercel\.app$/.test(normalizedOrigin) ||
+      /\.vercel\.dev$/.test(normalizedOrigin) ||
+      normalizedOrigin.endsWith('.amplifyapp.com');
+
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -187,7 +187,7 @@ app.use("/api/admin", adminRoutes);
 app.get("/api", (req, res) => {
   res.json({
     success: true,
-    message: "Abelus Backend API is running on Prisma!",
+    message: "impressa Backend API is running on Prisma!",
     version: "1.0.0",
     environment: process.env.NODE_ENV || "development"
   });
@@ -233,7 +233,7 @@ if (!isVercel && !isTest) {
       process.on('exit', (code) => {
         logger.info(`Process exiting with code: ${code}`);
       });
-      
+
     } catch (err) {
       logger.fatal({ err }, "❌ Failed to start server during initialization");
       process.exit(1);

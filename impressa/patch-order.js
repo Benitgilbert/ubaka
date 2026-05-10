@@ -1,21 +1,21 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetPath = path.join(__dirname, 'impressa-backend/controllers/orderController.js');
+const targetPath = path.join(__dirname, 'impressasa-backend/controllers/orderController.js');
 let content = fs.readFileSync(targetPath, 'utf8');
 
 // 1. Add Imports
 if (!content.includes('import ClientAbonne')) {
-    content = content.replace(
-        /import Shift from "\.\.\/models\/Shift\.js";/,
-        `import Shift from "../models/Shift.js";\nimport ClientAbonne from "../models/ClientAbonne.js";\nimport AbonneTransaction from "../models/AbonneTransaction.js";`
-    );
+  content = content.replace(
+    /import Shift from "\.\.\/models\/Shift\.js";/,
+    `import Shift from "../models/Shift.js";\nimport ClientAbonne from "../models/ClientAbonne.js";\nimport AbonneTransaction from "../models/AbonneTransaction.js";`
+  );
 }
 
 // 2. Destructure new body params
 content = content.replace(
-    /const { items, paymentMethod, storeLocation } = req\.body;/,
-    `const { items, paymentMethod, storeLocation, abonneId, upfrontCashPaid } = req.body;`
+  /const { items, paymentMethod, storeLocation } = req\.body;/,
+  `const { items, paymentMethod, storeLocation, abonneId, upfrontCashPaid } = req.body;`
 );
 
 // 3. Update order payment creation logic

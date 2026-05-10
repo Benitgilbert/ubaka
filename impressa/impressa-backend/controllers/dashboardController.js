@@ -30,7 +30,7 @@ export const getDashboardAnalytics = async (req, res) => {
     // Filter Logic
     const orderFilter = isStaff ? { items: { some: { sellerId: effectiveSellerId } } } : {};
     const productFilter = isStaff ? { sellerId: effectiveSellerId } : {};
-    
+
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
@@ -57,26 +57,26 @@ export const getDashboardAnalytics = async (req, res) => {
         select: { stock: true, price: true }
       })
     ]);
-    
+
     let todayRevenue = 0;
     let momoRevenue = 0;
     let cashRevenue = 0;
 
     (todayOrdersForRevenue || []).forEach(order => {
-        const total = order.grandTotal || 0;
-        todayRevenue += total;
-        const method = (order.paymentMethod || "cash").toLowerCase();
-        if (method.includes("momo") || method.includes("mobile")) {
-            momoRevenue += total;
-        } else {
-            cashRevenue += total;
-        }
+      const total = order.grandTotal || 0;
+      todayRevenue += total;
+      const method = (order.paymentMethod || "cash").toLowerCase();
+      if (method.includes("momo") || method.includes("mobile")) {
+        momoRevenue += total;
+      } else {
+        cashRevenue += total;
+      }
     });
 
     // Add Debt Collections to Revenue & Cash
     const debtCollections = await prisma.abonneTransaction.aggregate({
-        _sum: { amountPaid: true },
-        where: { createdAt: { gte: startOfToday } }
+      _sum: { amountPaid: true },
+      where: { createdAt: { gte: startOfToday } }
     });
     const totalDebtToday = debtCollections?._sum?.amountPaid || 0;
     todayRevenue += totalDebtToday;
@@ -100,13 +100,13 @@ export const getDashboardAnalytics = async (req, res) => {
           grandTotal: true,
           createdAt: true,
           customer: { select: { name: true, email: true } },
-          items: { 
+          items: {
             take: 3,
-            select: { 
-              quantity: true, 
+            select: {
+              quantity: true,
               productName: true,
               product: { select: { image: true } }
-            } 
+            }
           }
         }
       })
@@ -145,28 +145,28 @@ export const getDashboardAnalytics = async (req, res) => {
     // Process remaining original logic (items, changes, monthly stats, etc.)
     const [itemsThisWeekRaw, itemsLastWeekRaw, activeThisWeek, activeLastWeek] = await Promise.all([
       prisma.orderItem.findMany({
-        where: { 
+        where: {
           sellerId: isStaff ? effectiveSellerId : undefined,
-          order: { createdAt: { gte: startOfThisWeek }, status: { not: 'cancelled' } } 
+          order: { createdAt: { gte: startOfThisWeek }, status: { not: 'cancelled' } }
         },
         select: { quantity: true, customizations: true }
       }),
       prisma.orderItem.findMany({
-        where: { 
+        where: {
           sellerId: isStaff ? effectiveSellerId : undefined,
-          order: { createdAt: { gte: startOfLastWeek, lt: endOfLastWeek }, status: { not: 'cancelled' } } 
+          order: { createdAt: { gte: startOfLastWeek, lt: endOfLastWeek }, status: { not: 'cancelled' } }
         },
         select: { quantity: true, customizations: true }
       }),
       prisma.order.findMany({
-          where: { ...orderFilter, createdAt: { gte: startOfThisWeek } },
-          distinct: ['customerId'],
-          select: { customerId: true }
+        where: { ...orderFilter, createdAt: { gte: startOfThisWeek } },
+        distinct: ['customerId'],
+        select: { customerId: true }
       }).then(res => res.length),
       prisma.order.findMany({
-          where: { ...orderFilter, createdAt: { gte: startOfLastWeek, lt: endOfLastWeek } },
-          distinct: ['customerId'],
-          select: { customerId: true }
+        where: { ...orderFilter, createdAt: { gte: startOfLastWeek, lt: endOfLastWeek } },
+        distinct: ['customerId'],
+        select: { customerId: true }
       }).then(res => res.length)
     ]);
 
@@ -210,20 +210,20 @@ export const getDashboardAnalytics = async (req, res) => {
       }),
       prisma.order.groupBy({ by: ['status'], where: orderFilter, _count: { _all: true } }),
       prisma.orderItem.groupBy({
-          by: ['productId'],
-          _sum: { quantity: true },
-          where: { sellerId: isStaff ? effectiveSellerId : undefined, order: { status: 'delivered' } },
-          orderBy: { _sum: { quantity: 'desc' } },
-          take: 5
+        by: ['productId'],
+        _sum: { quantity: true },
+        where: { sellerId: isStaff ? effectiveSellerId : undefined, order: { status: 'delivered' } },
+        orderBy: { _sum: { quantity: 'desc' } },
+        take: 5
       })
     ]);
 
     const monthlyStats = {};
     monthlyOrders.forEach(order => {
-        const month = order.createdAt.getMonth() + 1;
-        if (!monthlyStats[month]) monthlyStats[month] = { month, revenue: 0, sales: 0 };
-        monthlyStats[month].revenue += order.grandTotal;
-        monthlyStats[month].sales += (order.items || []).reduce((s, i) => s + (i.quantity || 0), 0);
+      const month = order.createdAt.getMonth() + 1;
+      if (!monthlyStats[month]) monthlyStats[month] = { month, revenue: 0, sales: 0 };
+      monthlyStats[month].revenue += order.grandTotal;
+      monthlyStats[month].sales += (order.items || []).reduce((s, i) => s + (i.quantity || 0), 0);
     });
     const monthlyRevenue = Object.values(monthlyStats).sort((a, b) => a.month - b.month);
     const statusCounts = statusBreakdown.map(s => ({ id: s.status, count: s._count._all }));
@@ -231,13 +231,13 @@ export const getDashboardAnalytics = async (req, res) => {
     // Top Products Resolve
     const productIds = topProductsRaw.map(tp => tp.productId);
     const products = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, name: true }
+      where: { id: { in: productIds } },
+      select: { id: true, name: true }
     });
     const productMap = Object.fromEntries(products.map(p => [p.id, p]));
     const topProducts = topProductsRaw.map((tp) => ({
-        productName: productMap[tp.productId]?.name || 'N/A',
-        count: tp._sum.quantity
+      productName: productMap[tp.productId]?.name || 'N/A',
+      count: tp._sum.quantity
     }));
 
     const [totalSellers, activeSellers, pendingSellers, rejectedSellers] = !isStaff ? await Promise.all([
@@ -293,9 +293,9 @@ export const getDashboardAnalytics = async (req, res) => {
     });
   } catch (err) {
     console.error("Dashboard analytics failed:", err);
-    res.status(500).json({ 
-        message: "Failed to load dashboard analytics.",
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    res.status(500).json({
+      message: "Failed to load dashboard analytics.",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
@@ -312,10 +312,10 @@ export const getForecast = async (req, res) => {
 
     const monthlyStats = {};
     monthlyOrders.forEach(order => {
-        const month = order.createdAt.getMonth() + 1;
-        if (!monthlyStats[month]) monthlyStats[month] = { revenue: 0, orders: 0 };
-        monthlyStats[month].revenue += order.grandTotal;
-        monthlyStats[month].orders += 1;
+      const month = order.createdAt.getMonth() + 1;
+      if (!monthlyStats[month]) monthlyStats[month] = { revenue: 0, orders: 0 };
+      monthlyStats[month].revenue += order.grandTotal;
+      monthlyStats[month].orders += 1;
     });
 
     const sortedData = Object.values(monthlyStats);
@@ -323,13 +323,13 @@ export const getForecast = async (req, res) => {
     const orders = sortedData.map((d) => d.orders);
 
     const calcGrowth = (arr) => {
-        const slice = arr.slice(-3);
-        if (slice.length < 2) return 0;
-        let total = 0;
-        for (let i = 1; i < slice.length; i++) {
-            total += (slice[i] - slice[i-1]);
-        }
-        return total / (slice.length - 1);
+      const slice = arr.slice(-3);
+      if (slice.length < 2) return 0;
+      let total = 0;
+      for (let i = 1; i < slice.length; i++) {
+        total += (slice[i] - slice[i - 1]);
+      }
+      return total / (slice.length - 1);
     };
 
     const avgRevenueGrowth = calcGrowth(revenues);
@@ -361,9 +361,9 @@ export const getProductRecommendations = async (req, res) => {
       baseProductIds = [productId];
     } else if (userId) {
       const lastOrder = await prisma.order.findFirst({
-          where: { customerId: userId },
-          orderBy: { createdAt: 'desc' },
-          include: { items: true }
+        where: { customerId: userId },
+        orderBy: { createdAt: 'desc' },
+        include: { items: true }
       });
       if (lastOrder && lastOrder.items.length > 0) {
         baseProductIds = lastOrder.items.map(i => i.productId);
@@ -371,10 +371,10 @@ export const getProductRecommendations = async (req, res) => {
     }
 
     const recIds = await prisma.product.findMany({ take: 10, select: { id: true } }).then(res => res.map(p => p.id));
-    
+
     const products = await prisma.product.findMany({
-        where: { id: { in: recIds } },
-        select: { id: true, name: true, price: true, image: true, slug: true, averageRating: true }
+      where: { id: { in: recIds } },
+      select: { id: true, name: true, price: true, image: true, slug: true, averageRating: true }
     });
 
     res.json(products);
@@ -401,15 +401,15 @@ export const handleChatbotQueryLLM = async (req, res) => {
 
     if (userRole === "seller") {
       const earnings = await prisma.sellerEarning.aggregate({
-          _sum: { netAmount: true },
-          where: { sellerId: userId, status: { in: ["confirmed", "paid"] } }
+        _sum: { netAmount: true },
+        where: { sellerId: userId, status: { in: ["confirmed", "paid"] } }
       });
       systemContext = `SELLER DATA: Total Earnings: ${earnings._sum.netAmount || 0} RWF`;
-      systemPrompt = "You are the AI Assistant for a Seller on Abelus.";
+      systemPrompt = "You are the AI Assistant for a Seller on impressa.";
     } else {
       const totalOrders = await prisma.order.count();
       systemContext = `ADMIN DATA: Total Orders: ${totalOrders}`;
-      systemPrompt = "You are the AI Admin Assistant for Abelus.";
+      systemPrompt = "You are the AI Admin Assistant for impressa.";
     }
 
     res.json({ message: "AI response would go here. Data gathered successfully." });

@@ -1,10 +1,10 @@
-# Abelus Frontend (React)
+# impressa Frontend (React)
 
 Admin dashboard and reports UI.
 
 ## Quick start
 ```
-cd abelus/abelus-frontend
+cd impressa/impressa-frontend
 npm install
 npm start
 ```

@@ -619,7 +619,7 @@ model Subscriber {
 
 model SiteSettings {
   id                String   @id @default(uuid())
-  siteName          String   @default("Abelus")
+  siteName          String   @default("impressa")
   logo              String?  // Cloudinary URL for the logo
   tagline           String?
   footerTagline     String?
