@@ -1,4 +1,4 @@
-import pino from "pino";
+﻿import pino from "pino";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -36,7 +36,7 @@ const logger = pino({
   // Base fields to include in every log
   base: {
     env: process.env.NODE_ENV || "development",
-    app: "abelus-backend",
+    app: "impressa-backend",
   },
 
   // Timestamp format

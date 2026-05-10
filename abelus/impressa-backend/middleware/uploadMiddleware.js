@@ -1,4 +1,4 @@
-import multer from "multer";
+﻿import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import path from "path";
@@ -17,7 +17,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "abelus_uploads", // Folder name in Cloudinary
+    folder: "impressa_uploads", // Folder name in Cloudinary
     allowed_formats: ["jpg", "jpeg", "png", "gif", "webp", "pdf"], // Allowed formats
     // public_id: (req, file) => 'computed-filename-using-request',
   },

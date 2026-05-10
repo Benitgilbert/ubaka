@@ -1,10 +1,10 @@
-import cron from "node-cron";
+﻿import cron from "node-cron";
 import path from "path";
 import fs from "fs";
 
 import prisma from "../prisma.js";
 import { buildReportData } from "../services/reportBuilders.js";
-import { createabelusPDF } from "../utils/pdfLayout.js";
+import { createImpressaPDF } from "../utils/pdfLayout.js";
 import generateAISummary from "../utils/aiSummary.js";
 import sendReportEmail from "../utils/sendReportEmail.js";
 
@@ -41,12 +41,12 @@ cron.schedule("0 8 1 * *", async () => {
     }
     const filePath = path.join(reportsDir, `monthly-${month}-${year}.pdf`);
 
-    const doc = createabelusPDF({
+    const doc = createImpressaPDF({
       title: `Monthly Report - ${month}/${year}`,
       logoPath,
       signatory: {
         name: admin.name,
-        title: admin.title || "Abelus Administrator",
+        title: admin.title || "Impressa Administrator",
         signatureImage: admin.signatureImage,
         stampImage: admin.stampImage,
       },

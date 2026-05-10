@@ -1,4 +1,4 @@
-# Abelus Backend (Node/Express)
+﻿# Abelus Backend (Node/Express)
 
 Secure, scalable backend for products, orders, analytics, and reporting.
 
@@ -19,7 +19,7 @@ Secure, scalable backend for products, orders, analytics, and reporting.
 
 ## Quick start
 ```
-cd abelus/abelus-backend
+cd abelus/impressa-backend
 npm install
 npm run dev
 ```

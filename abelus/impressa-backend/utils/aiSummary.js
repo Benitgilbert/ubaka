@@ -1,10 +1,10 @@
-const generateAISummary = (type, summary) => {
+﻿const generateAISummary = (type, summary) => {
   const formatRWF = (amount) =>
     typeof amount === "number" ? `${amount.toLocaleString()} RWF` : "N/A";
 
   switch (type) {
     case "monthly":
-      return `This month, abelus processed ${summary.total || 0} orders. Top product: ${summary.topProduct || "N/A"}. Delivered: ${summary.delivered || 0}, Cancelled: ${summary.cancelled || 0}.`;
+      return `this month, Impressa processed ${summary.total || 0} orders. Top product: ${summary.topProduct || "N/A"}. Delivered: ${summary.delivered || 0}, Cancelled: ${summary.cancelled || 0}.`;
 
     case "daily":
       return `Today’s report includes ${summary.total || 0} orders. Most requested customization: ${summary.topCustomization || "N/A"}.`;

@@ -1,9 +1,9 @@
-import path from "path";
+﻿import path from "path";
 import fs from "fs";
 import axios from "axios";
 import prisma from "../prisma.js";
 import { buildReportData } from "../services/reportBuilders.js";
-import { createabelusPDF } from "../utils/pdfLayout.js";
+import { createImpressaPDF } from "../utils/pdfLayout.js";
 import convertToCSV from "../utils/csvExporter.js";
 import generateAISummary from "../utils/aiSummary.js";
 import sendReportEmail from "../utils/sendReportEmail.js";
@@ -139,9 +139,9 @@ export const generateReport = async (req, res) => {
         const cleanTitle = performanceTitle.replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, '_');
         const filename = `${cleanTitle}_${dateStr}.pdf`;
 
-        const doc = createabelusPDF({
+        const doc = createImpressaPDF({
             title: performanceTitle,
-            companyName: "PAPETERIE ABELUS",
+            companyName: "IMPRESSA",
             subtitle: "PASTORT BONUS CO.LTD",
             contentBuilder: (pdfDoc, helpers) => {
                 // ... (rest of the builder logic)

@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import path from "path";
 import passport from "./config/passport.js";
 import cors from "cors";
@@ -66,9 +66,9 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   "https://pastorbonus.vercel.app",
   "https://pastorbonuss.vercel.app",
-  "https://abelus.com",
-  "https://www.abelus.com",
-  "https://abeluss-backend.vercel.app",
+  "https://impressa.rw",
+  "https://www.impressa.rw",
+  "https://impressa-backend.vercel.app",
   "http://localhost:5000",
   "http://localhost:3000",
 ].filter(Boolean);

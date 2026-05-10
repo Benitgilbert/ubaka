@@ -1,7 +1,7 @@
-import express from "express";
+﻿import express from "express";
 import path from "path";
 import prisma from "../prisma.js";
-import { createabelusPDF } from "../utils/pdfLayout.js";
+import { createImpressaPDF } from "../utils/pdfLayout.js";
 import { verifyAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -43,7 +43,7 @@ router.get("/generate", verifyAdmin, async (req, res) => {
       };
 
       const signatory = {
-        name: "Abelus Admin",
+        name: "Impressa Admin",
         title: "System Generated",
         signatureImage: null,
         stampImage: null,
@@ -51,7 +51,7 @@ router.get("/generate", verifyAdmin, async (req, res) => {
 
       const logoPath = path.join(path.resolve(), "assets/logo.png");
 
-      const doc = createabelusPDF({
+      const doc = createImpressaPDF({
         title: "User Table Report",
         contentBuilder,
         signatory,

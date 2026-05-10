@@ -1,6 +1,6 @@
-import PDFDocument from "pdfkit";
+﻿import PDFDocument from "pdfkit";
 
-export const createabelusPDF = ({ title, companyName, subtitle, contentBuilder }) => {
+export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder }) => {
   const doc = new PDFDocument({ 
     margin: 50, 
     size: 'A4', 
@@ -15,7 +15,7 @@ export const createabelusPDF = ({ title, companyName, subtitle, contentBuilder }
 
     // Fixed Branding - Match User's Request Exactly
     doc.fillColor("#1E3A8A").fontSize(20).font("Helvetica-Bold")
-       .text((companyName || "PAPETERIE ABELUS").toUpperCase(), left, top);
+       .text((companyName || "IMPRESSA").toUpperCase(), left, top);
     
     doc.fillColor("#64748B").fontSize(9).font("Helvetica")
        .text(subtitle || "PASTORT BONUS CO.LTD", left, top + 24);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Abelus Marketplace - Seller Terms & Conditions
  * Version 1.0 - December 2024
  * 
@@ -8,7 +8,7 @@
 export const SELLER_TERMS_VERSION = "1.0";
 
 export const SELLER_TERMS_CONTENT = `
-# ABELUS MARKETPLACE
+# IMPRESSA MARKETPLACE
 ## SELLER TERMS AND CONDITIONS
 ### Version 1.0 - December 2024
 
@@ -186,7 +186,7 @@ To become a seller on Abelus, you must:
 ## 15. CONTACT INFORMATION
 
 For questions about these terms:
-- Email: sellers@abelus.rw
+- Email: ishfabzele2@gmail.com
 - Phone: +250 XXX XXX XXX
 - Address: Gicumbi, Byumba
 
