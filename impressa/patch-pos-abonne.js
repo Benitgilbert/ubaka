@@ -258,7 +258,7 @@ const applyToPos = (filePath) => {
     fs.writeFileSync(filePath, content, 'utf8');
 }
 
-applyToPos(path.join(__dirname, 'abelus-frontend/src/pages/admin/POS.jsx'));
-applyToPos(path.join(__dirname, 'abelus-frontend/src/pages/SellerPOS.jsx'));
+applyToPos(path.join(__dirname, 'impressa-frontend/src/pages/admin/POS.jsx'));
+applyToPos(path.join(__dirname, 'impressa-frontend/src/pages/SellerPOS.jsx'));
 
 console.log("Patched POS files with Abonné features");

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetPath = path.join(__dirname, 'abelus-frontend/src/App.js');
+const targetPath = path.join(__dirname, 'impressa-frontend/src/App.js');
 let content = fs.readFileSync(targetPath, 'utf8');
 
 // Add imports if they don't exist

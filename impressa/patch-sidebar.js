@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const applyToSidebar = (name, linkTarget, linkText) => {
-    const p = path.join(__dirname, 'abelus-frontend/src/components', name + '.jsx');
+    const p = path.join(__dirname, 'impressa-frontend/src/components', name + '.jsx');
     if (!fs.existsSync(p)) return;
     let c = fs.readFileSync(p, 'utf8');
 

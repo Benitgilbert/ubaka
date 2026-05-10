@@ -1,13 +1,13 @@
-# ABELUS - Unified Commerce & Business Management Platform
+# IMPRESSA - Unified Commerce & Business Management Platform
 
-![Abelus Banner](abelus_banner.png)
+![Impressa Banner](abelus_banner.png)
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Framework: React 19](https://img.shields.io/badge/Frontend-React%2019-blue.svg)](https://react.dev/)
 [![Backend: Node.js](https://img.shields.io/badge/Backend-Node.js-green.svg)](https://nodejs.org/)
 [![Database: Supabase/Prisma](https://img.shields.io/badge/Database-Supabase%20%2F%20Prisma-blueviolet.svg)](https://supabase.com/)
 
-**Abelus** is an enterprise-grade, multi-tenant commerce ecosystem designed to bridge the gap between digital marketplaces and physical retail operations. It provides a seamless experience for customers, a robust operating system for sellers, and a high-level command center for business owners.
+**Impressa** is an enterprise-grade, multi-tenant commerce ecosystem designed to bridge the gap between digital marketplaces and physical retail operations. It provides a seamless experience for customers, a robust operating system for sellers, and a high-level command center for business owners.
 
 ---
 
@@ -50,7 +50,7 @@ Strategic oversight and system governance.
 ## 🚀 Key Features Highlights
 
 ### 📊 Professional Financial Reporting
-Abelus features a sophisticated reporting engine that generates high-fidelity PDF documents.
+Impressa features a sophisticated reporting engine that generates high-fidelity PDF documents.
 - **Audit Parity**: Reports are designed for pixel-perfect parity with accounting standards.
 - **Dynamic Metrics**: 4-card dashboard summaries for real-time financial snapshots.
 - **Verification Logs**: Detailed "Collected By" tracking for physical goods movement.
@@ -70,15 +70,15 @@ Specialized module for managing recurring customers and credit-based transaction
 ## 📂 Project Structure
 
 ```text
-abelus/
-├── abelus-backend/       # Express 5 API (Prisma + Supabase)
+impressa/
+├── impressa-backend/       # Express 5 API (Prisma + Supabase)
 │   ├── prisma/             # Schema & Migrations
 │   ├── controllers/        # Business Logic
 │   ├── routes/             # RESTful API Endpoints
 │   ├── middleware/         # RBAC & Security
 │   └── config/             # Logger & Passport Config
 │
-└── abelus-frontend/      # React 19 Application (Tailwind CSS)
+└── impressa-frontend/      # React 19 Application (Tailwind CSS)
     ├── src/
     │   ├── components/     # UI Design System
     │   ├── context/        # Global State Management
@@ -130,7 +130,7 @@ abelus/
 ---
 
 ## 📄 License
-Proprietary to Abelus Custom Solutions. Unauthorized copying of this project, via any medium, is strictly prohibited.
+Proprietary to Impressa Custom Solutions. Unauthorized copying of this project, via any medium, is strictly prohibited.
 
 ---
-*Generated with ❤️ by Antigravity for Abelus.*
+*Generated with ❤️ by Antigravity for Impressa.*

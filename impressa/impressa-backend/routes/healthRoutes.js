@@ -8,7 +8,7 @@ const router = express.Router();
  * Root endpoint for basic connectivity check (Render default health check)
  */
 router.get("/", (req, res) => {
-  res.status(200).send("Abelus Backend is running");
+  res.status(200).send("Impressa Backend is running");
 });
 
 /**

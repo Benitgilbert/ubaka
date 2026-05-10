@@ -1,4 +1,4 @@
-﻿import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 import { Resend } from 'resend';
 import { renderTemplate } from "./emailTemplate.js";
 
@@ -28,13 +28,13 @@ const createTransporter = () => {
 };
 
 export const sendEmail = async ({ to, subject, text, html, headers }) => {
-    const from = process.env.SMTP_FROM || "Abelus <noreply@abelus.rw>";
+    const from = process.env.SMTP_FROM || "Impressa <noreply@impressa.rw>";
     
     // 1. Try Resend first if configured
     if (resend) {
         try {
             const { data, error } = await resend.emails.send({
-                from: from.includes('<') ? from : `Abelus <${from}>`,
+                from: from.includes('<') ? from : `Impressa <${from}>`,
                 to,
                 subject,
                 text,
@@ -56,7 +56,7 @@ export const sendEmail = async ({ to, subject, text, html, headers }) => {
     try {
         const transporter = createTransporter();
         const mailOptions = {
-            from: from.includes('<') ? from : `"Abelus" <${process.env.SMTP_USER || from}>`,
+            from: from.includes('<') ? from : `"Impressa" <${process.env.SMTP_USER || from}>`,
             to,
             subject,
             text,
@@ -110,13 +110,13 @@ export const sendOrderConfirmation = async (order) => {
             </div>
         </div>
         <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="color: #94a3b8; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Abelus. All rights reserved.</p>
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Impressa. All rights reserved.</p>
         </div>
     </div>`;
 
     return sendEmail({
         to: order.guestInfo?.email || order.customer?.email,
-        subject: `Order Confirmation #${order.publicId} — Abelus`,
+        subject: `Order Confirmation #${order.publicId} — Impressa`,
         html
     });
 };
@@ -136,7 +136,7 @@ export const sendStatusUpdate = async (order) => {
 
     return sendEmail({
         to: order.guestInfo?.email || order.customer?.email,
-        subject: `Order Update #${order.publicId} — Abelus`,
+        subject: `Order Update #${order.publicId} — Impressa`,
         html
     });
 };
@@ -146,7 +146,7 @@ export const sendGiftCardEmail = async (giftCard, senderName) => {
     const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; padding: 40px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white;">
         <h1 style="font-size: 32px; margin-bottom: 10px;">Surprise! 🎁</h1>
-        <p style="font-size: 18px; margin-bottom: 30px;">${senderName} has sent you an Abelus Gift Card.</p>
+        <p style="font-size: 18px; margin-bottom: 30px;">${senderName} has sent you an Impressa Gift Card.</p>
         <div style="background: rgba(255, 255, 255, 0.1); border: 2px dashed rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 20px; margin: 40px 0;">
             <p style="text-transform: uppercase; letter-spacing: 4px; font-size: 12px; margin: 0 0 10px 0; opacity: 0.8;">Your Gift Code</p>
             <h2 style="font-size: 36px; margin: 0; font-weight: 900; letter-spacing: 1px;">${giftCard.code}</h2>
@@ -180,7 +180,7 @@ export const sendSellerApprovedEmail = async (seller) => {
 
     return sendEmail({
         to: seller.email,
-        subject: "🎉 Your Seller Account is Approved - Abelus",
+        subject: "🎉 Your Seller Account is Approved - Impressa",
         html
     });
 };
@@ -193,12 +193,12 @@ export const sendSellerRejectedEmail = async (seller, reason) => {
         <p>Hi ${seller.name},</p>
         <p>We've reviewed your seller application for <strong>${seller.storeName || 'your store'}</strong>.</p>
         ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
-        <p style="color: #6b7280; margin-top: 24px;">— The Abelus Team</p>
+        <p style="color: #6b7280; margin-top: 24px;">— The Impressa Team</p>
     </div>`;
 
     return sendEmail({
         to: seller.email,
-        subject: "Seller Application Update - Abelus",
+        subject: "Seller Application Update - Impressa",
         html
     });
 };
@@ -218,7 +218,7 @@ export const sendProductApprovedEmail = async (seller, product) => {
 
     return sendEmail({
         to: seller.email,
-        subject: `✅ Product Approved: ${product.name} - Abelus`,
+        subject: `✅ Product Approved: ${product.name} - Impressa`,
         html
     });
 };
@@ -248,7 +248,7 @@ export const sendNewOrderEmail = async (seller, order) => {
 
     return sendEmail({
         to: seller.email,
-        subject: `🛒 New Order: ${order.orderNumber || order.id} - Abelus`,
+        subject: `🛒 New Order: ${order.orderNumber || order.id} - Impressa`,
         html
     });
 };
@@ -265,7 +265,7 @@ export const sendPayoutSentEmail = async (seller, payout) => {
 
     return sendEmail({
         to: seller.email,
-        subject: `💰 Payout Processed: ${payout.amount.toLocaleString()} RWF - Abelus`,
+        subject: `💰 Payout Processed: ${payout.amount.toLocaleString()} RWF - Impressa`,
         html
     });
 };
@@ -282,7 +282,7 @@ export const sendWarningEmail = async (seller, violation) => {
 
     return sendEmail({
         to: seller.email,
-        subject: "⚠️ Seller Account Warning - Abelus",
+        subject: "⚠️ Seller Account Warning - Impressa",
         html
     });
 };
@@ -307,7 +307,7 @@ export const sendLowStockEmail = async (seller, products) => {
 
     return sendEmail({
         to: seller.email,
-        subject: "📦 Low Stock Alert - Abelus",
+        subject: "📦 Low Stock Alert - Impressa",
         html
     });
 };
@@ -322,7 +322,7 @@ export const sendWelcomeEmail = async (email) => {
 
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Welcome to Abelus! 🎉</h2>
+        <h2>Welcome to Impressa! 🎉</h2>
         <p>Thank you for subscribing to our newsletter.</p>
         <div style="text-align: center; margin-top: 32px;">
             <a href="${process.env.FRONTEND_URL}/shop" 
@@ -334,7 +334,7 @@ export const sendWelcomeEmail = async (email) => {
 
     return sendEmail({
         to: email,
-        subject: "Welcome to the Abelus Community! 💌",
+        subject: "Welcome to the Impressa Community! 💌",
         html,
         headers
     });
