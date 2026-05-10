@@ -256,13 +256,9 @@ function Register() {
                     sellerData.append("nationalId", formData.nationalId);
                 }
 
-                // Note: api (axiosInstance) will automatically attach the token if we use it correctly
-                // or we can pass it in headers to be sure
-                await api.post("/seller-verification/apply", sellerData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
-                });
+                // Note: axios (via 'api' instance) handles FormData correctly and sets boundaries automatically.
+                // DO NOT set 'Content-Type' manually for multipart/form-data.
+                await api.post("/seller-verification/apply", sellerData);
 
                 setSuccessType('application_submitted');
                 setSuccess(true);

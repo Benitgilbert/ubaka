@@ -142,7 +142,7 @@ export const generateReport = async (req, res) => {
         const doc = createImpressaPDF({
             title: performanceTitle,
             companyName: "IMPRESSA",
-            subtitle: "PASTORT BONUS CO.LTD",
+            subtitle: "Custom Solutions ",
             contentBuilder: (pdfDoc, helpers) => {
                 // ... (rest of the builder logic)
                 if (aiSummary) {

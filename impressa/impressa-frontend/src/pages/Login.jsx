@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -18,6 +18,25 @@ function Login() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // Handle hash errors (like otp_expired)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const params = new URLSearchParams(hash.substring(1));
+      const errorCode = params.get('error_code');
+      const errorDescription = params.get('error_description');
+
+      if (errorCode === 'otp_expired') {
+        setError("Your email link has expired. Please try signing in below; if your email isn't confirmed, we'll help you resend the link.");
+      } else if (errorDescription) {
+        setError(errorDescription.replace(/\+/g, ' '));
+      }
+      
+      // Clean up hash to avoid showing error on refresh
+      window.history.replaceState(null, null, window.location.pathname);
+    }
+  }, []);
 
   const handleGoogleLogin = async () => {
     // Note: Google login via Supabase
@@ -52,7 +71,36 @@ function Login() {
       }
     } catch (err) {
       console.error("Login failed:", err);
-      setError(err.message || "Invalid email or password");
+      if (err.message?.toLowerCase().includes('email not confirmed')) {
+        setError(
+          <div className="flex flex-col gap-2">
+            <span>Your email is not confirmed yet.</span>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const { error } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: form.email,
+                    options: {
+                      emailRedirectTo: `${window.location.origin}/login`
+                    }
+                  });
+                  if (error) throw error;
+                  setError("A new verification link has been sent to your email!");
+                } catch (resendErr) {
+                  setError("Failed to resend link: " + resendErr.message);
+                }
+              }}
+              className="text-terracotta-500 underline text-left hover:text-terracotta-400 transition-colors"
+            >
+              Click here to resend the verification link
+            </button>
+          </div>
+        );
+      } else {
+        setError(err.message || "Invalid email or password");
+      }
     } finally {
       setLoading(false);
     }

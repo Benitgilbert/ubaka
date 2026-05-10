@@ -255,6 +255,12 @@ export default function Home() {
 
   // Initial fetch and time sync
   useEffect(() => {
+    // Handle auth errors in hash (redirect to login)
+    if (window.location.hash.includes('error=')) {
+      window.location.href = `/login${window.location.hash}`;
+      return;
+    }
+
     const syncTimeAndFetch = async () => {
       try {
         const serverTimeRes = await api.get('/time');

@@ -1,11 +1,11 @@
 ﻿import PDFDocument from "pdfkit";
 
 export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder }) => {
-  const doc = new PDFDocument({ 
-    margin: 50, 
-    size: 'A4', 
+  const doc = new PDFDocument({
+    margin: 50,
+    size: 'A4',
     bufferPages: true,
-    autoFirstPage: false 
+    autoFirstPage: false
   });
 
   const drawHeader = () => {
@@ -15,22 +15,22 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
 
     // Fixed Branding - Match User's Request Exactly
     doc.fillColor("#1E3A8A").fontSize(20).font("Helvetica-Bold")
-       .text((companyName || "IMPRESSA").toUpperCase(), left, top);
-    
+      .text((companyName || "IMPRESSA").toUpperCase(), left, top);
+
     doc.fillColor("#64748B").fontSize(9).font("Helvetica")
-       .text(subtitle || "PASTORT BONUS CO.LTD", left, top + 24);
+      .text(subtitle || "Custom Solutions ", left, top + 24);
 
     // Header Title (Right)
     doc.fillColor("#64748B").fontSize(12).font("Helvetica")
-       .text(title || "Performance Statement", left, top + 5, { align: "right", width: innerWidth });
-    
+      .text(title || "Performance Statement", left, top + 5, { align: "right", width: innerWidth });
+
     doc.fillColor("#94A3B8").fontSize(7.5)
-       .text(`Generated: ${new Date().toLocaleDateString()}`, left, top + 20, { align: "right", width: innerWidth });
+      .text(`Generated: ${new Date().toLocaleDateString()}`, left, top + 20, { align: "right", width: innerWidth });
 
     // Navy Accent Line
     doc.moveTo(left, top + 45).lineTo(left + innerWidth, top + 45)
-       .strokeColor("#1E3A8A").lineWidth(2).stroke();
-    
+      .strokeColor("#1E3A8A").lineWidth(2).stroke();
+
     doc.y = top + 70;
   };
 
@@ -39,20 +39,20 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
     const pageWidth = doc.page.width;
     const pageHeight = doc.page.height;
     const innerWidth = pageWidth - (doc.page.margins.left + doc.page.margins.right);
-    
+
     // Move up to avoid triggering auto-pagination at the page bottom
     const absoluteFooterY = pageHeight - 80;
 
     doc.save();
     doc.moveTo(left, absoluteFooterY).lineTo(left + innerWidth, absoluteFooterY)
-       .strokeColor("#E5E7EB").lineWidth(0.5).stroke();
+      .strokeColor("#E5E7EB").lineWidth(0.5).stroke();
 
     doc.fillColor("#94A3B8").fontSize(7.5).font("Helvetica")
-       .text("uwanyirigiraeleora@gmail.com | +250 788 819 878 | Building near Bank of Kigali Gicumbi Branch", 
-             left, absoluteFooterY + 8, { width: innerWidth, align: "center" });
-    
-    doc.text(`Page ${pageNumber} of ${totalPages}`, 
-             left, absoluteFooterY + 18, { width: innerWidth, align: "center" });
+      .text("uwanyirigiraeleora@gmail.com | +250 788 819 878 | Building near Bank of Kigali Gicumbi Branch",
+        left, absoluteFooterY + 8, { width: innerWidth, align: "center" });
+
+    doc.text(`Page ${pageNumber} of ${totalPages}`,
+      left, absoluteFooterY + 18, { width: innerWidth, align: "center" });
     doc.restore();
   };
 
@@ -64,14 +64,14 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
       if (doc.y > doc.page.height - 100) doc.addPage();
       doc.moveDown(1.5);
       doc.fillColor("#1E3A8A").fontSize(12).font("Helvetica-Bold")
-         .text(label.toUpperCase(), left, doc.y, { align: "center", width: innerWidth });
+        .text(label.toUpperCase(), left, doc.y, { align: "center", width: innerWidth });
       doc.moveDown(0.5);
     },
     infoBox: (label, text) => {
       const { left, right } = doc.page.margins;
       const innerWidth = doc.page.width - left - right;
       const padding = 15;
-      
+
       doc.font("Helvetica-Bold").fontSize(9.5);
       const labelStr = `${label}: `;
       const textHeight = doc.heightOfString(labelStr + text, { width: innerWidth - (padding * 2) - 10 });
@@ -86,14 +86,14 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
       doc.restore();
 
       doc.fillColor("#1E293B").fontSize(9.5).font("Helvetica-Bold")
-         .text(labelStr, left + padding + 5, currentY + padding, { lineBreak: false });
-      
+        .text(labelStr, left + padding + 5, currentY + padding, { lineBreak: false });
+
       const labelWidth = doc.widthOfString(labelStr);
       doc.font("Helvetica").fillColor("#475569")
-         .text(text, left + padding + 5 + labelWidth, currentY + padding, { 
-            width: innerWidth - (padding * 2) - 10 - labelWidth 
-         });
-      
+        .text(text, left + padding + 5 + labelWidth, currentY + padding, {
+          width: innerWidth - (padding * 2) - 10 - labelWidth
+        });
+
       doc.y = currentY + boxHeight + 20;
     },
     metricCards: (metrics) => {
@@ -102,25 +102,25 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
       const spacing = 15;
       const cardWidth = (innerWidth - (spacing * (metrics.length - 1))) / metrics.length;
       const cardHeight = 75;
-      
+
       if (doc.y + cardHeight > doc.page.height - 100) doc.addPage();
-      
+
       const startX = left;
       const startY = doc.y;
 
       metrics.forEach((m, idx) => {
         const x = startX + (idx * (cardWidth + spacing));
         const color = m.color || "#1E3A8A";
-        
+
         doc.save();
         doc.roundedRect(x, startY, cardWidth, cardHeight, 8).fill("#F8FAFC");
         doc.restore();
 
         doc.fillColor("#64748B").fontSize(8).font("Helvetica")
-           .text(m.label, x, startY + 18, { width: cardWidth, align: "center" });
-        
+          .text(m.label, x, startY + 18, { width: cardWidth, align: "center" });
+
         doc.fillColor(color).fontSize(18).font("Helvetica-Bold")
-           .text(m.value, x, startY + 38, { width: cardWidth, align: "center" });
+          .text(m.value, x, startY + 38, { width: cardWidth, align: "center" });
       });
 
       doc.y = startY + cardHeight + 25;
@@ -151,16 +151,16 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
       doc.restore();
 
       doc.fillColor(style.text).fontSize(9).font("Helvetica-Bold")
-         .text(label, alertX + padding, currentY + padding, { lineBreak: false });
-      
+        .text(label, alertX + padding, currentY + padding, { lineBreak: false });
+
       const labelWidth = doc.widthOfString(label);
       doc.font("Helvetica").text(text, alertX + padding + labelWidth, currentY + padding, { width: alertWidth - (padding * 2) - labelWidth });
-      
+
       doc.y = currentY + boxHeight + 20;
     },
     table: ({ columns, rows, totals }) => {
       if (!rows || rows.length === 0) return;
-      
+
       const startX = doc.page.margins.left;
       const totalWidth = columns.reduce((s, c) => s + (c.width || 100), 0);
       const headerHeight = 25;
@@ -168,7 +168,7 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
 
       // Header
       if (doc.y + headerHeight + rowHeight > doc.page.height - 100) doc.addPage();
-      
+
       let y = doc.y;
       doc.save().rect(startX, y, totalWidth, headerHeight).fill("#1E3A8A").restore();
       doc.fillColor("#FFFFFF").fontSize(8.5).font("Helvetica-Bold");
@@ -212,7 +212,7 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
             const badgeX = x + ((c.width || 100) - badgeWidth - 16);
             doc.roundedRect(badgeX, y + 5, badgeWidth, 12, 6).fill(isSuccess ? "#DCFCE7" : "#FEE2E2");
             doc.fillColor(isSuccess ? "#166534" : "#991B1B").fontSize(7).font("Helvetica-Bold")
-               .text(String(val).toUpperCase(), badgeX, y + 7, { width: badgeWidth, align: "center" });
+              .text(String(val).toUpperCase(), badgeX, y + 7, { width: badgeWidth, align: "center" });
             doc.restore();
           } else {
             doc.text(String(val ?? "-"), x, y + 7, { width: (c.width || 100) - 10, align: c.align || "left" });
@@ -248,7 +248,7 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
 
   // Start the document
   doc.addPage();
-  
+
   try {
     contentBuilder(doc, helpers);
   } catch (err) {
