@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     FaFileAlt, FaDownload, FaStore, FaCalendarAlt,
-    FaArrowUp, FaArrowDown, FaShoppingCart, FaStar, FaDollarSign
+    FaArrowUp, FaArrowDown, FaShoppingCart, FaStar, FaDollarSign, FaMoneyBillWave
 } from 'react-icons/fa';
 import api from '../utils/axiosInstance';
 
@@ -81,6 +81,8 @@ Metrics:
 - Total Orders: ${report.metrics.totalOrders}
 - Completed Orders: ${report.metrics.completedOrders}
 - Total Revenue: RWF ${report.metrics.totalRevenue.toLocaleString()}
+- Total Profit: RWF ${report.metrics.totalProfit.toLocaleString()}
+- Profit Margin: ${report.metrics.totalRevenue > 0 ? ((report.metrics.totalProfit / report.metrics.totalRevenue) * 100).toFixed(1) : 0}%
 - Average Rating: ${report.metrics.averageRating}/5
 - Avg Response Time: ${report.metrics.responseTime}h
 - Avg Fulfillment Time: ${report.metrics.fulfillmentTime}h
@@ -176,6 +178,14 @@ Metrics:
                                             <p className="text-lg font-bold text-charcoal-800 dark:text-white">{formatCurrency(report.metrics.totalRevenue)}</p>
                                             <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-1">Revenue</p>
                                             {getTrendIcon(report.trends.revenue)}
+                                        </div>
+                                        <div className="text-center p-3 bg-sage-50 dark:bg-sage-900/10 rounded-xl border border-sage-100 dark:border-sage-800/30">
+                                            <FaMoneyBillWave className="text-terracotta-500 mx-auto mb-2 text-lg" />
+                                            <p className="text-lg font-bold text-charcoal-800 dark:text-white">{formatCurrency(report.metrics.totalProfit)}</p>
+                                            <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-1">Profit</p>
+                                            <span className="text-[10px] font-black text-sage-600 bg-sage-100 dark:bg-sage-900/30 px-2 py-0.5 rounded-full">
+                                                {report.metrics.totalRevenue > 0 ? ((report.metrics.totalProfit / report.metrics.totalRevenue) * 100).toFixed(0) : 0}% Margin
+                                            </span>
                                         </div>
                                         <div className="text-center p-3 bg-cream-50 dark:bg-charcoal-700 rounded-xl">
                                             <FaStar className="text-sand-500 mx-auto mb-2" />

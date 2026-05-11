@@ -252,6 +252,8 @@ export const getSellerPerformanceReports = async (req, res, next) => {
                 completedOrderIds: new Set(),
                 cancelledOrderIds: new Set(),
                 totalRevenue: 0,
+                totalProfit: 0,
+                totalCost: 0,
                 fulfillmentTimes: []
             };
         });
@@ -277,7 +279,11 @@ export const getSellerPerformanceReports = async (req, res, next) => {
             
             if (item.order.status === 'delivered') {
                 s.completedOrderIds.add(item.orderId);
-                s.totalRevenue += (item.subtotal || 0);
+                const revenue = item.subtotal || 0;
+                const cost = (item.cost || 0) * item.quantity;
+                s.totalRevenue += revenue;
+                s.totalCost += cost;
+                s.totalProfit += (revenue - cost);
             } else if (item.order.status === 'cancelled') {
                 s.cancelledOrderIds.add(item.orderId);
             }
@@ -338,6 +344,8 @@ export const getSellerPerformanceReports = async (req, res, next) => {
                     completedOrders: completed,
                     cancelledOrders: cancelled,
                     totalRevenue: revenue,
+                    totalCost: s.totalCost,
+                    totalProfit: s.totalProfit,
                     averageOrderValue: completed > 0 ? Math.round(revenue / completed) : 0,
                     averageRating: parseFloat(avgRating.toFixed(1)),
                     fulfillmentTime: 24, // Default placeholder
