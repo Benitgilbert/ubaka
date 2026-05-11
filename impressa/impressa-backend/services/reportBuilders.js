@@ -58,6 +58,7 @@ const getRangeReport = async (start, end, sellerId) => {
   const productCount = {};
   const customizationCount = { customText: 0, customFile: 0, cloudLink: 0 };
   let totalRevenue = 0;
+  let totalCost = 0;
   let totalDebtCollected = 0;
   let totalExpenses = 0;
   let cashRevenue = 0;
@@ -87,7 +88,10 @@ const getRangeReport = async (start, end, sellerId) => {
         if (name) productCount[name] = (productCount[name] || 0) + item.quantity;
         
         const itemRevenue = (item.subtotal || 0);
+        const itemCost = (item.cost || 0) * item.quantity;
+
         totalRevenue += itemRevenue;
+        totalCost += itemCost;
 
         // Categorize revenue by payment method
         const method = (order.paymentMethod || "cash").toLowerCase();
@@ -145,6 +149,8 @@ const getRangeReport = async (start, end, sellerId) => {
     cancelled: orders.filter(o => o.status === "cancelled").length,
     topProduct,
     topCustomization,
+    totalCost,
+    totalProfit: totalRevenue - totalCost,
   };
 
   return { orders, summary, expenses, shifts, abonneTransactions };
@@ -322,17 +328,29 @@ const getInventoryReport = async ({ sellerId }) => {
       ]
     },
     include: { categories: { select: { name: true } } },
+    select: {
+      id: true,
+      name: true,
+      sku: true,
+      price: true,
+      costPrice: true,
+      stock: true,
+      categories: { select: { name: true } }
+    },
     orderBy: { name: 'asc' }
   });
 
   const totalProducts = products.length;
   const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
-  const totalValue = products.reduce((sum, p) => sum + ((p.stock || 0) * (p.price || 0)), 0);
+  const totalRetailValue = products.reduce((sum, p) => sum + ((p.stock || 0) * (p.price || 0)), 0);
+  const totalCostValue = products.reduce((sum, p) => sum + ((p.stock || 0) * (p.costPrice || 0)), 0);
 
   const summary = {
     totalProducts,
     totalStock,
-    totalValue,
+    totalRetailValue,
+    totalCostValue,
+    potentialProfit: totalRetailValue - totalCostValue,
   };
 
   return { products, summary };
