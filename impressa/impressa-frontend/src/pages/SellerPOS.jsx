@@ -34,6 +34,7 @@ export default function SellerPOS() {
     const [processing, setProcessing] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [seller, setSeller] = useState(null);
+    const [showMobileCart, setShowMobileCart] = useState(false);
 
     // Barcode scanning
     const [scanBuffer, setScanBuffer] = useState("");
@@ -157,7 +158,7 @@ export default function SellerPOS() {
     }, [selectedClient, fetchContractPrices]);
 
     const addToCart = useCallback((product, isVariation = false) => {
-        if (product.stock <= 0) return;
+        if (product.stock <= 0 && product.type !== 'service') return;
         setCart(prevCart => {
             const uniqueId = isVariation ? `${product.id}-${product.variationId}` : product.id;
             const existing = prevCart.find((item) => (item.uniqueId || item.id) === uniqueId);
@@ -600,8 +601,8 @@ export default function SellerPOS() {
     const changeAmount = parseFloat(cashReceived || 0) - calculateTotal();
 
     return (
-        <div className="flex flex-col min-w-0 h-full overflow-hidden">
-            <main className="flex-1 p-4 md:p-6 overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-6 relative">
+        <div className="flex flex-col min-w-0 h-[100dvh] overflow-hidden bg-gray-50 dark:bg-gray-900">
+            <main className="flex-1 p-0 md:p-6 overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-0 md:gap-6 relative">
 
                     {/* Shift Management moved to Cart Header for better visibility */}
 
@@ -1111,8 +1112,9 @@ export default function SellerPOS() {
                         </div>
                     )}
 
-                    <div className="md:col-span-8 flex flex-col min-w-0 h-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-gray-800 z-10">
+                    {/* --- PRODUCT SECTION --- */}
+                    <div className={`md:col-span-8 flex flex-col min-w-0 h-full bg-white dark:bg-gray-800 md:rounded-2xl shadow-sm border-r md:border border-gray-100 dark:border-gray-700 overflow-hidden transition-all ${showMobileCart ? 'hidden md:flex' : 'flex'}`}>
+                        <div className="p-4 md:p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-3 bg-white dark:bg-gray-800 z-10">
                             <div>
                                 <h1 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                                     <FaStore className="text-indigo-600" /> {seller?.storeName || 'My Store'} POS <span className="text-[10px] bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-400">v1.1</span>
@@ -1210,16 +1212,26 @@ export default function SellerPOS() {
                         </div>
                     </div>
 
-                    <div className="md:col-span-4 flex flex-col h-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div className="p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/80">
+                    {/* --- CART SECTION --- */}
+                    <div className={`md:col-span-4 flex flex-col h-full bg-white dark:bg-gray-800 md:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all ${showMobileCart ? 'flex' : 'hidden md:flex'}`}>
+                        <div className="p-4 md:p-5 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/80">
                              <div className="flex justify-between items-start mb-4">
-                                 <div>
-                                    <h2 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                        <FaShoppingCart className="text-indigo-600" /> Current Sale
-                                    </h2>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 block">
-                                        {cart.length} items in cart
-                                    </span>
+                                 <div className="flex items-center gap-3">
+                                    {/* Back button for mobile */}
+                                    <button 
+                                        onClick={() => setShowMobileCart(false)}
+                                        className="md:hidden w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full"
+                                    >
+                                        <FaTimes className="text-gray-500" />
+                                    </button>
+                                    <div>
+                                        <h2 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                            <FaShoppingCart className="text-indigo-600" /> Cart
+                                        </h2>
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
+                                            {cart.length} items
+                                        </span>
+                                    </div>
                                  </div>
                                  
                                  <div className="flex flex-col gap-2 items-end">
@@ -1478,6 +1490,30 @@ export default function SellerPOS() {
                         )}
                     </div>
                 </main>
+
+                {/* Mobile Floating Action Bar */}
+                {!showMobileCart && cart.length > 0 && (
+                    <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 animate-in slide-in-from-bottom duration-300">
+                        <button 
+                            onClick={() => setShowMobileCart(true)}
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl p-4 shadow-2xl shadow-indigo-600/40 flex justify-between items-center group active:scale-95 transition-all"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <FaShoppingCart />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-xs font-bold opacity-80 uppercase tracking-widest">View Order</p>
+                                    <p className="font-black text-lg">{cart.length} Items</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs font-bold opacity-80 uppercase tracking-widest">Total</p>
+                                <p className="font-black text-xl">RWF {calculateTotal().toLocaleString()}</p>
+                            </div>
+                        </button>
+                    </div>
+                )}
             </div>
     );
 }
