@@ -23,6 +23,7 @@ import RoleSwitcher from "./RoleSwitcher";
 import api from "../utils/axiosInstance";
 import assetUrl from "../utils/assetUrl";
 import { formatRwf } from "../utils/currency";
+import { supabase } from "../utils/supabaseClient";
 
 export default function Header() {
   const { items = [] } = useCart();
@@ -64,6 +65,27 @@ export default function Header() {
     };
 
     fetchCategories();
+
+    // Set up Real-time subscription
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Category'
+        },
+        () => {
+          console.log('Categories changed, re-fetching...');
+          fetchCategories();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
 

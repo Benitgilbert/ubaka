@@ -1,32 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { FaEye, FaFilter, FaBox } from "react-icons/fa";
 import api from "../utils/axiosInstance";
 
 const SellerOrders = () => {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState("all");
 
-    const fetchOrders = useCallback(async (isPolling = false) => {
-        try {
-            if (!isPolling) setLoading(true);
+    const { data: orders = [], isLoading } = useQuery({
+        queryKey: ['seller-orders'],
+        queryFn: async () => {
             const res = await api.get("/orders/seller/my-orders");
-            if (res.data.success) {
-                setOrders(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch orders", err);
-        } finally {
-            if (!isPolling) setLoading(false);
-        }
-    }, []);
+            return res.data.success ? res.data.data : [];
+        },
+        refetchInterval: 15000 // Background sync every 15s
+    });
 
-    useEffect(() => {
-        fetchOrders();
-        const interval = setInterval(() => fetchOrders(true), 10000); // 10s polling
-        return () => clearInterval(interval);
-    }, [fetchOrders]);
+    const loading = isLoading;
 
     const getStatusBadge = (status) => {
         const badges = {

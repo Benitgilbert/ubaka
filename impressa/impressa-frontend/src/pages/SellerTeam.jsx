@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FaPlus, FaTrash, FaUserShield, FaUserFriends, FaEnvelope, FaLock, FaTimes } from "react-icons/fa";
 import api from "../utils/axiosInstance";
 
 const SellerTeam = () => {
-    const [staff, setStaff] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [showModal, setShowModal] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
@@ -15,23 +15,15 @@ const SellerTeam = () => {
         password: ""
     });
 
-    const fetchStaff = async () => {
-        try {
-            setLoading(true);
+    const { data: staff = [], isLoading } = useQuery({
+        queryKey: ['staff'],
+        queryFn: async () => {
             const res = await api.get("/staff");
-            if (res.data.success) {
-                setStaff(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch staff:", err);
-        } finally {
-            setLoading(false);
+            return res.data.success ? res.data.data : [];
         }
-    };
+    });
 
-    useEffect(() => {
-        fetchStaff();
-    }, []);
+    const loading = isLoading;
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,7 +36,7 @@ const SellerTeam = () => {
         try {
             const res = await api.post("/staff", form);
             if (res.data.success) {
-                setStaff([res.data.staff, ...staff]);
+                queryClient.invalidateQueries(['staff']);
                 setShowModal(false);
                 setForm({ name: "", email: "", password: "" });
             }
@@ -59,7 +51,7 @@ const SellerTeam = () => {
         if (window.confirm("Are you sure you want to remove this staff member? They will lose access to the POS immediately.")) {
             try {
                 await api.delete(`/staff/${id}`);
-                setStaff(staff.filter(s => s.id !== id));
+                queryClient.invalidateQueries(['staff']);
             } catch (err) {
                 alert("Failed to remove staff member");
             }

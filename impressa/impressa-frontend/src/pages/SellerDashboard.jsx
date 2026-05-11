@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
     FaChartLine, FaDollarSign, FaBox, FaShoppingCart, FaMoneyBillWave
@@ -31,28 +32,6 @@ ChartJS.register(
 );
 
 export default function SellerDashboard() {
-    const [user, setUser] = useState(null);
-    const [stats, setStats] = useState({
-        totalProducts: 0,
-        activeProducts: 0,
-        pendingProducts: 0,
-        totalOrders: 0,
-        pendingOrders: 0,
-        totalEarnings: 0,
-        availableBalance: 0,
-        pendingPayouts: 0
-    });
-    const [shiftStats, setShiftStats] = useState({
-        isOpen: false,
-        moneyInDrawer: 0,
-        cashSales: 0,
-        momoSales: 0,
-        debtCollected: 0
-    });
-    const [recentOrders, setRecentOrders] = useState([]);
-    const [topProducts, setTopProducts] = useState([]);
-    const [revenueData, setRevenueData] = useState({ labels: [], datasets: [] });
-    const [loading, setLoading] = useState(true);
 
     const formatCurrency = (amount) => `RWF ${(amount || 0).toLocaleString()}`;
     const getStatusBadge = (status) => {
@@ -67,107 +46,96 @@ export default function SellerDashboard() {
         return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.class}`}>{badge.text}</span>;
     };
 
-    const fetchDashboardData = useCallback(async (isPolling = false) => {
-        try {
-            if (!isPolling) setLoading(true);
-
-            // Get user info (only once effectively, but cheap)
-            if (!user) {
-                const userRes = await api.get('/auth/me');
-                setUser(userRes.data);
-            }
-
-            // Get seller's products stats
-            const productsRes = await api.get('/products/seller/my-products?limit=5');
-            if (productsRes.data.success) {
-                setTopProducts(productsRes.data.data.slice(0, 5));
-                setStats(prev => ({
-                    ...prev,
-                    totalProducts: productsRes.data.pagination?.total || productsRes.data.data.length
-                }));
-            }
-
-            // Get earnings summary
-            try {
-                const earningsRes = await api.get('/commissions/my-earnings');
-                if (earningsRes.data.success) {
-                    const earningsData = earningsRes.data.data || {};
-                    const totalEarnings = (earningsData.totalPaid || 0) + (earningsData.availableBalance || 0);
-
-                    setStats(prev => ({
-                        ...prev,
-                        totalEarnings: totalEarnings,
-                        availableBalance: earningsData.availableBalance || 0,
-                        pendingPayouts: earningsData.pendingPayouts || 0
-                    }));
-                }
-            } catch (err) {
-                console.error('Failed to fetch earnings summary', err);
-            }
-
-            // Get recent orders for this seller
-            try {
-                const ordersRes = await api.get('/orders/seller/my-orders?limit=5');
-                if (ordersRes.data.success) {
-                    const allOrders = ordersRes.data.data || [];
-                    setRecentOrders(allOrders.slice(0, 5));
-                    setStats(prev => ({
-                        ...prev,
-                        totalOrders: ordersRes.data.pagination?.total || allOrders.length || 0
-                    }));
-                }
-            } catch (err) {
-                console.error('Failed to fetch recent orders', err);
-            }
-
-            // Get revenue data (Sales Chart) - Only fetch initially to save bandwidth
-            if (!isPolling) {
-                try {
-                    const revenueRes = await api.get('/analytics/seller/revenue?period=day');
-                    const data = Array.isArray(revenueRes.data) ? revenueRes.data : [];
-                    const labels = data.map(item => item.label);
-                    const revenues = data.map(item => item.revenue);
-
-                    setRevenueData({
-                        labels,
-                        datasets: [
-                            {
-                                label: 'Sales Revenue',
-                                data: revenues,
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                fill: true,
-                                tension: 0.4,
-                                pointRadius: 4,
-                                pointHoverRadius: 6
-                            }
-                        ]
-                    });
-                } catch (err) { }
-            }
-
-            // Get active shift stats
-            try {
-                const shiftRes = await api.get('/shifts/active-stats');
-                if (shiftRes.data.success) {
-                    setShiftStats(shiftRes.data.data);
-                }
-            } catch (err) {
-                console.error('Failed to fetch shift stats', err);
-            }
-
-        } catch (err) {
-            console.error('Failed to fetch dashboard data', err);
-        } finally {
-            if (!isPolling) setLoading(false);
+    // 1. Fetch Auth User
+    const { data: user } = useQuery({
+        queryKey: ['auth-me'],
+        queryFn: async () => {
+            const res = await api.get('/auth/me');
+            return res.data;
         }
-    }, [user]);
+    });
 
-    useEffect(() => {
-        fetchDashboardData();
-        const interval = setInterval(() => fetchDashboardData(true), 15000); // 15s polling
-        return () => clearInterval(interval);
-    }, [fetchDashboardData]);
+    // 2. Fetch Earnings & General Stats
+    const { data: dashboardStats = { totalEarnings: 0, availableBalance: 0, pendingPayouts: 0, totalProducts: 0, totalOrders: 0 }, isLoading: statsLoading } = useQuery({
+        queryKey: ['seller-dashboard-stats'],
+        queryFn: async () => {
+            const [earningsRes, productsRes, ordersRes] = await Promise.all([
+                api.get('/commissions/my-earnings'),
+                api.get('/products/seller/my-products?limit=1'), // Just to get total count
+                api.get('/orders/seller/my-orders?limit=1')    // Just to get total count
+            ]);
+
+            const earnings = earningsRes.data.data || {};
+            return {
+                totalEarnings: (earnings.totalPaid || 0) + (earnings.availableBalance || 0),
+                availableBalance: earnings.availableBalance || 0,
+                pendingPayouts: earnings.pendingPayouts || 0,
+                totalProducts: productsRes.data.pagination?.total || 0,
+                totalOrders: ordersRes.data.pagination?.total || 0
+            };
+        }
+    });
+
+    // 3. Fetch Active Shift Stats (Polling every 15s)
+    const { data: shiftStats = { isOpen: false, moneyInDrawer: 0, cashSales: 0, momoSales: 0, debtCollected: 0 } } = useQuery({
+        queryKey: ['active-shift-stats'],
+        queryFn: async () => {
+            const res = await api.get('/shifts/active-stats');
+            return res.data.success ? res.data.data : shiftStats;
+        },
+        refetchInterval: 15000 // Poll every 15s
+    });
+
+    // 4. Fetch Recent Orders
+    const { data: recentOrders = [] } = useQuery({
+        queryKey: ['recent-orders'],
+        queryFn: async () => {
+            const res = await api.get('/orders/seller/my-orders?limit=5');
+            return res.data.success ? (res.data.data || []) : [];
+        },
+        refetchInterval: 30000 // Poll every 30s
+    });
+
+    // 5. Fetch Top Products
+    const { data: topProducts = [] } = useQuery({
+        queryKey: ['seller-top-products'],
+        queryFn: async () => {
+            const res = await api.get('/products/seller/my-products?limit=5');
+            return res.data.success ? (res.data.data || []) : [];
+        }
+    });
+
+    // 6. Fetch Revenue Data (Sales Chart)
+    const { data: revenueDataRaw = [] } = useQuery({
+        queryKey: ['revenue-analytics'],
+        queryFn: async () => {
+            const res = await api.get('/analytics/seller/revenue?period=day');
+            return Array.isArray(res.data) ? res.data : [];
+        }
+    });
+
+    const revenueData = useMemo(() => {
+        const labels = revenueDataRaw.map(item => item.label);
+        const revenues = revenueDataRaw.map(item => item.revenue);
+
+        return {
+            labels,
+            datasets: [
+                {
+                    label: 'Sales Revenue',
+                    data: revenues,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        };
+    }, [revenueDataRaw]);
+
+    const isLoading = statsLoading;
 
 
 
@@ -191,7 +159,7 @@ export default function SellerDashboard() {
         maintainAspectRatio: false
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <main className="flex-1 p-8 flex items-center justify-center">
                 <div className="flex flex-col items-center">
@@ -231,7 +199,7 @@ export default function SellerDashboard() {
                                     </div>
                                     <p className="text-sm font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider">Total Earnings</p>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{formatCurrency(stats.totalEarnings)}</h3>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{formatCurrency(dashboardStats.totalEarnings)}</h3>
                             </div>
 
                             {/* Available Balance */}
@@ -242,7 +210,7 @@ export default function SellerDashboard() {
                                     </div>
                                     <p className="text-sm font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider">Balance</p>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{formatCurrency(stats.availableBalance)}</h3>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{formatCurrency(dashboardStats.availableBalance)}</h3>
                             </div>
 
                             {/* Total Orders */}
@@ -253,7 +221,7 @@ export default function SellerDashboard() {
                                     </div>
                                     <p className="text-sm font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider">Total Orders</p>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{stats.totalOrders}</h3>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{dashboardStats.totalOrders}</h3>
                             </div>
 
                             {/* Total Products */}
@@ -264,7 +232,7 @@ export default function SellerDashboard() {
                                     </div>
                                     <p className="text-sm font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider">Products</p>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{stats.totalProducts}</h3>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white truncate">{dashboardStats.totalProducts}</h3>
                             </div>
 
                             {/* Money in Drawer (New Card) */}

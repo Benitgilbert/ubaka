@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "../utils/axiosInstance";
 import { FaUserPlus, FaFileInvoiceDollar, FaTimes, FaMoneyBillWave, FaPrint, FaTag, FaPlus, FaTrash, FaSearch } from "react-icons/fa";
 
-
 const SellerAbonne = () => {
-    const [clients, setClients] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [showAddModal, setShowAddModal] = useState(false);
     const [showFicheModal, setShowFicheModal] = useState(false);
     const [showPayModal, setShowPayModal] = useState(false);
@@ -19,59 +18,45 @@ const SellerAbonne = () => {
     // Contract Prices State
     const [showPriceModal, setShowPriceModal] = useState(false);
     const [contractPrices, setContractPrices] = useState([]);
-    const [allProducts, setAllProducts] = useState([]);
     const [newPrice, setNewPrice] = useState({ productId: "", price: "" });
     const [savingPrice, setSavingPrice] = useState(false);
     const [productSearchTerm, setProductSearchTerm] = useState("");
-    const [siteSettings, setSiteSettings] = useState(null);
 
-    useEffect(() => {
-        fetchClients();
-        fetchProducts();
-        fetchSettings();
-    }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const res = await axios.get("/site-settings/public");
-            if (res.data.success) {
-                setSiteSettings(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch site settings");
-        }
-    };
-
-    const fetchProducts = async () => {
-        try {
-            const res = await axios.get("/orders/seller/pos-products");
-            if (res.data.success) {
-                setAllProducts(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch products");
-        }
-    };
-
-    const fetchClients = async () => {
-        try {
+    // 1. Fetch Clients
+    const { data: clients = [], isLoading: clientsLoading } = useQuery({
+        queryKey: ['abonnes'],
+        queryFn: async () => {
             const res = await axios.get("/abonnes");
-            if (res.data.success) {
-                setClients(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch abonnes", err);
-        } finally {
-            setLoading(false);
+            return res.data.success ? res.data.data : [];
         }
-    };
+    });
+
+    // 2. Fetch Products
+    const { data: allProducts = [] } = useQuery({
+        queryKey: ['pos-products'],
+        queryFn: async () => {
+            const res = await axios.get("/orders/seller/pos-products");
+            return res.data.success ? res.data.data : [];
+        }
+    });
+
+    // 3. Fetch Site Settings
+    const { data: siteSettings } = useQuery({
+        queryKey: ['site-settings-public'],
+        queryFn: async () => {
+            const res = await axios.get("/site-settings/public");
+            return res.data.success ? res.data.data : null;
+        }
+    });
+
+    const loading = clientsLoading;
 
     const handleAddClient = async (e) => {
         e.preventDefault();
         try {
             const res = await axios.post("/abonnes", newClient);
             if (res.data.success) {
-                setClients([...clients, res.data.data].sort((a, b) => a.name.localeCompare(b.name)));
+                queryClient.invalidateQueries(['abonnes']);
                 setShowAddModal(false);
                 setNewClient({ name: "", phone: "", email: "" });
             }
@@ -100,8 +85,7 @@ const SellerAbonne = () => {
         try {
             const res = await axios.post(`/abonnes/${selectedClient.id}/pay`, { amount: Number(payAmount) });
             if (res.data.success) {
-                // Update client in list
-                setClients(clients.map(c => c.id === selectedClient.id ? res.data.data : c));
+                queryClient.invalidateQueries(['abonnes']);
                 setShowPayModal(false);
                 setPayAmount("");
                 alert("Payment recorded successfully!");
@@ -132,7 +116,6 @@ const SellerAbonne = () => {
             setSavingPrice(true);
             const res = await axios.post(`/abonnes/${selectedClient.id}/prices`, newPrice);
             if (res.data.success) {
-                // Refresh prices
                 const freshRes = await axios.get(`/abonnes/${selectedClient.id}/prices`);
                 setContractPrices(freshRes.data.data);
                 setNewPrice({ productId: "", price: "" });
@@ -162,7 +145,7 @@ const SellerAbonne = () => {
         document.body.innerHTML = printContent;
         window.print();
         document.body.innerHTML = originalContent;
-        window.location.reload(); // Reload to restore React state bindings
+        window.location.reload(); 
     };
 
     return (

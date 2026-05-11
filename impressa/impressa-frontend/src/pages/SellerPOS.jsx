@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import assetUrl from "../utils/assetUrl";
@@ -27,13 +28,10 @@ const playBeep = () => {
 };
 
 export default function SellerPOS() {
-    const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [seller, setSeller] = useState(null);
     const [showMobileCart, setShowMobileCart] = useState(false);
 
     // Barcode scanning
@@ -42,7 +40,6 @@ export default function SellerPOS() {
     const searchInputRef = useRef(null);
 
     // Shifts
-    const [activeShift, setActiveShift] = useState(null);
     const [showStartShiftModal, setShowStartShiftModal] = useState(false);
     const [startingAmount, setStartingAmount] = useState("");
     const [showCloseShiftModal, setShowCloseShiftModal] = useState(false);
@@ -99,7 +96,7 @@ export default function SellerPOS() {
             setAbonneUpfrontCash("");
             setCollectedBy("");
             setCart([]);
-            fetchProducts();
+            queryClient.invalidateQueries(['pos-products', 'active-shift']);
         } catch (err) {
             alert(err.response?.data?.message || "Failed to process sale");
         } finally {
@@ -120,23 +117,57 @@ export default function SellerPOS() {
     const [completedOrder, setCompletedOrder] = useState(null);
     const [scanError, setScanError] = useState("");
 
-    // Client Selection
-    const [clients, setClients] = useState([]);
-    const [selectedClient, setSelectedClient] = useState(null);
-    const [clientContractPrices, setClientContractPrices] = useState([]);
-    const [clientSearchTerm, setClientSearchTerm] = useState("");
-    const [clientMode, setClientMode] = useState("guest"); // "guest" or "abonne"
+    const queryClient = useQueryClient();
 
-    const fetchClients = useCallback(async () => {
-        try {
-            const res = await api.get("/abonnes");
-            if (res.data.success) {
-                setClients(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch clients");
+    // 1. Fetch Products
+    const { data: products = [], isLoading: productsLoading } = useQuery({
+        queryKey: ['pos-products'],
+        queryFn: async () => {
+            const res = await api.get("/orders/seller/pos-products");
+            return res.data.success ? res.data.data : [];
         }
-    }, []);
+    });
+
+    // 2. Fetch Clients (Abonnés)
+    const { data: clients = [] } = useQuery({
+        queryKey: ['pos-clients'],
+        queryFn: async () => {
+            const res = await api.get("/abonnes");
+            return res.data.success ? res.data.data : [];
+        }
+    });
+
+    // 3. Fetch Seller Info
+    const { data: seller } = useQuery({
+        queryKey: ['auth-me'],
+        queryFn: async () => {
+            const res = await api.get("/auth/me");
+            return res.data;
+        }
+    });
+
+    // 4. Fetch Active Shift
+    const { data: activeShift = null, isLoading: shiftLoading } = useQuery({
+        queryKey: ['active-shift'],
+        queryFn: async () => {
+            try {
+                const res = await api.get("/shifts/current");
+                return (res.data.success && res.data.data) ? res.data.data : null;
+            } catch (err) {
+                return null;
+            }
+        },
+        refetchInterval: 30000 // Poll every 30s
+    });
+
+    // Handle shift modal visibility based on activeShift
+    useEffect(() => {
+        if (!shiftLoading && !activeShift) {
+            setShowStartShiftModal(true);
+        } else {
+            setShowStartShiftModal(false);
+        }
+    }, [activeShift, shiftLoading]);
 
     const fetchContractPrices = useCallback(async (clientId) => {
         try {
@@ -199,51 +230,6 @@ export default function SellerPOS() {
         }
     }, [products, addToCart]);
 
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await api.get("/orders/seller/pos-products");
-            if (res.data.success) {
-                setProducts(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch products");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const fetchSellerInfo = useCallback(async () => {
-        try {
-            const res = await api.get("/auth/me");
-            setSeller(res.data);
-        } catch (err) {
-            console.error("Failed to fetch seller info");
-        }
-    }, []);
-
-    const fetchActiveShift = useCallback(async () => {
-        try {
-            const res = await api.get("/shifts/current");
-            if (res.data.success && res.data.data) {
-                setActiveShift(res.data.data);
-                setShowStartShiftModal(false);
-            } else {
-                setActiveShift(null);
-                setShowStartShiftModal(true);
-            }
-        } catch (err) {
-            console.error("Failed to fetch shift", err);
-            setShowStartShiftModal(true);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchProducts();
-        fetchSellerInfo();
-        fetchActiveShift();
-        fetchClients();
-    }, [fetchProducts, fetchSellerInfo, fetchActiveShift, fetchClients]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -481,7 +467,7 @@ export default function SellerPOS() {
             setCompletedOrder(order);
             setShowReceipt(true);
             setCart([]);
-            fetchProducts(); 
+            queryClient.invalidateQueries(['pos-products', 'active-shift']);
         } catch (err) {
             alert(err.response?.data?.message || "Failed to process sale");
         } finally {
@@ -512,7 +498,7 @@ export default function SellerPOS() {
                         });
                         setShowReceipt(true);
                         setCart([]);
-                        fetchProducts();
+                        queryClient.invalidateQueries(['pos-products', 'active-shift']);
                     } else if (res.data.status === "failed") {
                         clearInterval(interval);
                         setPendingOrder(null);
@@ -525,7 +511,7 @@ export default function SellerPOS() {
             }, 3000);
         }
         return () => clearInterval(interval);
-    }, [pendingOrder, cart, seller, fetchProducts, getItemPrice]);
+    }, [pendingOrder, cart, seller, queryClient, getItemPrice]);
 
     const handleReceiptClose = () => {
         setShowReceipt(false);
@@ -537,7 +523,7 @@ export default function SellerPOS() {
         try {
             const res = await api.post("/shifts/start", { startingDrawerAmount: Number(startingAmount) });
             if (res.data.success) {
-                setActiveShift(res.data.data);
+                queryClient.invalidateQueries(['active-shift']);
                 setShowStartShiftModal(false);
             }
         } catch (err) {
@@ -558,7 +544,7 @@ export default function SellerPOS() {
                 if (reportRes.data.success) {
                     setShiftReport(reportRes.data.data);
                 }
-                setActiveShift(null);
+                queryClient.invalidateQueries(['active-shift']);
             }
         } catch (err) {
             alert(err.response?.data?.message || "Failed to close shift");
@@ -583,7 +569,7 @@ export default function SellerPOS() {
                 toast.success(expenseData.type === "in" ? "Money back recorded" : "Expense recorded");
                 setShowExpenseModal(false);
                 setExpenseData({ description: "", amount: "", category: "General", paymentMethod: "cash", type: "out" });
-                fetchActiveShift(); // Refresh shift stats
+                queryClient.invalidateQueries(['active-shift']); // Refresh shift stats
             }
         } catch (err) {
             alert(err.response?.data?.message || "Failed to record expense");

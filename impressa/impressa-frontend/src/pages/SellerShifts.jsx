@@ -1,46 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { FaHistory, FaCalendarAlt, FaArrowRight, FaTimes, FaClock, FaClipboardList, FaExclamationTriangle } from "react-icons/fa";
 import api from "../utils/axiosInstance";
 
 const SellerShifts = () => {
-    const [shifts, setShifts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedShift, setSelectedShift] = useState(null);
-    const [reportLoading, setReportLoading] = useState(false);
-    const [shiftReport, setShiftReport] = useState(null);
+    const [selectedShiftId, setSelectedShiftId] = useState(null);
 
-    const fetchShifts = async () => {
-        try {
-            setLoading(true);
+    // 1. Fetch Shifts List
+    const { data: shifts = [], isLoading: shiftsLoading } = useQuery({
+        queryKey: ['my-shifts'],
+        queryFn: async () => {
             const res = await api.get("/shifts/my-shifts");
-            if (res.data.success) {
-                setShifts(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch shifts", err);
-        } finally {
-            setLoading(false);
+            return res.data.success ? res.data.data : [];
         }
-    };
+    });
 
-    const fetchShiftReport = async (shiftId) => {
-        try {
-            setReportLoading(true);
-            setSelectedShift(shifts.find(s => s.id === shiftId));
-            const res = await api.get(`/shifts/${shiftId}/report`);
-            if (res.data.success) {
-                setShiftReport(res.data.data);
-            }
-        } catch (err) {
-            console.error("Failed to fetch shift report", err);
-        } finally {
-            setReportLoading(false);
-        }
-    };
+    // 2. Fetch Selected Shift Report
+    const { data: shiftReport, isLoading: reportLoading } = useQuery({
+        queryKey: ['shift-report', selectedShiftId],
+        queryFn: async () => {
+            if (!selectedShiftId) return null;
+            const res = await api.get(`/shifts/${selectedShiftId}/report`);
+            return res.data.success ? res.data.data : null;
+        },
+        enabled: !!selectedShiftId
+    });
 
-    useEffect(() => {
-        fetchShifts();
-    }, []);
+    const selectedShift = shifts.find(s => s.id === selectedShiftId);
+    const loading = shiftsLoading;
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-RW', { style: 'currency', currency: 'RWF', minimumFractionDigits: 0 }).format(amount || 0);
@@ -88,7 +75,7 @@ const SellerShifts = () => {
                         {shifts.map((shift) => (
                             <div 
                                 key={shift.id} 
-                                onClick={() => fetchShiftReport(shift.id)}
+                                onClick={() => setSelectedShiftId(shift.id)}
                                 className="group bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-500/50 transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
                             >
                                 <div className="flex items-center gap-4">
@@ -137,7 +124,7 @@ const SellerShifts = () => {
                                 </p>
                             </div>
                             <button
-                                onClick={() => { setSelectedShift(null); setShiftReport(null); }}
+                                onClick={() => setSelectedShiftId(null)}
                                 className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                             >
                                 <FaTimes />
@@ -305,7 +292,7 @@ const SellerShifts = () => {
                                 Print View
                             </button>
                             <button
-                                onClick={() => { setSelectedShift(null); setShiftReport(null); }}
+                                onClick={() => setSelectedShiftId(null)}
                                 className="flex-[2] py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98]"
                             >
                                 Done

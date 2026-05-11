@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -94,10 +95,20 @@ import AdminLayout from "./components/AdminLayout";
 import SellerLayout from "./components/SellerLayout";
 
 import { Toaster } from "react-hot-toast";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60000, // Data is fresh for 1 minute
+      cacheTime: 300000, // Data stays in memory for 5 minutes
+      refetchOnWindowFocus: false, // Don't refetch just because window regained focus
+    },
+  },
+});
 
 function App() {
   return (
-    <ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
           <CartProvider>
@@ -222,6 +233,7 @@ function App() {
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

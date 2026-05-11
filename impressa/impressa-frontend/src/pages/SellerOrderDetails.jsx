@@ -1,39 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../utils/axiosInstance";
 import { FaArrowLeft, FaBox, FaMapMarkerAlt, FaUser, FaCreditCard } from "react-icons/fa";
 
 const SellerOrderDetails = () => {
     const { id } = useParams();
-    const [order, setOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [updating, setUpdating] = useState(false);
     const [noteText, setNoteText] = useState("");
     const [addingNote, setAddingNote] = useState(false);
 
-    useEffect(() => {
-        const fetchOrderDetails = async () => {
-            try {
-                const { data } = await api.get(`/orders/${id}`);
-                setOrder(data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Failed to fetch order details:", error);
-                setLoading(false);
-            }
-        };
+    // 1. Fetch Order Details
+    const { data: order, isLoading } = useQuery({
+        queryKey: ['order-details', id],
+        queryFn: async () => {
+            const { data } = await api.get(`/orders/${id}`);
+            return data;
+        },
+        enabled: !!id
+    });
 
-        fetchOrderDetails();
-    }, [id]);
+    const loading = isLoading;
 
     const handleStatusUpdate = async (newStatus) => {
-        // Removed window.confirm to fix popup issue
-        // if (!window.confirm(`Are you sure you want to change status to "${newStatus}"?`)) return;
-
         setUpdating(true);
         try {
-            const { data } = await api.put(`/orders/${id}/status`, { status: newStatus });
-            setOrder(data);
+            await api.put(`/orders/${id}/status`, { status: newStatus });
+            queryClient.invalidateQueries(['order-details', id]);
+            queryClient.invalidateQueries(['seller-orders']);
             alert(`Order status updated to ${newStatus}`);
         } catch (error) {
             console.error("Failed to update status:", error);
@@ -49,11 +44,11 @@ const SellerOrderDetails = () => {
 
         setAddingNote(true);
         try {
-            const { data } = await api.post(`/orders/${id}/notes`, {
+            await api.post(`/orders/${id}/notes`, {
                 text: noteText,
-                isCustomerVisible: true // Sellers usually add customer-facing updates
+                isCustomerVisible: true 
             });
-            setOrder(data);
+            queryClient.invalidateQueries(['order-details', id]);
             setNoteText("");
             alert("Update added successfully");
         } catch (error) {

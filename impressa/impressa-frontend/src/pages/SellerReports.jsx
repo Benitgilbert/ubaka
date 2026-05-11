@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../utils/axiosInstance";
 import { supabase } from "../utils/supabaseClient";
 import { FaDownload, FaFilePdf, FaFileCsv, FaHistory, FaCheckCircle, FaExclamationTriangle, FaMoneyBillWave, FaTimes } from "react-icons/fa";
 
 function SellerReports() {
+  const queryClient = useQueryClient();
   const [type, setType] = useState("daily");
   const [format, setFormat] = useState("pdf");
   const [from, setFrom] = useState(new Date().toISOString().slice(0, 10));
   const [to, setTo] = useState("");
-  const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [logsLoading, setLogsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   // Shift Prompt State
@@ -18,20 +18,20 @@ function SellerReports() {
   const [drawerAmount, setDrawerAmount] = useState("");
   const [activeShift, setActiveShift] = useState(null);
 
-  const fetchLogs = async () => {
-    try {
-      setLogsLoading(true);
-      // For sellers, we'll fetch logs they generated
-      const res = await api.get("/orders/report/logs", { params: { page: 1, limit: 10 } });
-      setLogs(res.data?.logs || []);
-    } catch (err) {
-      console.error("Failed to load report logs:", err?.response?.data || err.message);
-    } finally {
-      setLogsLoading(false);
+  // 1. Fetch Report Logs
+  const { data: logs = [], isLoading: logsLoading } = useQuery({
+    queryKey: ['report-logs'],
+    queryFn: async () => {
+        const res = await api.get("/orders/report/logs", { params: { page: 1, limit: 10 } });
+        return res.data?.logs || [];
     }
-  };
+  });
 
-  useEffect(() => { fetchLogs(); }, []);
+  // 2. Query for current shift (manual trigger or background)
+  const fetchCurrentShift = async () => {
+    const res = await api.get("/shifts/current");
+    return res.data.success ? res.data.data : null;
+  };
 
   const handleStartGenerate = async (e) => {
     e.preventDefault();
@@ -41,11 +41,11 @@ function SellerReports() {
     const today = new Date().toISOString().slice(0, 10);
     if (type === "daily" && from === today) {
         try {
-            const res = await api.get("/shifts/current");
-            if (res.data.success && res.data.data) {
-                setActiveShift(res.data.data);
+            const shiftData = await fetchCurrentShift();
+            if (shiftData) {
+                setActiveShift(shiftData);
                 setShowShiftPrompt(true);
-                return; // Wait for user to input drawer amount
+                return; 
             }
         } catch (err) {
             console.error("Failed to check shift status");
@@ -109,7 +109,7 @@ function SellerReports() {
         link.click();
       }
       setMessage("✅ Report generated successfully");
-      fetchLogs();
+      queryClient.invalidateQueries(['report-logs']);
     } catch (err) {
       console.error("Report generation failed:", err);
       setMessage(`❌ Failed to generate report: ${err.message || "Unknown error"}`);
@@ -237,7 +237,7 @@ function SellerReports() {
                   <FaHistory className="text-[#1E3A8A] text-sm" />
                   <h3 className="font-bold text-[#1E3A8A] text-sm uppercase tracking-wider">Statement History</h3>
                 </div>
-                <button onClick={fetchLogs} className="text-[10px] text-[#1E3A8A] hover:underline font-bold uppercase tracking-widest">Refresh Logs</button>
+                <button onClick={() => queryClient.invalidateQueries(['report-logs'])} className="text-[10px] text-[#1E3A8A] hover:underline font-bold uppercase tracking-widest">Refresh Logs</button>
               </div>
 
               <div className="overflow-x-auto">

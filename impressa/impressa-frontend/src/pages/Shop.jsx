@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   FaSearch, FaHeart, FaShoppingCart, FaStar, FaTshirt, FaRegHeart, FaFilter, FaTimes
@@ -51,8 +52,6 @@ const WishlistButton = ({ product }) => {
 };
 
 export default function Shop() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -85,20 +84,7 @@ export default function Shop() {
 
   const { addItem } = useCart();
   const { showError } = useToast();
-  const [categories, setCategories] = useState([]);
   const [debouncedQ, setDebouncedQ] = useState(q);
-
-  const handleAddToCart = async (product) => {
-    if (product.customizable) {
-      window.location.href = `/product/${product.id}`;
-      return;
-    }
-    try {
-      await addItem(product, { quantity: 1 });
-    } catch (err) {
-      showError("Failed to add to cart");
-    }
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQ(q), 500);
@@ -118,84 +104,84 @@ export default function Shop() {
     }
   }, [debouncedQ, searchParams, setSearchParams]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const catRes = await api.get("/categories");
-        setCategories(catRes.data.data || []);
-      } catch (e) {
-        console.error("Failed to load categories", e);
+  // 1. Fetch Categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['shop-categories'],
+    queryFn: async () => {
+      const res = await api.get("/categories");
+      return res.data.data || [];
+    }
+  });
+
+  // 2. Fetch Products
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ['shop-products', debouncedQ, selectedCategory, minPrice, maxPrice, sortBy],
+    queryFn: async () => {
+      if (sortBy === "featured") {
+        const { data } = await api.get("/products/featured/list");
+        return Array.isArray(data) ? data : (data.data || data.products || []);
       }
-    })();
-  }, []);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
+      if (sortBy === "trending") {
+        const { data } = await api.get("/products/trending");
+        return Array.isArray(data) ? data : [];
+      }
 
-        if (sortBy === "featured") {
-          const { data } = await api.get("/products/featured/list");
-          const productList = Array.isArray(data) ? data : (data.data || data.products || []);
-          setProducts(productList);
-          setLoading(false);
-          return;
-        }
+      const params = new URLSearchParams();
+      if (debouncedQ) params.append("search", debouncedQ);
 
-        if (sortBy === "trending") {
-          const { data } = await api.get("/products/trending");
-          const productList = Array.isArray(data) ? data : [];
-          setProducts(productList);
-          setLoading(false);
-          return;
-        }
-
-        const params = new URLSearchParams();
-        if (debouncedQ) params.append("search", debouncedQ);
-
-        if (selectedCategory) {
-          const isId = /^[a-f\d]{24}$/i.test(selectedCategory) || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(selectedCategory);
-          if (isId) {
-            params.append("category", selectedCategory);
+      if (selectedCategory) {
+        const isId = /^[a-f\d]{24}$/i.test(selectedCategory) || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(selectedCategory);
+        if (isId) {
+          params.append("category", selectedCategory);
+        } else {
+          const cat = categories.find(c =>
+            c.name.toLowerCase() === selectedCategory.toLowerCase() ||
+            c.slug?.toLowerCase() === selectedCategory.toLowerCase()
+          );
+          if (cat) {
+            params.append("category", cat.id);
           } else {
-            const cat = categories.find(c =>
-              c.name.toLowerCase() === selectedCategory.toLowerCase() ||
-              c.slug?.toLowerCase() === selectedCategory.toLowerCase()
-            );
-            if (cat) {
-              params.append("category", cat.id);
-            } else {
-              params.append("category", selectedCategory);
-            }
+            params.append("category", selectedCategory);
           }
         }
-
-        if (minPrice) params.append("minPrice", minPrice);
-        if (maxPrice) params.append("maxPrice", maxPrice);
-        if (sortBy && sortBy !== "newest") params.append("sort", sortBy);
-
-        const { data } = await api.get(`/products?${params.toString()}`);
-        let productList = Array.isArray(data) ? data : (data.data || data.products || []);
-
-        if (sortBy === "price-asc") {
-          productList = [...productList].sort((a, b) => a.price - b.price);
-        } else if (sortBy === "price-desc") {
-          productList = [...productList].sort((a, b) => b.price - a.price);
-        } else if (sortBy === "newest") {
-          productList = [...productList].sort((a, b) =>
-            new Date(b.createdAt) - new Date(a.createdAt)
-          );
-        }
-
-        setProducts(productList);
-      } catch (e) {
-        console.error("Failed to load products", e);
-        if (e.name !== "CanceledError") showError("Failed to load products.");
-      } finally {
-        setLoading(false);
       }
-    })();
-  }, [debouncedQ, selectedCategory, minPrice, maxPrice, sortBy, categories, showError]);
+
+      if (minPrice) params.append("minPrice", minPrice);
+      if (maxPrice) params.append("maxPrice", maxPrice);
+      if (sortBy && sortBy !== "newest") params.append("sort", sortBy);
+
+      const { data } = await api.get(`/products?${params.toString()}`);
+      let productList = Array.isArray(data) ? data : (data.data || data.products || []);
+
+      if (sortBy === "price-asc") {
+        productList = [...productList].sort((a, b) => a.price - b.price);
+      } else if (sortBy === "price-desc") {
+        productList = [...productList].sort((a, b) => b.price - a.price);
+      } else if (sortBy === "newest") {
+        productList = [...productList].sort((a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      }
+
+      return productList;
+    },
+    enabled: true // Always run
+  });
+
+  const loading = productsLoading;
+
+  const handleAddToCart = async (product) => {
+    if (product.customizable) {
+      window.location.href = `/product/${product.id}`;
+      return;
+    }
+    try {
+      await addItem(product, { quantity: 1 });
+    } catch (err) {
+      showError("Failed to add to cart");
+    }
+  };
 
   const handleSortChange = (e) => {
     const newSort = e.target.value;

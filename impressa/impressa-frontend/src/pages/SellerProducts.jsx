@@ -1,35 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { FaPlus, FaSearch, FaEdit, FaTrash, FaBoxOpen, FaEye, FaFilePdf } from "react-icons/fa";
 import api from "../utils/axiosInstance";
 import ProductCreateEditModal from "../components/ProductCreateEditModal";
-// wind migration
 
 const SellerProducts = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
     const [downloadingReport, setDownloadingReport] = useState(false);
-    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [creating, setCreating] = useState(false);
     const [editing, setEditing] = useState(null);
 
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
+    const { data: products = [], isLoading, error: queryError } = useQuery({
+        queryKey: ['seller-products'],
+        queryFn: async () => {
             const res = await api.get("/products/seller/my-products");
-            if (res.data.success) {
-                setProducts(res.data.data);
-            } else {
-                setProducts([]);
-            }
-        } catch (err) {
-            console.error("Failed to fetch products:", err);
-            setError("Failed to load products.");
-        } finally {
-            setLoading(false);
+            return res.data.success ? res.data.data : [];
         }
-    };
+    });
+
+    const loading = isLoading;
+    const error = queryError ? "Failed to load products." : null;
 
     const handleDownloadReport = async () => {
         try {
@@ -39,7 +31,6 @@ const SellerProducts = () => {
                 responseType: 'blob'
             });
 
-            // Create a blob link to trigger the download
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -55,29 +46,21 @@ const SellerProducts = () => {
         }
     };
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
                 await api.delete(`/products/${id}`);
-                setProducts(products.filter((p) => p.id !== id));
+                queryClient.invalidateQueries(['seller-products']);
             } catch (err) {
                 alert("Failed to delete product");
             }
         }
     };
 
-    const handleSaved = (saved) => {
-        if (editing) {
-            setProducts((prev) => prev.map((p) => (p.id === saved.id ? saved : p)));
-            setEditing(null);
-        } else {
-            setProducts((prev) => [saved, ...prev]);
-            setCreating(false);
-        }
+    const handleSaved = () => {
+        queryClient.invalidateQueries(['seller-products']);
+        setCreating(false);
+        setEditing(null);
     };
 
     const filteredProducts = products.filter((product) =>
