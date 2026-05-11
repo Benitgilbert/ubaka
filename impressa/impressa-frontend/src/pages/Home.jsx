@@ -1,5 +1,6 @@
 // Impressa Home Page - Premium Marketplace Design
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   FaArrowRight, FaHeart, FaRegHeart, FaStar, FaShieldAlt, FaTruck, FaUndo, FaHeadset, FaPrint
@@ -111,6 +112,7 @@ const defaultColors = [
 ];
 
 export default function Home() {
+  const { t } = useTranslation();
   const [featured, setFeatured] = useState([]);
   const [trending, setTrending] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -292,20 +294,20 @@ export default function Home() {
           <div className="relative mx-auto max-w-7xl px-6 py-12 md:py-24">
             <div className="max-w-2xl">
               <span className="inline-block bg-terracotta-500/20 text-terracotta-200 px-3 py-1.5 rounded-full text-xs font-semibold mb-6 backdrop-blur-sm border border-terracotta-500/30 uppercase tracking-wider">
-                ✨ The future of shopping
+                {t('home.hero.badge')}
               </span>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
-                Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta-300 to-sand-300">Premium</span> Products
+                {t('home.hero.title_part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta-300 to-sand-300">{t('home.hero.title_premium')}</span> {t('home.hero.title_part2')}
               </h1>
               <p className="text-lg text-cream-300 dark:text-cream-400 mb-8 max-w-lg opacity-90">
-                Curated collections and exclusive deals. Find everything you need in one seamless experience.
+                {t('home.hero.description')}
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link to="/shop" className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 hover:from-terracotta-600 hover:to-terracotta-700 text-white px-6 py-3 rounded-full font-bold text-base transition-all shadow-lg shadow-terracotta-500/25 hover:shadow-terracotta-500/40 flex items-center gap-2 active:scale-95">
-                  Explore Now <FaArrowRight className="text-sm" />
+                  {t('home.hero.cta_shop')} <FaArrowRight className="text-sm" />
                 </Link>
                 <Link to="/daily-deals" className="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-full font-bold text-base transition backdrop-blur-md border border-white/10 active:scale-95">
-                  View Deals
+                  {t('home.hero.cta_deals')}
                 </Link>
               </div>
             </div>
@@ -323,16 +325,16 @@ export default function Home() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-10">
               <div className="flex-1 text-center md:text-left">
                 <span className="inline-block bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 border border-blue-500/30">
-                  Business Services
+                  {t('home.print.badge')}
                 </span>
                 <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 leading-tight">
-                  Professional <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-emerald-300">Printing</span> Portal
+                  {t('home.print.title_part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-emerald-300">{t('home.print.title_highlight')}</span> {t('home.print.title_part2')}
                 </h2>
                 <p className="text-blue-100 text-base mb-6 opacity-75 max-w-lg font-medium">
-                  Upload your documents directly. Get custom quotes, binding options, and doorstep delivery.
+                  {t('home.print.description')}
                 </p>
                 <Link to="/print-portal" className="inline-flex items-center gap-2 bg-white text-indigo-950 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:bg-blue-50 transition-all active:scale-95">
-                  Start Printing <FaArrowRight className="text-sm" />
+                  {t('home.print.cta')} <FaArrowRight className="text-sm" />
                 </Link>
               </div>
               <div className="w-full md:w-64 aspect-video md:aspect-square bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-6 flex items-center justify-center relative group">
@@ -340,8 +342,8 @@ export default function Home() {
                   <FaPrint />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-terracotta-500 text-white px-4 py-2 rounded-xl shadow-xl transform -rotate-3">
-                  <span className="block text-lg font-bold">24h</span>
-                  <span className="text-[10px] font-bold uppercase tracking-tighter opacity-80">Turnaround</span>
+                  <span className="block text-lg font-bold">{t('home.print.speed')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-tighter opacity-80">{t('home.print.turnaround')}</span>
                 </div>
               </div>
             </div>
@@ -353,11 +355,11 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <h2 className="text-3xl font-bold text-charcoal-800 dark:text-white mb-2">Shop by Category</h2>
-                <p className="text-charcoal-500 dark:text-charcoal-400">Browse our curated collections</p>
+                <h2 className="text-3xl font-bold text-charcoal-800 dark:text-white mb-2">{t('home.categories.title')}</h2>
+                <p className="text-charcoal-500 dark:text-charcoal-400">{t('home.categories.description')}</p>
               </div>
               <Link to="/shop" className="text-terracotta-500 dark:text-terracotta-400 hover:text-terracotta-600 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1">
-                View All <FaArrowRight className="text-sm" />
+                {t('home.categories.view_all')} <FaArrowRight className="text-sm" />
               </Link>
             </div>
 

@@ -43,5 +43,31 @@
     "sign_in": "Sign In",
     "sign_out": "Sign Out",
     "register": "Register"
+  },
+  "home": {
+    "hero": {
+      "badge": "✨ The future of shopping",
+      "title_part1": "Discover",
+      "title_premium": "Premium",
+      "title_part2": "Products",
+      "description": "Curated collections and exclusive deals. Find everything you need in one seamless experience.",
+      "cta_shop": "Explore Now",
+      "cta_deals": "View Deals"
+    },
+    "print": {
+      "badge": "Business Services",
+      "title_part1": "Professional",
+      "title_highlight": "Printing",
+      "title_part2": "Portal",
+      "description": "Upload your documents directly. Get custom quotes, binding options, and doorstep delivery.",
+      "cta": "Start Printing",
+      "speed": "24h",
+      "turnaround": "Turnaround"
+    },
+    "categories": {
+      "title": "Shop by Category",
+      "description": "Browse our curated collections",
+      "view_all": "View All"
+    }
   }
 }

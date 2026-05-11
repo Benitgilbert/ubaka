@@ -43,5 +43,31 @@
     "sign_in": "Injira",
     "sign_out": "Sohoka",
     "register": "Kwiyandikisha"
+  },
+  "home": {
+    "hero": {
+      "badge": "✨ Kazoza k'ubuhahirane",
+      "title_part1": "Vumbura",
+      "title_premium": "Ibicuruzwa",
+      "title_part2": "Byiza cyane",
+      "description": "Ibice byatoranijwe neza n'ibiciro bidasanzwe. Shakira ibyo ukeneye byose hano.",
+      "cta_shop": "Tangira ubu",
+      "cta_deals": "Reba ibigabanijwe"
+    },
+    "print": {
+      "badge": "Serivisi z'ubucuruzi",
+      "title_part1": "Gucapa",
+      "title_highlight": "Kinyamwuga",
+      "title_part2": "hano",
+      "description": "Ohereza inyandiko zawe mu buryo bworoshye. Ubone ibiciro, guhuza inyandiko, no kugezwaho aho uri.",
+      "cta": "Tangira gucapa",
+      "speed": "Saha 24",
+      "turnaround": "Igihe bitwara"
+    },
+    "categories": {
+      "title": "Shakira mu byiciro",
+      "description": "Reba ibice byatoranijwe neza",
+      "view_all": "Reba byose"
+    }
   }
 }
