@@ -544,14 +544,27 @@ export default function Home() {
                   check: <FaShieldAlt className="text-2xl" />,
                   heart: <FaHeart className="text-2xl" />
                 };
+                const featureKeyMap = {
+                  truck: 'shipping',
+                  shield: 'payment',
+                  undo: 'returns',
+                  headset: 'support',
+                  clock: 'support'
+                };
+                const key = featureKeyMap[badge.icon];
+
                 return (
                   <div key={badge.id || idx} className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-terracotta-50 dark:bg-charcoal-700 rounded-xl flex items-center justify-center text-terracotta-500 dark:text-terracotta-400">
                       {iconMap[badge.icon] || <FaShieldAlt className="text-2xl" />}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-charcoal-800 dark:text-cream-100">{badge.title}</h4>
-                      <p className="text-sm text-charcoal-500 dark:text-charcoal-400">{badge.description}</p>
+                      <h4 className="font-semibold text-charcoal-800 dark:text-cream-100">
+                        {key ? t(`home.features.${key}.title`) : badge.title}
+                      </h4>
+                      <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
+                        {key ? t(`home.features.${key}.description`) : badge.description}
+                      </p>
                     </div>
                   </div>
                 );
