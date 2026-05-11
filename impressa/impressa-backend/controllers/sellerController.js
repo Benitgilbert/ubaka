@@ -232,7 +232,28 @@ export const getSellerPerformanceReports = async (req, res, next) => {
         const startDate = new Date(year, month - 1, 1);
         const endDate = new Date(year, month, 1);
 
-        // Fetch all order items within the period
+        // 1. Fetch ALL active sellers first (so we show those with 0 sales too)
+        const activeSellers = await prisma.user.findMany({
+            where: { role: "seller", sellerStatus: "active" },
+            select: { id: true, name: true, email: true, storeName: true }
+        });
+
+        const sellerMap = {};
+        activeSellers.forEach(seller => {
+            sellerMap[seller.id] = {
+                id: seller.id,
+                storeName: seller.storeName || seller.name,
+                name: seller.name,
+                email: seller.email,
+                orderIds: new Set(),
+                completedOrderIds: new Set(),
+                cancelledOrderIds: new Set(),
+                totalRevenue: 0,
+                fulfillmentTimes: []
+            };
+        });
+
+        // 2. Fetch order items and map them to the existing sellers
         const orderItems = await prisma.orderItem.findMany({
             where: {
                 order: {
@@ -240,47 +261,20 @@ export const getSellerPerformanceReports = async (req, res, next) => {
                 }
             },
             include: {
-                order: { select: { id: true, status: true, createdAt: true, grandTotal: true } },
-                product: {
-                    select: {
-                        seller: {
-                            select: { id: true, name: true, email: true, storeName: true }
-                        }
-                    }
-                }
+                order: { select: { id: true, status: true, createdAt: true, grandTotal: true } }
             }
         });
 
-        // Group by seller in JS
-        const sellerMap = {};
-
         orderItems.forEach(item => {
-            const seller = item.product?.seller || { id: 'unknown', name: 'Unknown', email: '', storeName: 'Unknown' };
-            const sellerId = seller.id;
-
-            if (!sellerMap[sellerId]) {
-                sellerMap[sellerId] = {
-                    id: sellerId,
-                    storeName: seller.storeName || seller.name,
-                    name: seller.name,
-                    email: seller.email,
-                    orderIds: new Set(),
-                    completedOrderIds: new Set(),
-                    cancelledOrderIds: new Set(),
-                    totalRevenue: 0,
-                    fulfillmentTimes: []
-                };
-            }
+            const sellerId = item.sellerId;
+            if (!sellerMap[sellerId]) return; // Skip if seller is no longer active/seller role
 
             const s = sellerMap[sellerId];
             s.orderIds.add(item.orderId);
             
             if (item.order.status === 'delivered') {
                 s.completedOrderIds.add(item.orderId);
-                s.totalRevenue += item.subtotal;
-                
-                // Fulfillment time (if we had deliveredAt in Order, but it's not in basic schema yet)
-                // Let's assume 24h for now or skip if not available
+                s.totalRevenue += (item.subtotal || 0);
             } else if (item.order.status === 'cancelled') {
                 s.cancelledOrderIds.add(item.orderId);
             }
