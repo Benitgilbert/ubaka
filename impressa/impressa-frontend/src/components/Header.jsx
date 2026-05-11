@@ -315,8 +315,6 @@ export default function Header() {
                 <LuUser className="w-5 h-5" />
               </button>
 
-              </button>
-
               {accountDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setAccountDropdownOpen(false)} />
@@ -326,37 +324,30 @@ export default function Header() {
                       <p className="text-sm font-medium text-white truncate">{user?.name || user?.email}</p>
                     </div>
                     <div className="p-1">
-                      {/* Unified Dashboard Link */}
                       {(user?.role === 'admin' || user?.role === 'owner') && (
                         <Link to="/admin/overview" className="flex items-center gap-3 px-4 py-2.5 text-sm text-terracotta-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
                           <LuShieldAlert className="w-4 h-4" /> {user?.role === 'owner' ? 'Owner Overview' : 'Admin Panel'}
                         </Link>
                       )}
-                      
                       {user?.role === 'seller' && (
                         <Link to="/seller/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-blue-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
                           <LuLayoutDashboard className="w-4 h-4" /> Seller Dashboard
                         </Link>
                       )}
-
                       {user?.role === 'cashier' && (
                         <Link to="/seller/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
                           <LuLayoutDashboard className="w-4 h-4" /> Cashier Dashboard
                         </Link>
                       )}
-
                       {user?.role === 'customer' && (
                         <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-cream-300 hover:text-white hover:bg-charcoal-700 rounded-lg transition-colors">
                           <LuLayoutDashboard className="w-4 h-4" /> My Dashboard
                         </Link>
                       )}
-
                       <Link to="/orders" className="flex items-center gap-3 px-4 py-2.5 text-sm text-cream-300 hover:text-white hover:bg-charcoal-700 rounded-lg transition-colors">
                         <LuTruck className="w-4 h-4" /> My Orders
                       </Link>
-
                       <div className="h-px bg-charcoal-700 my-1 mx-2" />
-
                       <Link to={isSellerOrAdminView ? "/seller/profile" : "/dashboard"} className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal-400 hover:text-white hover:bg-charcoal-700 rounded-lg transition-colors">
                         <LuUser className="w-4 h-4" /> {isSellerOrAdminView ? 'Seller Profile' : 'Account Settings'}
                       </Link>
@@ -493,6 +484,6 @@ export default function Header() {
           </div>
         )
       }
-    </header >
+    </header>
   );
 }
