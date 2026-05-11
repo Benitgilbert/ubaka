@@ -327,7 +327,6 @@ const getInventoryReport = async ({ sellerId }) => {
         { name: { contains: "Service", mode: "insensitive" } }
       ]
     },
-    include: { categories: { select: { name: true } } },
     select: {
       id: true,
       name: true,
