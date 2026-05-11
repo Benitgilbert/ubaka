@@ -217,7 +217,6 @@ model ProductVariation {
   sku         String   @unique
   attributes  Json     // Map of attribute name to value
   price       Float
-  costPrice   Float    @default(0)
   stock       Int      @default(0)
   conversionFactor Int @default(1)
   image       String?
