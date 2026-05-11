@@ -126,7 +126,6 @@ export default function SellerPOS() {
     const [completedOrder, setCompletedOrder] = useState(null);
     const [scanError, setScanError] = useState("");
 
-    const queryClient = useQueryClient();
 
     // 1. Fetch Products
     const { data: products = [], isLoading: productsLoading } = useQuery({
