@@ -140,10 +140,27 @@ export const generateReport = async (req, res) => {
         const cleanTitle = performanceTitle.replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, '_');
         const filename = `${cleanTitle}_${dateStr}.pdf`;
 
+        // Dynamic Branding Logic
+        const isSellerReport = req.user.role !== "admin" && req.user.role !== "owner";
+        const companyName = isSellerReport ? (user.storeName || "IMPRESSA") : (settings?.siteName || "IMPRESSA");
+        const companySubtitle = isSellerReport ? (user.storeDescription || "Store Performance Report") : "Platform Performance Report";
+        
+        // Address formatting
+        let displayAddress = settings?.contactAddress || "Gicumbi, Rwanda";
+        if (isSellerReport && user.billingAddress) {
+            const addr = typeof user.billingAddress === 'string' ? JSON.parse(user.billingAddress) : user.billingAddress;
+            if (addr.city || addr.street) {
+                displayAddress = `${addr.street ? addr.street + ', ' : ''}${addr.city || ''}`;
+            }
+        }
+
         const doc = createImpressaPDF({
             title: performanceTitle,
-            companyName: "IMPRESSA",
-            subtitle: "Custom Solutions ",
+            companyName: companyName,
+            subtitle: companySubtitle,
+            companyEmail: isSellerReport ? user.email : (settings?.contactEmail || "support@impressa.com"),
+            companyPhone: isSellerReport ? (user.storePhone || user.phone) : (settings?.contactPhone || "+250 788 819 878"),
+            companyAddress: displayAddress,
             contentBuilder: (pdfDoc, helpers) => {
                 // ... (rest of the builder logic)
                 if (aiSummary) {

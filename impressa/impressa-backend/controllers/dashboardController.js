@@ -11,6 +11,15 @@ export const getDashboardAnalytics = async (req, res) => {
   try {
     const user = req.user;
     const isStaff = user.role === 'seller' || user.role === 'cashier';
+    const isSeller = user.role === 'seller';
+    
+    // Get all staff IDs for a seller to track aggregate expenses
+    let staffIds = [user.id];
+    if (isSeller) {
+      const staff = await prisma.user.findMany({ where: { managedById: user.id }, select: { id: true } });
+      staffIds = [user.id, ...staff.map(s => s.id)];
+    }
+
     const effectiveSellerId = user.role === 'cashier' ? user.managedById : (user.role === 'seller' ? user.id : null);
 
     // Boundaries
@@ -52,7 +61,7 @@ export const getDashboardAnalytics = async (req, res) => {
         _sum: { amount: true },
         where: { 
           createdAt: { gte: startOfToday },
-          ...(isStaff && { shift: { userId: { in: [user.id, ...(user.managedById ? [user.managedById] : [])] } } }) // Approximation since expense doesn't have sellerId directly, but shift does
+          ...(isStaff && { shift: { userId: { in: staffIds } } })
         }
       }),
       prisma.product.findMany({
@@ -311,8 +320,12 @@ export const getDashboardAnalytics = async (req, res) => {
  */
 export const getForecast = async (req, res) => {
   try {
+    const isStaff = req.user.role === 'seller' || req.user.role === 'cashier';
+    const effectiveSellerId = req.user.role === 'cashier' ? req.user.managedById : (req.user.role === 'seller' ? req.user.id : null);
+    const orderFilter = isStaff ? { items: { some: { sellerId: effectiveSellerId } } } : {};
+
     const monthlyOrders = await prisma.order.findMany({
-      where: { status: "delivered" },
+      where: { ...orderFilter, status: "delivered" },
       select: { grandTotal: true, createdAt: true }
     });
 
@@ -376,7 +389,15 @@ export const getProductRecommendations = async (req, res) => {
       }
     }
 
-    const recIds = await prisma.product.findMany({ take: 10, select: { id: true } }).then(res => res.map(p => p.id));
+    const isStaff = req.user.role === 'seller' || req.user.role === 'cashier';
+    const effectiveSellerId = req.user.role === 'cashier' ? req.user.managedById : (req.user.role === 'seller' ? req.user.id : null);
+    const productFilter = isStaff ? { sellerId: effectiveSellerId } : {};
+
+    const recIds = await prisma.product.findMany({ 
+      where: productFilter,
+      take: 10, 
+      select: { id: true } 
+    }).then(res => res.map(p => p.id));
 
     const products = await prisma.product.findMany({
       where: { id: { in: recIds } },

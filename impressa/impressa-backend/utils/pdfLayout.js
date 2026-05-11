@@ -1,6 +1,14 @@
-﻿import PDFDocument from "pdfkit";
+import PDFDocument from "pdfkit";
 
-export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder }) => {
+export const createImpressaPDF = ({ 
+  title, 
+  companyName, 
+  subtitle, 
+  companyEmail, 
+  companyPhone, 
+  companyAddress,
+  contentBuilder 
+}) => {
   const doc = new PDFDocument({
     margin: 50,
     size: 'A4',
@@ -47,9 +55,14 @@ export const createImpressaPDF = ({ title, companyName, subtitle, contentBuilder
     doc.moveTo(left, absoluteFooterY).lineTo(left + innerWidth, absoluteFooterY)
       .strokeColor("#E5E7EB").lineWidth(0.5).stroke();
 
+    const contactInfo = [
+      companyEmail || "support@impressa.com",
+      companyPhone || "+250 000 000 000",
+      companyAddress || "Impressa Platform"
+    ].filter(Boolean).join(" | ");
+
     doc.fillColor("#94A3B8").fontSize(7.5).font("Helvetica")
-      .text("uwanyirigiraeleora@gmail.com | +250 788 819 878 | Building near Bank of Kigali Gicumbi Branch",
-        left, absoluteFooterY + 8, { width: innerWidth, align: "center" });
+      .text(contactInfo, left, absoluteFooterY + 8, { width: innerWidth, align: "center" });
 
     doc.text(`Page ${pageNumber} of ${totalPages}`,
       left, absoluteFooterY + 18, { width: innerWidth, align: "center" });

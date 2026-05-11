@@ -17,7 +17,10 @@ const getRangeReport = async (start, end, sellerId) => {
   // Fetch Expenses in the same range
   const expenseWhere = { date: { gte: start, lt: end } };
   if (sellerId) {
-    expenseWhere.userId = sellerId;
+    // Include expenses from the seller AND all their staff
+    const staff = await prisma.user.findMany({ where: { managedById: sellerId }, select: { id: true } });
+    const staffIds = [sellerId, ...staff.map(s => s.id)];
+    expenseWhere.shift = { userId: { in: staffIds } };
   }
   const expenses = await prisma.expense.findMany({
     where: expenseWhere,
@@ -27,7 +30,9 @@ const getRangeReport = async (start, end, sellerId) => {
   // Fetch Shifts in the same range
   const shiftWhere = { startTime: { gte: start, lt: end } };
   if (sellerId) {
-    shiftWhere.userId = sellerId;
+    const staff = await prisma.user.findMany({ where: { managedById: sellerId }, select: { id: true } });
+    const staffIds = [sellerId, ...staff.map(s => s.id)];
+    shiftWhere.userId = { in: staffIds };
   }
   const shifts = await prisma.shift.findMany({
     where: shiftWhere,
@@ -37,13 +42,8 @@ const getRangeReport = async (start, end, sellerId) => {
   // Fetch Abonne Debt Collections in the same range
   const abonneWhere = { createdAt: { gte: start, lt: end } };
   if (sellerId) {
-    // For sellers, we might only want to show debt collections relevant to them?
-    // But debt collection is usually a store-wide thing handled by the cashier.
-    // If the seller is managing the store, they see it.
-    // However, AbonneTransaction belongs to a "responsible" (the user who did it).
-    // Let's filter by responsibleId if it's a seller?
-    // Actually, let's keep it simple: if sellerId is provided, filter by responsibleId.
-    abonneWhere.responsibleId = sellerId;
+    // Filter by client ownership instead of responsibleId for better coverage
+    abonneWhere.client = { sellerId };
   }
 
   const abonneTransactions = await prisma.abonneTransaction.findMany({
