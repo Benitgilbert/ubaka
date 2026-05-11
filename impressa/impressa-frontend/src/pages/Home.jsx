@@ -130,11 +130,10 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [featuredRes, trendingRes, categoriesRes, flashSaleRes, bannersRes, testimonialsRes, brandPartnersRes, siteSettingsRes] = await Promise.all([
+      const [featuredRes, trendingRes, categoriesRes, bannersRes, testimonialsRes, brandPartnersRes, siteSettingsRes] = await Promise.all([
         api.get('/products/featured/list'),
         api.get('/products/trending'),
         api.get('/categories'),
-        api.get('/flash-sales/active'),
         api.get('/banners/active?position=hero'),
         api.get('/testimonials/active?limit=6'),
         api.get('/brand-partners/active'),
