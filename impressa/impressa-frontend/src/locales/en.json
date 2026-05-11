@@ -7,7 +7,8 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "search": "Search...",
-    "back": "Back"
+    "back": "Back",
+    "categories": "Categories"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -18,7 +19,13 @@
     "clients": "Clients",
     "reports": "Reports",
     "shifts": "Shifts",
-    "shop": "Shop"
+    "shop": "Shop",
+    "all_products": "All Products",
+    "print_portal": "Print Portal",
+    "deals": "Daily Deals",
+    "gift_cards": "Gift Cards",
+    "track": "Track Order",
+    "blog": "Blog"
   },
   "pos": {
     "cart": "Cart",
@@ -31,5 +38,10 @@
     "start_shift": "Start Shift",
     "end_shift": "End Shift",
     "expense": "Record Expense"
+  },
+  "auth": {
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out",
+    "register": "Register"
   }
 }
