@@ -10,12 +10,13 @@ import { getAnomalyAlerts } from "../utils/anomalyUtils.js";
 export const getDashboardAnalytics = async (req, res) => {
   try {
     const user = req.user;
-    const isStaff = user.role === 'seller' || user.role === 'cashier' || user.role === 'admin';
-    const isSeller = user.role === 'seller' || user.role === 'admin';
+    const isAdmin = user.role === 'admin';
+    const isStaff = user.role === 'seller' || user.role === 'cashier' || isAdmin;
+    const isSeller = user.role === 'seller' || isAdmin;
     
     // Get all staff IDs for a seller to track aggregate expenses
     let staffIds = [user.id];
-    if (isSeller) {
+    if (isSeller && !isAdmin) {
       const staff = await prisma.user.findMany({ where: { managedById: user.id }, select: { id: true } });
       staffIds = [user.id, ...staff.map(s => s.id)];
     }
@@ -37,8 +38,9 @@ export const getDashboardAnalytics = async (req, res) => {
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     // Filter Logic
-    const orderFilter = isStaff ? { items: { some: { sellerId: effectiveSellerId } } } : {};
-    const productFilter = isStaff ? { sellerId: effectiveSellerId } : {};
+    // Filter Logic - God-Mode for Admins
+    const orderFilter = (isStaff && !isAdmin) ? { items: { some: { sellerId: effectiveSellerId } } } : {};
+    const productFilter = (isStaff && !isAdmin) ? { sellerId: effectiveSellerId } : {};
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -61,7 +63,7 @@ export const getDashboardAnalytics = async (req, res) => {
         _sum: { amount: true },
         where: { 
           createdAt: { gte: startOfToday },
-          ...(isStaff && { shift: { userId: { in: staffIds } } })
+          ...((isStaff && !isAdmin) && { shift: { userId: { in: staffIds } } })
         }
       }),
       prisma.product.findMany({
@@ -90,7 +92,7 @@ export const getDashboardAnalytics = async (req, res) => {
       _sum: { amountPaid: true },
       where: { 
         createdAt: { gte: startOfToday },
-        ...(isStaff && { client: { sellerId: effectiveSellerId } })
+        ...((isStaff && !isAdmin) && { client: { sellerId: effectiveSellerId } })
       }
     });
     const totalDebtToday = debtCollections?._sum?.amountPaid || 0;
@@ -103,7 +105,7 @@ export const getDashboardAnalytics = async (req, res) => {
     // Batch 2: Inventory & Users
     const [inventoryData, totalUsers, recentOrders] = await Promise.all([
       prisma.product.aggregate({ _sum: { stock: true }, where: { ...productFilter, isDigital: false } }),
-      isStaff ? prisma.order.findMany({ where: orderFilter, distinct: ['customerId'], select: { customerId: true } }).then(r => r.length) : prisma.user.count(),
+      (isStaff && !isAdmin) ? prisma.order.findMany({ where: orderFilter, distinct: ['customerId'], select: { customerId: true } }).then(r => r.length) : prisma.user.count(),
       prisma.order.findMany({
         where: orderFilter,
         orderBy: { createdAt: 'desc' },
@@ -139,8 +141,8 @@ export const getDashboardAnalytics = async (req, res) => {
 
     // Batch 4: Revenue & Growth
     const [newCustomersThisMonth, newCustomersLastMonth, pendingOrders, pendingOrdersLastWeek, revenueThisMonthAgg, revenueThisWeekAgg, revenueLastWeekAgg] = await Promise.all([
-      isStaff ? prisma.order.findMany({ where: { ...orderFilter, createdAt: { gte: startOfThisMonth } }, distinct: ['customerId'] }).then(r => r.length) : prisma.user.count({ where: { createdAt: { gte: startOfThisMonth } } }),
-      isStaff ? prisma.order.findMany({ where: { ...orderFilter, createdAt: { gte: startOfLastMonth, lt: endOfLastMonth } }, distinct: ['customerId'] }).then(r => r.length) : prisma.user.count({ where: { createdAt: { gte: startOfLastMonth, lt: endOfLastMonth } } }),
+      (isStaff && !isAdmin) ? prisma.order.findMany({ where: { ...orderFilter, createdAt: { gte: startOfThisMonth } }, distinct: ['customerId'] }).then(r => r.length) : prisma.user.count({ where: { createdAt: { gte: startOfThisMonth } } }),
+      (isStaff && !isAdmin) ? prisma.order.findMany({ where: { ...orderFilter, createdAt: { gte: startOfLastMonth, lt: endOfLastMonth } }, distinct: ['customerId'] }).then(r => r.length) : prisma.user.count({ where: { createdAt: { gte: startOfLastMonth, lt: endOfLastMonth } } }),
       prisma.order.count({ where: { ...orderFilter, status: { in: ["pending", "processing"] } } }),
       prisma.order.count({ where: { ...orderFilter, status: { in: ["pending", "processing"] }, createdAt: { gte: startOfLastWeek, lt: endOfLastWeek } } }),
       prisma.order.aggregate({
@@ -161,14 +163,14 @@ export const getDashboardAnalytics = async (req, res) => {
     const [itemsThisWeekRaw, itemsLastWeekRaw, activeThisWeek, activeLastWeek] = await Promise.all([
       prisma.orderItem.findMany({
         where: {
-          sellerId: isStaff ? effectiveSellerId : undefined,
+          sellerId: (isStaff && !isAdmin) ? effectiveSellerId : undefined,
           order: { createdAt: { gte: startOfThisWeek }, status: { not: 'cancelled' } }
         },
         select: { quantity: true, customizations: true }
       }),
       prisma.orderItem.findMany({
         where: {
-          sellerId: isStaff ? effectiveSellerId : undefined,
+          sellerId: (isStaff && !isAdmin) ? effectiveSellerId : undefined,
           order: { createdAt: { gte: startOfLastWeek, lt: endOfLastWeek }, status: { not: 'cancelled' } }
         },
         select: { quantity: true, customizations: true }
@@ -227,7 +229,7 @@ export const getDashboardAnalytics = async (req, res) => {
       prisma.orderItem.groupBy({
         by: ['productId'],
         _sum: { quantity: true },
-        where: { sellerId: isStaff ? effectiveSellerId : undefined, order: { status: 'delivered' } },
+        where: { sellerId: (isStaff && !isAdmin) ? effectiveSellerId : undefined, order: { status: 'delivered' } },
         orderBy: { _sum: { quantity: 'desc' } },
         take: 5
       })
@@ -389,9 +391,10 @@ export const getProductRecommendations = async (req, res) => {
       }
     }
 
-    const isStaff = req.user.role === 'seller' || req.user.role === 'cashier' || req.user.role === 'admin';
+    const isAdmin = req.user.role === 'admin';
+    const isStaff = req.user.role === 'seller' || req.user.role === 'cashier' || isAdmin;
     const effectiveSellerId = req.user.role === 'cashier' ? req.user.managedById : req.user.id;
-    const productFilter = { sellerId: effectiveSellerId };
+    const productFilter = (isStaff && !isAdmin) ? { sellerId: effectiveSellerId } : {};
 
     const recIds = await prisma.product.findMany({ 
       where: productFilter,
