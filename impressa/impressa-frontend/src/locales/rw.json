@@ -68,6 +68,15 @@
       "title": "Shakira mu byiciro",
       "description": "Reba ibice byatoranijwe neza",
       "view_all": "Reba byose"
+    },
+    "flash_sale": {
+      "badge": "KUGABANYA IBICIRO",
+      "ends_in": "Bisoza mu:",
+      "days": "IMINSI",
+      "hours": "AMASAHA",
+      "mins": "IMINOTA",
+      "secs": "AMASEGONDA",
+      "cta": "Gura ibigabanijwe"
     }
   }
 }

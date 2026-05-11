@@ -68,6 +68,15 @@
       "title": "Shop by Category",
       "description": "Browse our curated collections",
       "view_all": "View All"
+    },
+    "flash_sale": {
+      "badge": "FLASH SALE",
+      "ends_in": "Ends in:",
+      "days": "DAYS",
+      "hours": "HOURS",
+      "mins": "MINS",
+      "secs": "SECS",
+      "cta": "Shop Flash Sale"
     }
   }
 }
