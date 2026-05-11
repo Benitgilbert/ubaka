@@ -144,7 +144,6 @@ export default function Home() {
       const featuredData = featuredRes.data;
       const trendingData = trendingRes.data;
       const categoriesData = categoriesRes.data;
-      const flashSaleData = flashSaleRes.data;
       const bannersData = bannersRes.data;
       const testimonialsData = testimonialsRes.data;
       const brandPartnersData = brandPartnersRes.data;
