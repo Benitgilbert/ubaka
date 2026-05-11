@@ -18,8 +18,7 @@ import {
   LuMenu,
   LuX,
   LuGift,
-  LuLayoutDashboard,
-  LuShieldAlert
+  LuLayoutDashboard
 } from "react-icons/lu";
 import RoleSwitcher from "./RoleSwitcher";
 import api from "../utils/axiosInstance";
