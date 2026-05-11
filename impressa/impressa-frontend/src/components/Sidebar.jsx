@@ -2,10 +2,12 @@ import { FaChartBar, FaUser, FaBox, FaFileAlt, FaSignOutAlt, FaTags, FaTicketAlt
 
 import { Link, useLocation } from "react-router-dom";
 import { useRef, useLayoutEffect } from "react";
+import { useTranslation } from "react-i18next";
 import AdminChatbot from "./AdminChatBot";
 import { useAuth } from "../context/AuthContext";
 
 function Sidebar({ isOpen, onClose }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const sidebarRef = useRef(null);
   const { user } = useAuth();
@@ -139,10 +141,10 @@ function Sidebar({ isOpen, onClose }) {
             {isAdminOrOwner && <NavLink to="/admin/users" icon={FaUser}>Users</NavLink>}
             {isAdminOrOwner && <NavLink to="/admin/sellers" icon={FaStore} iconColor="text-amber-400">Sellers</NavLink>}
             {isAdminOnly && <NavLink to="/admin/violations" icon={FaExclamationTriangle} iconColor="text-red-400">Violations</NavLink>}
-            {isAdminOrOwner && <NavLink to="/admin/seller-reports" icon={FaChartLine} iconColor="text-indigo-400">Seller Reports</NavLink>}
-            {isStaff && <NavLink to="/admin/orders" icon={FaBox} iconColor="text-blue-400">Orders</NavLink>}
+            {isAdminOrOwner && <NavLink to="/admin/seller-reports" icon={FaChartLine} iconColor="text-indigo-400">{t('nav.reports')}</NavLink>}
+            {isStaff && <NavLink to="/admin/orders" icon={FaBox} iconColor="text-blue-400">{t('nav.orders')}</NavLink>}
             {isAdminOnly && <NavLink to="/admin/orders?status=quote_requested" icon={FaQuestionCircle} iconColor="text-teal-400">Inquiries</NavLink>}
-            {isStaff && <NavLink to="/admin/products" icon={FaBox} iconColor="text-sage-400">Products</NavLink>}
+            {isStaff && <NavLink to="/admin/products" icon={FaBox} iconColor="text-sage-400">{t('nav.products')}</NavLink>}
             {isAdminOnly && <NavLink to="/admin/product-approval" icon={FaClipboardCheck} iconColor="text-orange-400">Product Approval</NavLink>}
             {isAdminOrOwner && <NavLink to="/admin/shifts" icon={FaHistory} iconColor="text-terracotta-400">Shifts</NavLink>}
             {isAdminOrOwner && <NavLink to="/admin/categories" icon={FaFolder} iconColor="text-sand-400">Categories</NavLink>}
@@ -150,7 +152,7 @@ function Sidebar({ isOpen, onClose }) {
             {isAdminOnly && <NavLink to="/admin/reviews" icon={FaStar} iconColor="text-yellow-400">Reviews</NavLink>}
             {isAdminOnly && <NavLink to="/admin/tickets" icon={FaHeadset} iconColor="text-indigo-400">Support Tickets</NavLink>}
             {isAdminOnly && <NavLink to="/admin/customer-queries" icon={FaRobot} iconColor="text-teal-400">AI Customer Queries</NavLink>}
-            {isAdminOnly && <NavLink to="/admin/abonnes" icon={FaUserFriends} iconColor="text-emerald-400">Abonnés</NavLink>}
+            {isAdminOnly && <NavLink to="/admin/abonnes" icon={FaUserFriends} iconColor="text-emerald-400">{t('nav.clients')}</NavLink>}
           </NavSection>
 
 

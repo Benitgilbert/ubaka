@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Biracyashakishwa...",
+    "error": "Harashaye ikibazo",
+    "success": "Byagenze neza",
+    "save": "Bika",
+    "cancel": "Siba",
+    "delete": "Gukuraho",
+    "search": "Shakisha...",
+    "back": "Subira inyuma"
+  },
+  "nav": {
+    "dashboard": "Imbonerahamwe",
+    "pos": "Akabati k'ubucuruzi",
+    "orders": "Amakomande",
+    "products": "Ibicuruzwa",
+    "team": "Abakozi",
+    "clients": "Abonnés",
+    "reports": "Raporo",
+    "shifts": "Igihe cy'akazi",
+    "shop": "Iduka"
+  },
+  "pos": {
+    "cart": "Agatebo",
+    "cart_empty_title": "Agatebo karimo ubusa",
+    "cart_empty_desc": "(nta gicuruzwa wahisemo)",
+    "total": "Igiteranyo",
+    "cash": "Amafaranga",
+    "momo": "MoMo",
+    "checkout": "Kwishura",
+    "start_shift": "Tangira akazi",
+    "end_shift": "Sohoka mu kazi",
+    "expense": "Andika ibyasohotse"
+  }
+}

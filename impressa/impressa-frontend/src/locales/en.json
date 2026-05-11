@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "search": "Search...",
+    "back": "Back"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "pos": "POS",
+    "orders": "Orders",
+    "products": "Products",
+    "team": "Team",
+    "clients": "Clients",
+    "reports": "Reports",
+    "shifts": "Shifts",
+    "shop": "Shop"
+  },
+  "pos": {
+    "cart": "Cart",
+    "cart_empty_title": "Cart is empty",
+    "cart_empty_desc": "Scan or click products to add",
+    "total": "Total",
+    "cash": "Cash",
+    "momo": "MoMo",
+    "checkout": "Checkout",
+    "start_shift": "Start Shift",
+    "end_shift": "End Shift",
+    "expense": "Record Expense"
+  }
+}

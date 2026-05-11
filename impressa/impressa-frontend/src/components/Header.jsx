@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -30,6 +31,11 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { cartCount } = useCart();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
@@ -39,9 +45,10 @@ export default function Header() {
   const [isSearching, setIsSearching] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-
-  const location = useLocation();
-  const navigate = useNavigate();
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'rw' ? 'en' : 'rw';
+    i18n.changeLanguage(newLang);
+  };
 
   const isSellerOrAdminView = location.pathname.startsWith('/seller') || location.pathname.startsWith('/admin');
 
@@ -297,6 +304,16 @@ export default function Header() {
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-charcoal-700 border border-charcoal-600 text-terracotta-400 hover:border-terracotta-500 transition-colors"
               >
                 <LuUser className="w-5 h-5" />
+              </button>
+
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full border border-charcoal-600 bg-charcoal-700/50 hover:bg-charcoal-700 transition-all text-[10px] font-black uppercase tracking-widest text-cream-200"
+              >
+                <span className={i18n.language === 'en' ? 'text-terracotta-400' : ''}>EN</span>
+                <span className="opacity-30">|</span>
+                <span className={i18n.language === 'rw' ? 'text-terracotta-400' : ''}>RW</span>
               </button>
 
               {accountDropdownOpen && (

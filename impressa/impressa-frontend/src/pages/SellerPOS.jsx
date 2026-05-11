@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../utils/axiosInstance";
 import toast from "react-hot-toast";
@@ -28,6 +29,8 @@ const playBeep = () => {
 };
 
 export default function SellerPOS() {
+    const { t } = useTranslation();
+    const queryClient = useQueryClient();
     const [cart, setCart] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [processing, setProcessing] = useState(false);
@@ -1124,25 +1127,25 @@ export default function SellerPOS() {
                             <div className="md:hidden flex gap-2 w-full">
                                 {activeShift?.id ? (
                                     <>
-                                        <button
-                                            onClick={() => setShowExpenseModal(true)}
-                                            className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl shadow-lg text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95"
-                                        >
-                                            <FaWallet /> Expense
-                                        </button>
-                                        <button
-                                            onClick={() => setShowCloseShiftModal(true)}
-                                            className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl shadow-lg text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95"
-                                        >
-                                            <FaTimes /> End Shift
-                                        </button>
+                                            <button
+                                                onClick={() => setShowExpenseModal(true)}
+                                                className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl shadow-lg text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95"
+                                            >
+                                                <FaWallet /> {t('pos.expense')}
+                                            </button>
+                                            <button
+                                                onClick={() => setShowCloseShiftModal(true)}
+                                                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl shadow-lg text-xs font-black flex items-center justify-center gap-2 transition-all active:scale-95"
+                                            >
+                                                <FaTimes /> {t('pos.end_shift')}
+                                            </button>
                                     </>
                                 ) : (
                                     <button
                                         onClick={() => setShowStartShiftModal(true)}
                                         className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl shadow-lg text-sm font-black flex items-center justify-center gap-2 transition-all active:scale-95"
                                     >
-                                        <FaPlus /> Start Your Shift
+                                        <FaPlus /> {t('pos.start_shift')}
                                     </button>
                                 )}
                             </div>
@@ -1249,7 +1252,7 @@ export default function SellerPOS() {
                                     </button>
                                     <div>
                                         <h2 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                            <FaShoppingCart className="text-indigo-600" /> Cart
+                                            <FaShoppingCart className="text-indigo-600" /> {t('pos.cart')}
                                         </h2>
                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
                                             {cart.length} items
@@ -1264,13 +1267,13 @@ export default function SellerPOS() {
                                                 onClick={() => setShowExpenseModal(true)}
                                                 className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg shadow-sm text-xs font-black flex items-center gap-1.5 transition-all active:scale-95"
                                             >
-                                                <FaWallet /> Record Expense
+                                                <FaWallet /> {t('pos.expense')}
                                             </button>
                                             <button
                                                 onClick={() => setShowCloseShiftModal(true)}
                                                 className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg shadow-sm text-xs font-black flex items-center gap-1.5 transition-all active:scale-95"
                                             >
-                                                <FaTimes /> End Shift
+                                                <FaTimes /> {t('pos.end_shift')}
                                             </button>
                                         </div>
                                     ) : (
@@ -1279,7 +1282,7 @@ export default function SellerPOS() {
                                                 onClick={() => setShowStartShiftModal(true)}
                                                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl shadow-lg text-sm font-black flex items-center gap-2 transition-all active:scale-95"
                                             >
-                                                <FaPlus /> Start Shift
+                                                <FaPlus /> {t('pos.start_shift')}
                                             </button>
                                             <span className="text-[9px] font-black text-red-500 uppercase animate-pulse">Required to Record Expenses</span>
                                         </div>
@@ -1355,8 +1358,8 @@ export default function SellerPOS() {
                             {cart.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-xl m-2">
                                     <FaShoppingCart size={32} className="mb-3 opacity-30" />
-                                    <p className="text-sm">Cart is empty</p>
-                                    <p className="text-xs mt-1">Scan or click products to add</p>
+                                    <p className="text-sm">{t('pos.cart_empty_title')}</p>
+                                    <p className="text-xs mt-1">{t('pos.cart_empty_desc')}</p>
                                 </div>
                             ) : (
                                 cart.map((item) => (
@@ -1409,7 +1412,7 @@ export default function SellerPOS() {
                         <div className="border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 p-5 space-y-4">
                             <div className="space-y-2">
                                 <div className="flex justify-between text-gray-900 dark:text-white text-xl font-bold pt-2 border-t border-dashed border-gray-200 dark:border-gray-600">
-                                    <span>Total</span>
+                                    <span>{t('pos.total')}</span>
                                     <span>RWF {calculateTotal().toLocaleString()}</span>
                                 </div>
                             </div>
@@ -1430,14 +1433,14 @@ export default function SellerPOS() {
                                             disabled={processing || cart.length === 0}
                                             className="flex items-center justify-center gap-2 py-3 px-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold shadow-lg shadow-green-600/20 transition-all disabled:opacity-50 disabled:grayscale"
                                         >
-                                            <FaMoneyBillWave /> Cash
+                                            <FaMoneyBillWave /> {t('pos.cash')}
                                         </button>
                                         <button
                                             onClick={initiateMomoPayment}
                                             disabled={processing || cart.length === 0}
                                             className="flex items-center justify-center gap-2 py-3 px-4 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-bold shadow-lg shadow-yellow-500/20 transition-all disabled:opacity-50 disabled:grayscale"
                                         >
-                                            <FaMobileAlt /> MoMo
+                                            <FaMobileAlt /> {t('pos.momo')}
                                         </button>
                                     </>
                                 )}
