@@ -304,7 +304,13 @@ const getInventoryReport = async ({ sellerId }) => {
   }
 
   const products = await prisma.product.findMany({
-    where,
+    where: {
+      ...where,
+      NOT: [
+        { type: "service" },
+        { isDigital: true }
+      ]
+    },
     include: { categories: { select: { name: true } } },
     orderBy: { name: 'asc' }
   });
