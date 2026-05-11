@@ -1,6 +1,6 @@
 import express from "express";
 import { generateReport } from "../controllers/reportController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -9,6 +9,6 @@ const router = express.Router();
  * @desc    Generate and download reports (PDF/CSV)
  * @access  Private (Admin/Seller/Cashier)
  */
-router.get("/", protect, generateReport);
+router.get("/", verifyToken, generateReport);
 
 export default router;
