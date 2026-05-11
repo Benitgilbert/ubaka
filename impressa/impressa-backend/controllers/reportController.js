@@ -143,9 +143,11 @@ export const generateReport = async (req, res) => {
         const cleanTitle = performanceTitle.replace(/[^\x00-\x7F]/g, "").replace(/\s+/g, '_');
         const filename = `${cleanTitle}_${dateStr}.pdf`;
 
-        // Dynamic Branding Logic
-        const isSellerReport = req.user.role !== "admin" && req.user.role !== "owner";
-        const companyName = isSellerReport ? (user.storeName || "IMPRESSA") : (settings?.siteName || "IMPRESSA");
+        // Dynamic Branding Logic: Prioritize store branding if the user has a shop
+        const hasStore = !!(user.storeName);
+        const isSellerReport = hasStore; // Treat as seller report if they have a store name
+        
+        const companyName = isSellerReport ? user.storeName : (settings?.siteName || "IMPRESSA");
         const companySubtitle = isSellerReport ? (user.storeDescription || "Store Performance Report") : "Platform Performance Report";
         
         // Address formatting
