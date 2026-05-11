@@ -31,10 +31,9 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartCount } = useCart();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
