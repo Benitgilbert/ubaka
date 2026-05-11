@@ -70,6 +70,7 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
     attributes: parseAttributes(product?.attributes),
     variations: parseVariations(product?.variations),
     bundleConfigurations: parseBundles(product?.bundleConfigurations),
+    costPrice: product?.costPrice || "",
   });
 
   useEffect(() => {
@@ -296,6 +297,10 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
         fd.append("stock", String(finalStock));
       }
 
+      if (form.costPrice !== "" && form.costPrice !== null && form.costPrice !== undefined) {
+        fd.append("costPrice", String(form.costPrice));
+      }
+
       fd.append("customizable", String(form.customizable));
       fd.append("featured", String(form.featured));
       fd.append("isDigital", String(form.isDigital));
@@ -485,14 +490,32 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
               </div>
 
               <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Base Price</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between">
+                  Selling Price (Igicuruzo)
+                  <span className="text-[10px] text-gray-400 font-normal italic">Customer pays</span>
+                </label>
                 <input
                   type="number"
                   name="price"
                   value={form.price}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 dark:text-white transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 dark:text-white transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500 font-bold text-indigo-600"
+                />
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between">
+                  Buying Price (Ikiranguzo)
+                  <span className="text-[10px] text-terracotta-500 font-normal italic">Used for profit</span>
+                </label>
+                <input
+                  type="number"
+                  name="costPrice"
+                  value={form.costPrice}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 border border-orange-200 dark:border-orange-900/30 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-orange-50/30 dark:bg-orange-900/10 dark:text-white transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500"
                 />
               </div>
 
