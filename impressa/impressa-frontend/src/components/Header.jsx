@@ -38,7 +38,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [settingsDropdownOpen, setSettingsDropdownOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -48,13 +48,14 @@ export default function Header() {
     const currentLang = i18n.language || 'en';
     const newLang = currentLang.startsWith('rw') ? 'en' : 'rw';
     i18n.changeLanguage(newLang);
+    setSettingsDropdownOpen(false);
   };
 
   const isSellerOrAdminView = location.pathname.startsWith('/seller') || location.pathname.startsWith('/admin');
 
   useEffect(() => {
     setCategoryDropdownOpen(false);
-    setAccountDropdownOpen(false);
+    setSettingsDropdownOpen(false);
     setShowSuggestions(false);
   }, [location]);
 
@@ -135,7 +136,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    setAccountDropdownOpen(false);
+    setSettingsDropdownOpen(false);
     navigate("/login");
   };
 
@@ -169,7 +170,7 @@ export default function Header() {
                 onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
                 className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
               >
-                Categories <LuChevronDown className={`w-4 h-4 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
+                {t('common.categories')} <LuChevronDown className={`w-4 h-4 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {categoryDropdownOpen && (
@@ -181,7 +182,7 @@ export default function Header() {
                       onClick={() => setCategoryDropdownOpen(false)}
                       className="block px-4 py-3 text-sm text-terracotta-400 font-semibold hover:bg-charcoal-700 transition-colors"
                     >
-                      All Products
+                      {t('nav.all_products')}
                     </Link>
                     <div className="h-px bg-charcoal-700 mx-2" />
                     <div className="max-h-80 overflow-y-auto p-1">
@@ -214,7 +215,7 @@ export default function Header() {
 
         {/* Search Bar - DESKTOP ONLY */}
         {!isSellerOrAdminView && (
-          <div className="hidden lg:block flex-1 max-w-sm xl:max-w-md px-2 xl:px-4 min-w-[180px]">
+          <div className="hidden md:block flex-1 max-w-sm xl:max-w-md px-2 xl:px-4">
             <div className="relative w-full group">
               <form onSubmit={handleSearchSubmit}>
                 <input
@@ -274,31 +275,26 @@ export default function Header() {
             {theme === 'light' ? <LuMoon className="w-5 h-5" /> : <LuSun className="w-5 h-5" />}
           </button>
 
-          {/* Language Toggle */}
-          <button
-            onClick={toggleLanguage}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-charcoal-600 bg-charcoal-700/50 hover:bg-charcoal-700 transition-all text-[10px] font-black uppercase tracking-widest text-cream-200"
-          >
-            <span className={i18n.language?.startsWith('en') ? 'text-terracotta-400' : ''}>EN</span>
-            <span className="opacity-30">|</span>
-            <span className={i18n.language?.startsWith('rw') ? 'text-terracotta-400' : ''}>RW</span>
-          </button>
-
           {/* Role Switcher (Admin Only) */}
           <RoleSwitcher user={user} theme={theme} />
 
           {!isSellerOrAdminView && (
             <>
               {/* Wishlist */}
-              <Link to="/wishlist" className="p-2.5 text-charcoal-300 hover:text-white transition-colors">
-                <LuHeart className="w-5 h-5" />
+              <Link to="/wishlist" className="p-2.5 text-charcoal-300 hover:text-white transition-colors relative group">
+                <LuHeart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                {wishlist?.length > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-terracotta-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-charcoal-800">
+                    {wishlist.length}
+                  </span>
+                )}
               </Link>
 
               {/* Cart */}
-              <Link to="/cart" className="relative p-2.5 text-charcoal-300 hover:text-white transition-colors">
-                <LuShoppingCart className="w-5 h-5" />
+              <Link to="/cart" className="relative p-2.5 text-charcoal-300 hover:text-white transition-colors group">
+                <LuShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 {items.length > 0 && (
-                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-terracotta-500 text-[10px] font-bold text-white border-2 border-charcoal-800">
+                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white border-2 border-charcoal-800">
                     {items.length}
                   </span>
                 )}
@@ -306,71 +302,106 @@ export default function Header() {
             </>
           )}
 
-          {/* User Account / Sign In */}
-          {isAuthenticated ? (
-            <div className="relative ml-2">
-              <button
-                onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-charcoal-700 border border-charcoal-600 text-terracotta-400 hover:border-terracotta-500 transition-colors"
-              >
-                <LuUser className="w-5 h-5" />
-              </button>
+          {/* Account & Settings Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
+              className={`flex items-center gap-2 p-1.5 rounded-full transition-all border ${settingsDropdownOpen ? 'bg-charcoal-700 border-terracotta-500/50' : 'hover:bg-charcoal-700 border-charcoal-700'}`}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isAuthenticated ? 'bg-gradient-to-tr from-terracotta-500 to-terracotta-600 shadow-lg' : 'bg-charcoal-700 text-charcoal-400'}`}>
+                {isAuthenticated ? (
+                  <span className="text-xs font-black text-white">{user?.name?.charAt(0).toUpperCase() || 'U'}</span>
+                ) : (
+                  <LuUser className="w-5 h-5" />
+                )}
+              </div>
+              <LuChevronDown className={`w-4 h-4 text-charcoal-400 transition-transform ${settingsDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-              {accountDropdownOpen && (
-                <>
-                  <div className="fixed inset-0 z-30" onClick={() => setAccountDropdownOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-charcoal-800 border border-charcoal-600 rounded-xl shadow-2xl z-40">
-                    <div className="p-4 border-b border-charcoal-700">
-                      <p className="text-xs text-charcoal-400 uppercase font-bold tracking-wider">Signed in as</p>
-                      <p className="text-sm font-medium text-white truncate">{user?.name || user?.email}</p>
-                    </div>
-                    <div className="p-1">
-                      {(user?.role === 'admin' || user?.role === 'owner') && (
-                        <Link to="/admin/overview" className="flex items-center gap-3 px-4 py-2.5 text-sm text-terracotta-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
-                          <LuShieldAlert className="w-4 h-4" /> {user?.role === 'owner' ? 'Owner Overview' : 'Admin Panel'}
-                        </Link>
-                      )}
-                      {user?.role === 'seller' && (
-                        <Link to="/seller/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-blue-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
-                          <LuLayoutDashboard className="w-4 h-4" /> Seller Dashboard
-                        </Link>
-                      )}
-                      {user?.role === 'cashier' && (
-                        <Link to="/seller/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-400 font-bold hover:bg-charcoal-700 rounded-lg transition-colors">
-                          <LuLayoutDashboard className="w-4 h-4" /> Cashier Dashboard
-                        </Link>
-                      )}
-                      {user?.role === 'customer' && (
-                        <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2.5 text-sm text-cream-300 hover:text-white hover:bg-charcoal-700 rounded-lg transition-colors">
-                          <LuLayoutDashboard className="w-4 h-4" /> My Dashboard
-                        </Link>
-                      )}
-                      <Link to="/orders" className="flex items-center gap-3 px-4 py-2.5 text-sm text-cream-300 hover:text-white hover:bg-charcoal-700 rounded-lg transition-colors">
-                        <LuTruck className="w-4 h-4" /> My Orders
-                      </Link>
-                      <div className="h-px bg-charcoal-700 my-1 mx-2" />
-                      <Link to={isSellerOrAdminView ? "/seller/profile" : "/dashboard"} className="flex items-center gap-3 px-4 py-2.5 text-sm text-charcoal-400 hover:text-white hover:bg-charcoal-700 rounded-lg transition-colors">
-                        <LuUser className="w-4 h-4" /> {isSellerOrAdminView ? 'Seller Profile' : 'Account Settings'}
-                      </Link>
+            {settingsDropdownOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setSettingsDropdownOpen(false)} />
+                <div className="absolute right-0 top-full mt-2 w-72 bg-charcoal-800 border border-charcoal-600 rounded-2xl shadow-2xl z-40 overflow-hidden animate-in fade-in zoom-in duration-200">
+                  {/* Language Section */}
+                  <div className="p-4 border-b border-charcoal-700 bg-charcoal-900/20">
+                    <p className="text-[10px] font-bold text-charcoal-500 uppercase tracking-widest mb-3 px-1">Language / Ururimi</p>
+                    <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-terracotta-400 hover:bg-terracotta-500/10 rounded-lg transition-colors text-left"
+                        onClick={() => { i18n.changeLanguage('en'); setSettingsDropdownOpen(false); }}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-xl border transition-all ${i18n.language?.startsWith('en') ? 'bg-terracotta-500/10 border-terracotta-500 text-terracotta-400 shadow-inner' : 'bg-charcoal-700/50 border-transparent text-charcoal-400 hover:text-white hover:bg-charcoal-700'}`}
                       >
-                        <LuLogOut className="w-4 h-4" /> Sign Out
+                        <span className="text-xs font-bold">English</span>
+                        <span className="text-[8px] opacity-60 uppercase tracking-tighter">Default</span>
+                      </button>
+                      <button
+                        onClick={() => { i18n.changeLanguage('rw'); setSettingsDropdownOpen(false); }}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-xl border transition-all ${i18n.language?.startsWith('rw') ? 'bg-terracotta-500/10 border-terracotta-500 text-terracotta-400 shadow-inner' : 'bg-charcoal-700/50 border-transparent text-charcoal-400 hover:text-white hover:bg-charcoal-700'}`}
+                      >
+                        <span className="text-xs font-bold">Kinyarwanda</span>
+                        <span className="text-[8px] opacity-60 uppercase tracking-tighter">Native</span>
                       </button>
                     </div>
                   </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="ml-2 px-4 md:px-6 py-2 md:py-2.5 bg-gradient-to-r from-terracotta-500 to-terracotta-600 hover:from-terracotta-400 hover:to-terracotta-500 text-white text-sm font-bold rounded-full shadow-lg shadow-terracotta-900/20 transition-all whitespace-nowrap shrink-0"
-            >
-              {t('auth.sign_in')}
-            </Link>
-          )}
+
+                  {/* Account / Auth Section */}
+                  <div className="p-2">
+                    {isAuthenticated ? (
+                      <>
+                        <div className="px-4 py-3 border-b border-charcoal-700/50 mb-1 bg-charcoal-900/10 rounded-xl">
+                          <p className="text-[10px] text-charcoal-500 uppercase font-black tracking-widest mb-1">Authenticated</p>
+                          <p className="text-sm font-bold text-white truncate">{user?.name || user?.email}</p>
+                          <p className="text-[10px] text-terracotta-400 font-bold uppercase tracking-tighter mt-1">{user?.role}</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-1">
+                          <Link 
+                            to={user?.role === 'customer' ? "/dashboard" : "/seller/dashboard"} 
+                            onClick={() => setSettingsDropdownOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 text-sm text-charcoal-300 hover:text-white hover:bg-charcoal-700 rounded-xl transition-all"
+                          >
+                            <LuLayoutDashboard className="w-4 h-4 text-terracotta-400" /> {t('nav.blog')} Dashboard
+                          </Link>
+                          <Link 
+                            to="/orders" 
+                            onClick={() => setSettingsDropdownOpen(false)}
+                            className="flex items-center gap-3 px-4 py-3 text-sm text-charcoal-300 hover:text-white hover:bg-charcoal-700 rounded-xl transition-all"
+                          >
+                            <LuTruck className="w-4 h-4 text-terracotta-400" /> {t('nav.track')}
+                          </Link>
+                          <div className="h-px bg-charcoal-700 my-1 mx-2" />
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-terracotta-400 hover:bg-terracotta-500/10 rounded-xl transition-all text-left font-bold"
+                          >
+                            <LuLogOut className="w-4 h-4" /> Sign Out
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="p-2 flex flex-col gap-2">
+                        <Link
+                          to="/login"
+                          onClick={() => setSettingsDropdownOpen(false)}
+                          className="flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-terracotta-500 to-terracotta-600 hover:from-terracotta-400 hover:to-terracotta-500 text-white text-sm font-black uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-terracotta-900/40"
+                        >
+                          {t('auth.sign_in')}
+                        </Link>
+                        <div className="py-2 text-center">
+                          <p className="text-[10px] text-charcoal-500 uppercase font-bold tracking-widest mb-1">New to Impressa?</p>
+                          <Link 
+                            to="/register" 
+                            onClick={() => setSettingsDropdownOpen(false)}
+                            className="text-xs text-terracotta-400 hover:text-terracotta-300 font-black uppercase tracking-widest hover:underline"
+                          >
+                            Create Account
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
