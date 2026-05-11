@@ -273,6 +273,16 @@ export default function Header() {
             {theme === 'light' ? <LuMoon className="w-5 h-5" /> : <LuSun className="w-5 h-5" />}
           </button>
 
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-charcoal-600 bg-charcoal-700/50 hover:bg-charcoal-700 transition-all text-[10px] font-black uppercase tracking-widest text-cream-200"
+          >
+            <span className={i18n.language === 'en' ? 'text-terracotta-400' : ''}>EN</span>
+            <span className="opacity-30">|</span>
+            <span className={i18n.language === 'rw' ? 'text-terracotta-400' : ''}>RW</span>
+          </button>
+
           {/* Role Switcher (Admin Only) */}
           <RoleSwitcher user={user} theme={theme} />
 
@@ -305,14 +315,6 @@ export default function Header() {
                 <LuUser className="w-5 h-5" />
               </button>
 
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLanguage}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-charcoal-600 bg-charcoal-700/50 hover:bg-charcoal-700 transition-all text-[10px] font-black uppercase tracking-widest text-cream-200"
-              >
-                <span className={i18n.language === 'en' ? 'text-terracotta-400' : ''}>EN</span>
-                <span className="opacity-30">|</span>
-                <span className={i18n.language === 'rw' ? 'text-terracotta-400' : ''}>RW</span>
               </button>
 
               {accountDropdownOpen && (
