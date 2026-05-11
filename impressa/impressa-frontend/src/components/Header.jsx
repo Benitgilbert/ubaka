@@ -140,7 +140,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-charcoal-800 text-white shadow-xl border-b border-charcoal-700">
-      <div className="mx-auto max-w-7xl px-3 md:px-6 h-16 flex items-center justify-between gap-2 md:gap-6">
+      <div className="mx-auto max-w-7xl px-3 md:px-6 h-16 flex items-center justify-between gap-1 md:gap-2 lg:gap-4 xl:gap-6">
 
         {/* Mobile Menu Button - Left */}
         <button
@@ -200,20 +200,20 @@ export default function Header() {
               )}
             </div>
 
-            <Link to="/shop" className="px-3 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">Shop</Link>
-            <Link to="/print-portal" className="px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">Print Portal</Link>
-            <Link to="/daily-deals" className="px-3 py-2 text-sm font-medium text-sand-400 hover:text-sand-300 transition-colors">Deals</Link>
-            <Link to="/gift-cards" className="px-3 py-2 text-sm font-medium text-terracotta-400 hover:text-terracotta-300 transition-colors">Gift Cards</Link>
-            <Link to="/track" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">
+            <Link to="/shop" className="px-2 xl:px-3 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">Shop</Link>
+            <Link to="/print-portal" className="px-2 xl:px-3 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors whitespace-nowrap">Print Portal</Link>
+            <Link to="/daily-deals" className="px-2 xl:px-3 py-2 text-sm font-medium text-sand-400 hover:text-sand-300 transition-colors whitespace-nowrap">Deals</Link>
+            <Link to="/gift-cards" className="px-2 xl:px-3 py-2 text-sm font-medium text-terracotta-400 hover:text-terracotta-300 transition-colors whitespace-nowrap">Gift Cards</Link>
+            <Link to="/track" className="flex items-center gap-1 px-2 xl:px-3 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors whitespace-nowrap">
               <LuTruck className="w-4 h-4" /> Track
             </Link>
-            <Link to="/blog" className="px-3 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">Blog</Link>
+            <Link to="/blog" className="px-2 xl:px-3 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">Blog</Link>
           </nav>
         )}
 
         {/* Search Bar - DESKTOP ONLY */}
         {!isSellerOrAdminView && (
-          <div className="hidden lg:block flex-1 max-w-md px-2 xl:px-4">
+          <div className="hidden lg:block flex-1 max-w-sm xl:max-w-md px-2 xl:px-4 min-w-[180px]">
             <div className="relative w-full group">
               <form onSubmit={handleSearchSubmit}>
                 <input
