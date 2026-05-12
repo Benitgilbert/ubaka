@@ -74,6 +74,10 @@ export default function Shop() {
 
     if (category !== selectedCategory) setSelectedCategory(category);
 
+    // Update SEO Page Title
+    const title = category ? `${category} | Impressa Shop` : sortBy === 'featured' ? 'Featured Products | Impressa' : sortBy === 'trending' ? 'Trending Now | Impressa' : 'Shop Premium Custom Prints | Impressa';
+    document.title = title;
+
     // Only update local search if q matches URL (to allow typing without interference)
     if (query !== q) {
       setQ(query);

@@ -1,3 +1,8 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /seller
+Disallow: /dashboard
+Disallow: /cart
+Disallow: /checkout
+
+Sitemap: https://impressaa.vercel.app/sitemap.xml

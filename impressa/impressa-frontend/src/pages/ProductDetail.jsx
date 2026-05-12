@@ -41,17 +41,58 @@ export default function ProductDetail() {
     (async () => {
       try {
         const res = await api.get(`/products/${id}`);
-        setProduct(res.data);
+        const productData = res.data;
+        setProduct(productData);
+
+        // Update SEO Tags
+        document.title = `${productData.name} | Impressa`;
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute("content", productData.description || `Buy ${productData.name} at Impressa. Premium custom printing solutions.`);
+        }
+
+        // Inject JSON-LD Structured Data for Google
+        const schema = {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "name": productData.name,
+          "image": assetUrl(productData.image),
+          "description": productData.description,
+          "brand": {
+            "@type": "Brand",
+            "name": "Impressa"
+          },
+          "offers": {
+            "@type": "Offer",
+            "url": window.location.href,
+            "priceCurrency": "RWF",
+            "price": productData.price,
+            "availability": productData.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+          }
+        };
+
+        const script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.id = "json-ld-product";
+        script.innerHTML = JSON.stringify(schema);
+        document.head.appendChild(script);
 
         // Fetch Reviews
         try {
           const reviewsRes = await api.get(`/reviews/product/${id}`);
           setReviews(reviewsRes.data);
 
-          // Calculate average rating locally if not on product
           if (reviewsRes.data.length > 0) {
             const avg = reviewsRes.data.reduce((acc, r) => acc + r.rating, 0) / reviewsRes.data.length;
             setProduct(prev => ({ ...prev, averageRating: avg }));
+            
+            // Update schema with ratings
+            schema.aggregateRating = {
+              "@type": "AggregateRating",
+              "ratingValue": avg.toFixed(1),
+              "reviewCount": reviewsRes.data.length
+            };
+            document.getElementById("json-ld-product").innerHTML = JSON.stringify(schema);
           }
         } catch (err) {
           console.error("Failed to fetch reviews", err);
@@ -65,21 +106,19 @@ export default function ProductDetail() {
           console.error("Failed to fetch related products", err);
         }
 
-        // Fetch Recommendations (Smart Picks)
+        // Fetch Recommendations
         try {
           const recRes = await api.get(`/products/recommendations?productId=${id}`);
           setRecommendations(recRes.data);
         } catch (err) {
-          // Silently fail if no recommendations
           setRecommendations([]);
         }
 
-        // Initialize attributes if variable
-        if (res.data.type === 'variable' && res.data.attributes) {
+        if (productData.type === 'variable' && productData.attributes) {
           const initialAttrs = {};
-          res.data.attributes.forEach(attr => {
+          productData.attributes.forEach(attr => {
             if (attr.variation && attr.values.length > 0) {
-              initialAttrs[attr.name] = ""; // Start empty to force selection
+              initialAttrs[attr.name] = "";
             }
           });
           setSelectedAttributes(initialAttrs);
@@ -91,6 +130,12 @@ export default function ProductDetail() {
         setLoading(false);
       }
     })();
+
+    // Cleanup script on unmount
+    return () => {
+      const script = document.getElementById("json-ld-product");
+      if (script) script.remove();
+    };
   }, [id, showError]);
 
 
