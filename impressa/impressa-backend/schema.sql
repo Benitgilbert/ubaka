@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS "Product" (
     "approvalStatus" TEXT NOT NULL DEFAULT 'pending',
     "approvalNote" TEXT,
     "approvedAt" TIMESTAMP(3),
+    "approvedBy" TEXT,
     "sellerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

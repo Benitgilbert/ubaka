@@ -192,6 +192,7 @@ model Product {
 
   approvalStatus    String             @default("pending")
   approvalNote      String?
+  approvedBy        String?
   approvedAt        DateTime?
   
   bundleConfigurations Json?          @default("[]") // Array of { unitType, pcsPerUnit, price }
