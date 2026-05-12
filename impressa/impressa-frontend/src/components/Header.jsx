@@ -149,8 +149,9 @@ export default function Header() {
         <button
           className="lg:hidden p-2 text-white"
           onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open menu"
         >
-          <LuMenu className="w-6 h-6" />
+          <LuMenu className="w-6 h-6" aria-hidden="true" />
         </button>
 
         {/* Logo */}
@@ -219,6 +220,9 @@ export default function Header() {
           <div className="hidden md:block flex-1 max-w-sm xl:max-w-md px-1 xl:px-2">
             <div className="relative w-full group">
               <form onSubmit={handleSearchSubmit}>
+                <label htmlFor="search-input-desktop" className="sr-only">
+                  {t('common.search')}
+                </label>
                 <input
                   id="search-input-desktop"
                   name="q"
@@ -229,8 +233,8 @@ export default function Header() {
                   placeholder={t('common.search')}
                   className="w-full h-10 pl-4 pr-10 rounded-full bg-charcoal-700/50 border border-charcoal-600 focus:border-terracotta-500 focus:ring-1 focus:ring-terracotta-500 text-sm text-white placeholder-charcoal-400 outline-none transition-all"
                 />
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-400 group-focus-within:text-terracotta-400 transition-colors">
-                  <LuSearch className="w-5 h-5" />
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-400 group-focus-within:text-terracotta-400 transition-colors" aria-label="Search">
+                  <LuSearch className="w-5 h-5" aria-hidden="true" />
                 </button>
               </form>
 
@@ -272,8 +276,9 @@ export default function Header() {
             onClick={toggleTheme}
             className="p-2.5 text-charcoal-300 hover:text-white transition-colors"
             title={theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
-            {theme === 'light' ? <LuMoon className="w-5 h-5" /> : <LuSun className="w-5 h-5" />}
+            {theme === 'light' ? <LuMoon className="w-5 h-5" aria-hidden="true" /> : <LuSun className="w-5 h-5" aria-hidden="true" />}
           </button>
 
           {/* Role Switcher (Admin Only) */}

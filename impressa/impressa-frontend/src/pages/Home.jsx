@@ -216,11 +216,11 @@ export default function Home() {
     <div className="min-h-screen bg-cream-100 dark:bg-charcoal-900 transition-colors duration-300">
       <Header />
 
-      <main>
+      <main id="main-content">
         {/* Hero Section - Warm Humanised Design */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-charcoal-700 via-charcoal-800 to-charcoal-900 dark:from-charcoal-900 dark:via-black dark:to-charcoal-900"></div>
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557821552-17105176677c?w=1920')] bg-cover bg-center opacity-10"></div>
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557821552-17105176677c?w=1600&auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10"></div>
 
           <div className="relative mx-auto max-w-7xl px-6 py-12 md:py-24">
             <div className="max-w-2xl">
@@ -607,7 +607,11 @@ export default function Home() {
                 }
               }}
             >
+              <label htmlFor="newsletter-email" className="sr-only">
+                {t('home.community.placeholder')}
+              </label>
               <input
+                id="newsletter-email"
                 type="email"
                 placeholder={t('home.community.placeholder')}
                 value={newsletterEmail}

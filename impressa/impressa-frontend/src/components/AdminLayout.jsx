@@ -20,7 +20,7 @@ function AdminLayout() {
                 <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
                 {/* Only this part changes when you navigate */}
-                <main className="flex-1">
+                <main id="main-content" className="flex-1">
                     <Outlet />
                 </main>
             </div>
