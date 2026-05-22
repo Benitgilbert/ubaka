@@ -128,6 +128,13 @@ export const seedRolesAndPermissions = async () => {
   }
 
   try {
+    const permCount = await prisma.permission.count();
+    const roleCount = await prisma.role.count();
+    if (permCount === ALL_PERMISSIONS.length && roleCount === ALL_ROLES.length) {
+      console.log('✅ Dynamic Roles & Permissions are already up-to-date. Skipping seed.');
+      return;
+    }
+
     console.log('🌱 Seeding dynamic Roles & Permissions to Database...');
 
     // 1. Create permissions
