@@ -353,11 +353,11 @@ export default function Header() {
                         </div>
                         <div className="grid grid-cols-1 gap-1">
                           <Link 
-                            to={user?.role === 'customer' ? "/dashboard" : "/seller/dashboard"} 
+                            to={(user?.role === 'seller' || user?.role === 'cashier') ? "/seller/dashboard" : "/dashboard"} 
                             onClick={() => setSettingsDropdownOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 text-sm text-charcoal-300 hover:text-white hover:bg-charcoal-700 rounded-xl transition-all"
                           >
-                            <LuLayoutDashboard className="w-4 h-4 text-terracotta-400" /> {t('nav.blog')} Dashboard
+                            <LuLayoutDashboard className="w-4 h-4 text-terracotta-400" /> {t('nav.dashboard')}
                           </Link>
                           <Link 
                             to="/orders" 

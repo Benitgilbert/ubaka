@@ -4,7 +4,7 @@ import api from "../utils/axiosInstance";
 import Header from "../components/Header";
 import { getProvinces, getDistricts, getSectors, getCells } from "../utils/locationHelpers";
 import { FaBox, FaMapMarkerAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
-import { LuShieldAlert } from "react-icons/lu";
+
 
 function UserDashboard() {
   const [activeTab, setActiveTab] = useState("orders");
@@ -207,14 +207,7 @@ function UserDashboard() {
                 >
                   <FaUser /> Account Details
                 </button>
-                {(user?.role === 'admin' || user?.role === 'owner') && (
-                  <button
-                    onClick={() => navigate("/admin/overview")}
-                    className="w-full flex items-center gap-3 px-4 py-2 rounded-md bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors mb-2 font-bold"
-                  >
-                    <LuShieldAlert /> Management
-                  </button>
-                )}
+
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-2 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mt-4"
