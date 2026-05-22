@@ -63,6 +63,9 @@ export const AuthProvider = ({ children }) => {
             password
         });
         if (error) throw error;
+        if (data?.session) {
+            await checkAuth(data.session);
+        }
         return data;
     };
 

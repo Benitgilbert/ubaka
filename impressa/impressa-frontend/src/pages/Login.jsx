@@ -63,7 +63,7 @@ function Login() {
       if (from) {
         navigate(from, { replace: true });
       } else if (role === "admin" || role === "owner") {
-        navigate("/admin/overview");
+        navigate("/dashboard");
       } else if (role === "seller" || role === "cashier") {
         navigate("/seller/dashboard");
       } else {
