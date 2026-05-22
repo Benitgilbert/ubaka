@@ -9,15 +9,13 @@ const Login = ({ onBackToLanding }) => {
   const [loading, setLoading] = useState(false);
   const [localGreeting, setLocalGreeting] = useState('Welcome');
 
-  // Dynamic warm greeting for internal team members
+  // Dynamic greeting
   useEffect(() => {
     const hours = new Date().getHours();
     if (hours >= 5 && hours < 12) {
-      setLocalGreeting('Mwaramutse, Inzozi Team Member');
-    } else if (hours >= 12 && hours < 18) {
-      setLocalGreeting('Mwiriwe, Inzozi Team Member');
+      setLocalGreeting('Mwaramutse');
     } else {
-      setLocalGreeting('Mwiriwe, Inzozi Team Member');
+      setLocalGreeting('Mwiriwe');
     }
   }, []);
 
@@ -74,15 +72,8 @@ const Login = ({ onBackToLanding }) => {
         {/* Standard Login Form Card */}
         <div className="bg-slate-900/40 border border-slate-900 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
           
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-950 border border-slate-850 rounded-xl text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-              <Terminal className="w-3.5 h-3.5 text-purple-400" />
-              Internal System Access
-            </div>
-            <h2 className="text-xl font-black text-white tracking-tight">{localGreeting}</h2>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Provide your workspace credentials to enter the role-based dashboard.
-            </p>
+          <div className="space-y-1 text-center">
+            <h2 className="text-2xl font-black text-white tracking-tight">{localGreeting}</h2>
           </div>
 
           {error && (
@@ -125,20 +116,10 @@ const Login = ({ onBackToLanding }) => {
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
               ) : (
-                <>
-                  <LogIn className="w-4.5 h-4.5" />
-                  Secure Workspace Log In
-                </>
+                "Login"
               )}
             </button>
           </form>
-
-          <div className="flex items-center gap-2 p-3 bg-slate-950/50 rounded-xl border border-slate-850">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="text-[9px] text-slate-500 leading-normal">
-              This endpoint utilizes cryptographic session tracking on an isolated PostgreSQL database cluster.
-            </span>
-          </div>
 
         </div>
       </div>
