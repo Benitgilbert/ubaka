@@ -14,7 +14,6 @@ export default function Contact() {
         const data = await res.json();
         if (data.success) setSettings(data.data);
       } catch (err) {
-        console.error("Failed to fetch site settings:", err);
       }
     };
     fetchSettings();

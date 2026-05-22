@@ -106,7 +106,7 @@ export const getTasks = async (req, res) => {
       });
       return res.json(tasks);
     } catch (err) {
-      console.warn('[TaskController] Database query failed, falling back to mock tasks:', err.message);
+      // DB query failed, falling back to mock tasks
     }
   }
 
@@ -146,9 +146,10 @@ export const createTask = async (req, res) => {
           assignee: { select: { name: true, avatar: true } }
         }
       });
+      // Broadcast real-time creation to all connected clients
+      if (req.io) req.io.emit('task_updated', { action: 'created', task });
       return res.status(201).json(task);
     } catch (err) {
-      console.error('[TaskController] DB Error creating task:', err.message);
       return res.status(500).json({ error: 'Failed to create task on database' });
     }
   }
@@ -169,7 +170,10 @@ export const createTask = async (req, res) => {
   };
 
   MOCK_TASKS.push(newTask);
-  return res.status(201).json(enrichMockTask(newTask));
+  const enriched = enrichMockTask(newTask);
+  // Broadcast real-time creation to all connected clients (mock mode)
+  if (req.io) req.io.emit('task_updated', { action: 'created', task: enriched });
+  return res.status(201).json(enriched);
 };
 
 // Update a task (e.g. dragging across columns on Kanban board)
@@ -195,9 +199,10 @@ export const updateTask = async (req, res) => {
           assignee: { select: { name: true, avatar: true } }
         }
       });
+      // Broadcast real-time update to all connected clients
+      if (req.io) req.io.emit('task_updated', { action: 'updated', task: updated });
       return res.json(updated);
     } catch (err) {
-      console.error(`[TaskController] DB Error updating task ${id}:`, err.message);
       return res.status(500).json({ error: 'Failed to update task' });
     }
   }
@@ -220,7 +225,10 @@ export const updateTask = async (req, res) => {
   };
 
   MOCK_TASKS[taskIndex] = updatedTask;
-  return res.json(enrichMockTask(updatedTask));
+  const enrichedUpdated = enrichMockTask(updatedTask);
+  // Broadcast real-time update to all connected clients (mock mode)
+  if (req.io) req.io.emit('task_updated', { action: 'updated', task: enrichedUpdated });
+  return res.json(enrichedUpdated);
 };
 
 // Delete a task
@@ -231,9 +239,10 @@ export const deleteTask = async (req, res) => {
   if (dbActive) {
     try {
       await prisma.task.delete({ where: { id } });
+      // Broadcast real-time deletion to all connected clients
+      if (req.io) req.io.emit('task_updated', { action: 'deleted', taskId: id });
       return res.json({ success: true, message: 'Task deleted successfully' });
     } catch (err) {
-      console.error(`[TaskController] DB Error deleting task ${id}:`, err.message);
       return res.status(500).json({ error: 'Failed to delete task' });
     }
   }
@@ -245,5 +254,7 @@ export const deleteTask = async (req, res) => {
   }
 
   MOCK_TASKS = MOCK_TASKS.filter(t => t.id !== id);
-  return res.json({ success: true, message: 'Task deleted successfully (mock)' });
+  // Broadcast real-time deletion to all connected clients (mock mode)
+  if (req.io) req.io.emit('task_updated', { action: 'deleted', taskId: id });
+  return res.json({ success: true, message: 'Task deleted successfully' });
 };

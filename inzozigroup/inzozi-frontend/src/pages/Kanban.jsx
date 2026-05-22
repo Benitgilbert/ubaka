@@ -9,7 +9,9 @@ import {
   AlertCircle, 
   Calendar,
   Grid,
-  CheckSquare
+  CheckSquare,
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 
 const Kanban = () => {
@@ -28,6 +30,11 @@ const Kanban = () => {
   const [newPriority, setNewPriority] = useState('medium');
   const [newProjId, setNewProjId] = useState('');
   const [newAssigneeId, setNewAssigneeId] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+
+  // Delete Confirmation Modal State
+  const [confirmDelete, setConfirmDelete] = useState(null); // { id, title } | null
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const columns = [
     { id: 'todo', label: 'To Do', color: 'border-t-slate-700 bg-slate-900/40' },
@@ -50,14 +57,13 @@ const Kanban = () => {
         setTasks(data);
       }
     } catch (err) {
-      console.error('Error fetching tasks:', err);
+      // Failed to fetch tasks - silent
     }
   };
 
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
-      // Fetch projects for filters and dropdowns
       try {
         const projRes = await fetch(`${API_BASE_URL}/projects`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -70,7 +76,7 @@ const Kanban = () => {
           }
         }
       } catch (err) {
-        console.error('Error loading projects:', err);
+        // Failed to load projects - silent
       }
 
       await fetchTasks();
@@ -84,17 +90,29 @@ const Kanban = () => {
   useEffect(() => {
     if (!socket) return;
 
-    // Join room for real-time task board tracking
     socket.emit('join_channel', 'tasks_global');
 
-    socket.on('task_updated', (data) => {
-      console.log('[WebSocket] Live task update received:', data);
-      // Refetch tasks to sync the board
-      fetchTasks();
-    });
+    const handleTaskUpdated = (data) => {
+      const { action, task, taskId } = data;
+      if (action === 'created') {
+        setTasks(prev => {
+          if (prev.some(t => t.id === task.id)) return prev;
+          return [...prev, task];
+        });
+      } else if (action === 'updated') {
+        setTasks(prev => prev.map(t => t.id === task.id ? { ...t, ...task } : t));
+      } else if (action === 'deleted') {
+        setTasks(prev => prev.filter(t => t.id !== taskId));
+      } else {
+        // Fallback: full re-sync for legacy drag-drop events
+        fetchTasks();
+      }
+    };
+
+    socket.on('task_updated', handleTaskUpdated);
 
     return () => {
-      socket.off('task_updated');
+      socket.off('task_updated', handleTaskUpdated);
     };
   }, [socket, selectedProjectId]);
 
@@ -111,7 +129,6 @@ const Kanban = () => {
     const taskId = e.dataTransfer.getData('text/plain');
     if (!taskId) return;
 
-    // Instantly update UI locally (Optimistic update)
     const taskToMove = tasks.find(t => t.id === taskId);
     if (!taskToMove || taskToMove.status === columnId) return;
 
@@ -129,23 +146,18 @@ const Kanban = () => {
       });
 
       if (!response.ok) {
-        // Rollback
         setTasks(originalTasks);
-      } else {
-        // Emit socket notification to alert others
-        if (socket) {
-          socket.emit('task_moved', { taskId, status: columnId, projectId: 'tasks_global' });
-        }
       }
+      // Backend will emit task_updated via Socket.io for other clients
     } catch (err) {
-      console.error('Error updating task status:', err);
       setTasks(originalTasks);
     }
   };
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
-    if (!newTitle) return;
+    if (!newTitle || isCreating) return;
+    setIsCreating(true);
 
     try {
       const response = await fetch(`${API_BASE_URL}/tasks`, {
@@ -167,35 +179,37 @@ const Kanban = () => {
         setIsModalOpen(false);
         setNewTitle('');
         setNewDescription('');
-        await fetchTasks();
-        
-        // Notify others
-        if (socket) {
-          socket.emit('task_moved', { projectId: 'tasks_global' });
-        }
+        // Backend emits task_updated via Socket.io — all clients auto-update
       }
     } catch (err) {
-      console.error('Error creating task:', err);
+      // Failed to create task - silent
+    } finally {
+      setIsCreating(false);
     }
   };
 
-  const handleDeleteTask = async (taskId) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
+  const confirmDeleteTask = (task) => {
+    setConfirmDelete({ id: task.id, title: task.title });
+  };
+
+  const handleDeleteTask = async () => {
+    if (!confirmDelete || isDeleting) return;
+    setIsDeleting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL}/tasks/${confirmDelete.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
-        await fetchTasks();
-        if (socket) {
-          socket.emit('task_moved', { projectId: 'tasks_global' });
-        }
+        setConfirmDelete(null);
+        // Backend emits task_updated { action: 'deleted' } — all clients auto-update
       }
     } catch (err) {
-      console.error('Error deleting task:', err);
+      // Failed to delete task - silent
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -243,7 +257,7 @@ const Kanban = () => {
           {/* Add Task Button */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-purple-500/10 cursor-pointer"
+            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-1.5 px-4 rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-purple-500/10 cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4" />
             Add Task
@@ -295,8 +309,8 @@ const Kanban = () => {
                             {task.title}
                           </h4>
                           <button
-                            onClick={() => handleDeleteTask(task.id)}
-                            className="text-slate-600 hover:text-red-400 p-0.5 rounded transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                            onClick={() => confirmDeleteTask(task)}
+                            className="text-slate-600 hover:text-red-400 p-0.5 rounded transition-all opacity-0 group-hover:opacity-100 cursor-pointer hover:bg-red-500/10 active:scale-90"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -350,7 +364,54 @@ const Kanban = () => {
         </div>
       )}
 
-      {/* Creation Modal */}
+      {/* ──── Custom Delete Confirmation Modal ──── */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-500/20 rounded-2xl w-full max-w-sm p-6 shadow-2xl shadow-red-950/20 space-y-5">
+            {/* Icon + Title */}
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="space-y-1 flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-white">Delete Task?</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  You are about to permanently delete{' '}
+                  <span className="text-slate-200 font-semibold">"{confirmDelete.title}"</span>.
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(null)}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteTask}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 inline-flex items-center justify-center gap-2 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-95"
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5" />
+                )}
+                {isDeleting ? 'Deleting...' : 'Delete Task'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ──── Creation Modal ──── */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
@@ -427,15 +488,20 @@ const Kanban = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-2 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-slate-400 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
+                  disabled={isCreating}
+                  className="flex-1 py-2 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-slate-400 font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg cursor-pointer"
+                  disabled={isCreating || !newTitle}
+                  className="flex-1 py-2 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-lg text-xs transition-all shadow-lg cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-95"
                 >
-                  Create Task
+                  {isCreating ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : null}
+                  {isCreating ? 'Creating...' : 'Create Task'}
                 </button>
               </div>
             </form>

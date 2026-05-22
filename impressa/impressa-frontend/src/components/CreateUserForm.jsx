@@ -24,7 +24,6 @@ function CreateUserForm() {
       setMessage("✅ User created successfully");
       setForm({ name: "", email: "", password: "", role: "cashier" });
     } catch (err) {
-      console.error("User creation failed:", err.response?.data || err.message);
       setMessage("❌ Failed to create user: " + (err.response?.data?.message || "Server error"));
     } finally {
       setLoading(false);

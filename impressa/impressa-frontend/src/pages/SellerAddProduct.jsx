@@ -29,7 +29,6 @@ const SellerAddProduct = () => {
                     setCategories(res.data.data);
                 }
             } catch (err) {
-                console.error("Failed to fetch categories");
             }
         };
         fetchCategories();
@@ -77,7 +76,6 @@ const SellerAddProduct = () => {
                 navigate("/seller/products");
             }
         } catch (err) {
-            console.error(err);
             setError(err.response?.data?.message || "Failed to create product");
         } finally {
             setLoading(false);

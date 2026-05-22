@@ -31,7 +31,6 @@ const SellerOrderDetails = () => {
             queryClient.invalidateQueries(['seller-orders']);
             alert(`Order status updated to ${newStatus}`);
         } catch (error) {
-            console.error("Failed to update status:", error);
             alert("Failed to update status");
         } finally {
             setUpdating(false);
@@ -52,7 +51,6 @@ const SellerOrderDetails = () => {
             setNoteText("");
             alert("Update added successfully");
         } catch (error) {
-            console.error("Failed to add note:", error);
             alert("Failed to add note");
         } finally {
             setAddingNote(false);

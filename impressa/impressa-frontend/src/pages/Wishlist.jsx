@@ -28,7 +28,6 @@ export default function Wishlist() {
         const res = await api.get("/products/by-ids", { params: { ids: ids.join(",") } });
         setProducts(res.data || []);
       } catch (e) {
-        console.error("Failed to load wishlist products", e);
       } finally {
         setLoading(false);
       }

@@ -30,7 +30,7 @@ const Dashboard = () => {
           setProjects(data);
         }
       } catch (err) {
-        console.error('Error fetching projects:', err);
+        // Fetch projects error
       } finally {
         setLoading(false);
       }

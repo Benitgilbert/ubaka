@@ -193,7 +193,6 @@ export default function Home() {
         setTrustBadges(siteSettingsData.data.trustBadges);
       }
     } catch (error) {
-      console.error('Error fetching home data:', error);
     } finally {
       setLoading(false);
     }

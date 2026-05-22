@@ -24,7 +24,6 @@ export function CartProvider({ children }) {
       setCartSafe(payload.data || null);
       setError(null);
     } catch (err) {
-      console.error("Failed to fetch cart:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -77,12 +76,6 @@ export function CartProvider({ children }) {
     } catch (err) {
       // Log full backend error details to understand 400 responses
       const backendMessage = err?.response?.data?.message;
-      console.error("Failed to add item:", {
-        message: err.message,
-        status: err?.response?.status,
-        backendMessage,
-        data: err?.response?.data,
-      });
       throw err;
     }
   };
@@ -93,7 +86,6 @@ export function CartProvider({ children }) {
       setCartSafe(payload.data || null);
       return payload;
     } catch (err) {
-      console.error("Failed to update item:", err);
       throw err;
     }
   };
@@ -114,7 +106,6 @@ export function CartProvider({ children }) {
       setCartSafe(payload.data || null);
       return payload;
     } catch (err) {
-      console.error("Failed to remove item:", err);
       throw err;
     }
   };
@@ -125,7 +116,6 @@ export function CartProvider({ children }) {
       setCartSafe(payload.data || null);
       return payload;
     } catch (err) {
-      console.error("Failed to clear cart:", err);
       throw err;
     }
   };
@@ -136,7 +126,6 @@ export function CartProvider({ children }) {
       setCartSafe(payload.data || null);
       return payload;
     } catch (err) {
-      console.error("Failed to apply coupon:", err);
       throw err;
     }
   };
@@ -147,7 +136,6 @@ export function CartProvider({ children }) {
       setCartSafe(payload.data || null);
       return payload;
     } catch (err) {
-      console.error("Failed to remove coupon:", err);
       throw err;
     }
   };
@@ -234,7 +222,6 @@ export function CartProvider({ children }) {
         setCartSafe(payload.data || null);
         return payload;
       } catch (err) {
-        console.error("Failed to merge cart:", err);
       }
     },
   };

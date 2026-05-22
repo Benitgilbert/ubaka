@@ -21,7 +21,6 @@ export default function About() {
           setTeamMembers(data);
         }
       } catch (error) {
-        console.error('Error fetching team members:', error);
       } finally {
         setLoading(false);
       }

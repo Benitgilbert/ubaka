@@ -53,7 +53,6 @@ function ProductTable() {
         setFiltered(data);
       }
     } catch (err) {
-      console.error("Failed to fetch products:", err);
       setMessage("error:Failed to load products");
     } finally {
       setLoading(false);
@@ -67,7 +66,6 @@ function ProductTable() {
       setProducts((prev) => prev.filter((p) => p.id !== id));
       setMessage("success:Product deleted");
     } catch (err) {
-      console.error("Delete failed:", err);
       setMessage("error:Failed to delete product");
     }
   };
@@ -119,7 +117,6 @@ function ProductTable() {
       setBulkAction("");
       setBulkValue("");
     } catch (err) {
-      console.error("Bulk action failed:", err);
       setMessage("error:Bulk action failed");
     }
   };

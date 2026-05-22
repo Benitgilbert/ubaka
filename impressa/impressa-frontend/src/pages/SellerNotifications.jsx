@@ -12,7 +12,7 @@ const SellerNotifications = () => {
             if (!isPolling) setLoading(true);
             const res = await api.get(`/notifications?unreadOnly=${filter === 'unread'}`);
             if (res.data.success) { setNotifications(res.data.data); }
-        } catch (error) { console.error("Failed to fetch notifications:", error); }
+        } catch (error) { }
         finally { if (!isPolling) setLoading(false); }
     }, [filter]);
 
@@ -26,14 +26,14 @@ const SellerNotifications = () => {
         try {
             await api.put(`/notifications/${id}/read`);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
-        } catch (error) { console.error("Failed to mark as read:", error); }
+        } catch (error) { }
     };
 
     const handleMarkAllAsRead = async () => {
         try {
             await api.put("/notifications/mark-all-read");
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-        } catch (error) { console.error("Failed to mark all as read:", error); }
+        } catch (error) { }
     };
 
     const handleDelete = async (id) => {
@@ -41,7 +41,7 @@ const SellerNotifications = () => {
         try {
             await api.delete(`/notifications/${id}`);
             setNotifications(prev => prev.filter(n => n.id !== id));
-        } catch (error) { console.error("Failed to delete notification:", error); }
+        } catch (error) { }
     };
 
     const handleClearAll = async () => {
@@ -49,7 +49,7 @@ const SellerNotifications = () => {
         try {
             await api.delete("/notifications");
             setNotifications([]);
-        } catch (error) { console.error("Failed to clear notifications:", error); }
+        } catch (error) { }
     };
 
     const getIcon = (type) => {

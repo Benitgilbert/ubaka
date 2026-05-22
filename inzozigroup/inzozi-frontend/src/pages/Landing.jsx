@@ -164,7 +164,7 @@ const Landing = ({ onEnterPortal }) => {
           }
         }
       } catch (err) {
-        console.warn('[Landing] Failed to fetch live showcase, falling back to mock data:', err.message);
+        // Fallback to local mockup data silently
       }
     };
     fetchShowcase();

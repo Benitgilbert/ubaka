@@ -41,7 +41,7 @@ const Chat = () => {
         setMessages(data);
       }
     } catch (err) {
-      console.error('Error fetching messages:', err);
+      // Handle fetch messages error silently or show inline indicator
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,6 @@ const Chat = () => {
 
     // Listen for incoming messages
     socket.on('receive_message', (message) => {
-      console.log('[WebSocket] Live message received:', message);
       if (message.channel === activeChannel) {
         setMessages(prev => {
           // Prevent duplicates
@@ -119,7 +118,7 @@ const Chat = () => {
         }
       }
     } catch (err) {
-      console.error('Error sending message:', err);
+      // Handle send message error silently or show error banner
     }
   };
 

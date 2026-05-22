@@ -18,7 +18,6 @@ function EditUserModal({ user, onClose, onSave }) {
       onSave(res.data);
       onClose();
     } catch (err) {
-      console.error("Update failed:", err);
     } finally {
       setLoading(false);
     }

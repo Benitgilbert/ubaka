@@ -43,7 +43,6 @@ export default function DailyDeals() {
                 }
             }
         } catch (error) {
-            console.error('Error fetching flash sales:', error);
         } finally {
             setLoading(false);
         }
@@ -60,7 +59,6 @@ export default function DailyDeals() {
                     setServerTimeOffset(offset);
                 }
             } catch (err) {
-                console.error('Time sync failed:', err);
             }
             await fetchFlashSales();
         };
@@ -106,7 +104,6 @@ export default function DailyDeals() {
             await addItem(product, { quantity: 1 });
             // addItem already handles success toast via its internal logic or caller
         } catch (error) {
-            console.error("Cart error:", error);
         }
     };
 

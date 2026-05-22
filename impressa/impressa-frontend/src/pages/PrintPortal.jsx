@@ -46,7 +46,6 @@ const PrintPortal = () => {
                 
                 setServices(filteredServices);
             } catch (err) {
-                console.error("Failed to fetch services:", err);
             } finally {
                 setLoading(false);
             }
@@ -70,7 +69,6 @@ const PrintPortal = () => {
                     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                     newPagesCount += pdf.numPages;
                 } catch (err) {
-                    console.error("Error reading PDF pages:", err);
                     newPagesCount += 1;
                 }
             } else {

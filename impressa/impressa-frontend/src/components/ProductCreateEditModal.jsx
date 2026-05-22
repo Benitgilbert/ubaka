@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "../utils/axiosInstance";
 
 function ProductCreateEditModal({ product, onClose, onSaved }) {
-  console.log("ProductCreateEditModal Rendered", { type: product?.type });
   const isEdit = !!product;
   const [activeTab, setActiveTab] = useState("general");
   const [globalAttributes, setGlobalAttributes] = useState([]);
@@ -85,7 +84,6 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
       const res = await api.get("/attributes");
       setGlobalAttributes(res.data || []);
     } catch (err) {
-      console.error("Failed to fetch global attributes:", err);
     }
   };
 
@@ -95,7 +93,6 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
       // The endpoint returns the array directly
       setAllProducts(Array.isArray(res.data) ? res.data : (res.data.data || res.data.products || []));
     } catch (err) {
-      console.error("Failed to fetch products:", err);
     }
   };
 
@@ -104,7 +101,6 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
       const res = await api.get("/shipping-classes");
       setShippingClasses(res.data.data || res.data);
     } catch (err) {
-      console.error("Failed to fetch shipping classes:", err);
     }
   };
 
@@ -113,7 +109,6 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
       const res = await api.get("/categories");
       setCategories(res.data.data || res.data || []);
     } catch (err) {
-      console.error("Failed to fetch categories:", err);
     }
   };
 
@@ -360,7 +355,6 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
         : await api.post("/products", fd, config);
       onSaved(res.data);
     } catch (err) {
-      console.error("Save product failed:", err?.response?.data || err.message);
       setError(err?.response?.data?.message || "Failed to save product");
     } finally {
       setSaving(false);

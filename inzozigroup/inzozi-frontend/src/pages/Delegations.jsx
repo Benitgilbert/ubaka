@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, API_BASE_URL } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
 import { 
   Users, 
   ShieldAlert, 
@@ -15,11 +16,13 @@ import {
   AlertTriangle,
   UserCheck,
   Zap,
-  ShoppingBag
+  ShoppingBag,
+  Loader2
 } from 'lucide-react';
 
 const Delegations = () => {
   const { token, user } = useAuth();
+  const socket = useSocket();
   
   // States
   const [employees, setEmployees] = useState([]);
@@ -30,6 +33,19 @@ const Delegations = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+
+  // Button Action states (Transforms / feedback)
+  const [delegationSubmitting, setDelegationSubmitting] = useState(false);
+  const [hireSubmitting, setHireSubmitting] = useState(false);
+  const [revokingId, setRevokingId] = useState(null);
+
+  // Hire Form State
+  const [activeRightTab, setActiveRightTab] = useState('delegation'); // 'delegation' or 'hire'
+  const [hireName, setHireName] = useState('');
+  const [hireEmail, setHireEmail] = useState('');
+  const [hirePassword, setHirePassword] = useState('');
+  const [hireRole, setHireRole] = useState('software_engineer');
+  const [hireTitle, setHireTitle] = useState('');
   
   // Form State
   const [selectedEmp, setSelectedEmp] = useState('');
@@ -47,6 +63,7 @@ const Delegations = () => {
 
   const userPermissions = user?.permissions || [];
   const isAdmin = userPermissions.includes('manage_delegations_admin');
+  const canManageUsers = userPermissions.includes('manage_users');
 
   const fetchData = async () => {
     setLoading(true);
@@ -82,7 +99,6 @@ const Delegations = () => {
         setDelegations(delData);
       }
     } catch (err) {
-      console.error(err);
       setErrorMsg(err.message || 'Server error loading directory');
     } finally {
       setLoading(false);
@@ -92,6 +108,39 @@ const Delegations = () => {
   useEffect(() => {
     fetchData();
   }, [token]);
+
+  // Real-time WebSocket sync
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleDelegationUpdate = (data) => {
+      if (data.action === 'create') {
+        setDelegations(prev => {
+          if (prev.some(d => d.id === data.delegation.id)) return prev;
+          return [data.delegation, ...prev];
+        });
+      } else if (data.action === 'revoke') {
+        setDelegations(prev => prev.map(d => d.id === data.id ? { ...d, isActive: false } : d));
+      }
+    };
+
+    const handleEmployeeUpdate = (data) => {
+      if (data.action === 'created') {
+        setEmployees(prev => {
+          if (prev.some(e => e.id === data.employee.id)) return prev;
+          return [...prev, data.employee].sort((a, b) => a.name.localeCompare(b.name));
+        });
+      }
+    };
+
+    socket.on('delegation_updated', handleDelegationUpdate);
+    socket.on('employee_updated', handleEmployeeUpdate);
+
+    return () => {
+      socket.off('delegation_updated', handleDelegationUpdate);
+      socket.off('employee_updated', handleEmployeeUpdate);
+    };
+  }, [socket]);
 
   const handleSubmitDelegation = async (e) => {
     e.preventDefault();
@@ -110,6 +159,7 @@ const Delegations = () => {
       return;
     }
 
+    setDelegationSubmitting(true);
     try {
       const response = await fetch(`${API_BASE_URL}/delegations`, {
         method: 'POST',
@@ -133,21 +183,22 @@ const Delegations = () => {
         setSelectedEmp('');
         setSelectedRole('');
         setReason('');
-        // Refresh
         fetchData();
-        // Clear message
         setTimeout(() => setSuccessMsg(null), 5000);
       } else {
         setErrorMsg(resData.error || 'Failed to authorize coverage');
       }
     } catch (err) {
       setErrorMsg('Network error. Failed to dispatch delegation payload.');
+    } finally {
+      setDelegationSubmitting(false);
     }
   };
 
   const handleRevoke = async (id) => {
     setErrorMsg(null);
     setSuccessMsg(null);
+    setRevokingId(id);
     try {
       const response = await fetch(`${API_BASE_URL}/delegations/${id}`, {
         method: 'DELETE',
@@ -164,6 +215,56 @@ const Delegations = () => {
       }
     } catch (err) {
       setErrorMsg('Network failure during revocation.');
+    } finally {
+      setRevokingId(null);
+    }
+  };
+
+  const handleHireEmployee = async (e) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    if (!hireName || !hireEmail || !hirePassword || !hireRole) {
+      setErrorMsg('Please fill in all required fields (Name, Email, Password, and Role).');
+      return;
+    }
+
+    setHireSubmitting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: hireName,
+          email: hireEmail,
+          password: hirePassword,
+          role: hireRole,
+          title: hireTitle || roles.find(r => r.code === hireRole)?.name || 'Worker'
+        })
+      });
+
+      const resData = await response.json();
+
+      if (response.ok) {
+        setSuccessMsg(`Successfully hired and onboarded ${hireName}!`);
+        setHireName('');
+        setHireEmail('');
+        setHirePassword('');
+        setHireTitle('');
+        setHireRole('software_engineer');
+        fetchData();
+        setTimeout(() => setSuccessMsg(null), 5000);
+      } else {
+        setErrorMsg(resData.error || 'Failed to register worker');
+      }
+    } catch (err) {
+      setErrorMsg('Network error. Failed to dispatch registration payload.');
+    } finally {
+      setHireSubmitting(false);
     }
   };
 
@@ -270,92 +371,223 @@ const Delegations = () => {
           {/* Right Column: Delegation Creator & Timelines */}
           <div className="lg:col-span-5 flex flex-col min-h-0 overflow-hidden space-y-6">
             
-            {/* Create Delegation Form */}
+            {/* Form Container (Delegation or Hire) */}
             <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-850 rounded-2xl p-5 shadow-xl shrink-0 space-y-4">
-              <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                <UserCheck className="w-4.5 h-4.5 text-purple-400" />
-                Assign Temporary Coverage
-              </h3>
+              {canManageUsers ? (
+                <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-850 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setActiveRightTab('delegation')}
+                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
+                      activeRightTab === 'delegation'
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+                    }`}
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    Assign Coverage
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveRightTab('hire')}
+                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
+                      activeRightTab === 'hire'
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    Hire Employee
+                  </button>
+                </div>
+              ) : (
+                <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <UserCheck className="w-4.5 h-4.5 text-purple-400" />
+                  Assign Temporary Coverage
+                </h3>
+              )}
               
-              <form onSubmit={handleSubmitDelegation} className="space-y-3">
-                {/* Employee select */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Cover Worker</label>
-                  <select 
-                    value={selectedEmp}
-                    onChange={(e) => setSelectedEmp(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
-                  >
-                    <option value="">-- Choose employee --</option>
-                    {employees.map(e => (
-                      <option key={e.id} value={e.id}>{e.name} ({e.roleName})</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Target Role select */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Delegate Role & Dashboards</label>
-                  <select 
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
-                  >
-                    <option value="">-- Choose target role --</option>
-                    {roles.map(r => (
-                      <option 
-                        key={r.code} 
-                        value={r.code}
-                        disabled={r.isTechnical && !isAdmin}
-                      >
-                        {r.name} {r.isTechnical ? '🔒 (Admin Only)' : '👥 (HR Delegatable)'}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-3">
+              {activeRightTab === 'delegation' || !canManageUsers ? (
+                <form onSubmit={handleSubmitDelegation} className="space-y-3">
+                  {/* Employee select */}
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Start Date</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Cover Worker</label>
+                    <select 
+                      value={selectedEmp}
+                      onChange={(e) => setSelectedEmp(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                      disabled={delegationSubmitting}
+                    >
+                      <option value="">-- Choose employee --</option>
+                      {employees.map(e => (
+                        <option key={e.id} value={e.id}>{e.name} ({e.roleName})</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Target Role select */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Delegate Role & Dashboards</label>
+                    <select 
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                      disabled={delegationSubmitting}
+                    >
+                      <option value="">-- Choose target role --</option>
+                      {roles.map(r => (
+                        <option 
+                          key={r.code} 
+                          value={r.code}
+                          disabled={r.isTechnical && !isAdmin}
+                        >
+                          {r.name} {r.isTechnical ? '🔒 (Admin Only)' : '👥 (HR Delegatable)'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Dates */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Start Date</label>
+                      <input 
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500 transition-colors"
+                        disabled={delegationSubmitting}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">End Date</label>
+                      <input 
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500 transition-colors"
+                        disabled={delegationSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Reason */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Coverage Reason</label>
                     <input 
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500 transition-colors"
+                      type="text"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      placeholder="e.g. Gaju sick leave, moderating storefront queue"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                      disabled={delegationSubmitting}
                     />
                   </div>
+
+                  <button
+                    type="submit"
+                    disabled={delegationSubmitting}
+                    className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+                  >
+                    {delegationSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Deploying Authorization...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Deploy Coverage Authorization
+                      </>
+                    )}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleHireEmployee} className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+                      <input 
+                        type="text"
+                        value={hireName}
+                        onChange={(e) => setHireName(e.target.value)}
+                        placeholder="Benit Gilbert"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                        disabled={hireSubmitting}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Job Title</label>
+                      <input 
+                        type="text"
+                        value={hireTitle}
+                        onChange={(e) => setHireTitle(e.target.value)}
+                        placeholder="Content Moderator"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                        disabled={hireSubmitting}
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">End Date</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
                     <input 
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500 transition-colors"
+                      type="email"
+                      value={hireEmail}
+                      onChange={(e) => setHireEmail(e.target.value)}
+                      placeholder="moderator@inzozi.com"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                      disabled={hireSubmitting}
                     />
                   </div>
-                </div>
 
-                {/* Reason */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Coverage Reason</label>
-                  <input 
-                    type="text"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="e.g. Gaju sick leave, moderating storefront queue"
-                    className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                    <input 
+                      type="password"
+                      value={hirePassword}
+                      onChange={(e) => setHirePassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                      disabled={hireSubmitting}
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1"
-                >
-                  <Plus className="w-4 h-4" />
-                  Deploy Coverage Authorization
-                </button>
-              </form>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Primary Role</label>
+                    <select 
+                      value={hireRole}
+                      onChange={(e) => setHireRole(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                      disabled={hireSubmitting}
+                    >
+                      {roles.map(r => (
+                        <option key={r.code} value={r.code}>
+                          {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={hireSubmitting}
+                    className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+                  >
+                    {hireSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Onboarding Employee...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Hire & Onboard Employee
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
             </div>
 
             {/* Active Delegations Log */}
@@ -388,10 +620,15 @@ const Delegations = () => {
                           
                           <button
                             onClick={() => handleRevoke(del.id)}
-                            className="p-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 rounded-lg transition-colors cursor-pointer"
+                            disabled={revokingId === del.id}
+                            className="p-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.05] active:scale-[0.95]"
                             title="Revoke coverage instantly"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            {revokingId === del.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
                           </button>
                         </div>
 

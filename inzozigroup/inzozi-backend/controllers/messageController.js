@@ -93,7 +93,7 @@ export const getMessagesByChannel = async (req, res) => {
       });
       return res.json(messages);
     } catch (err) {
-      console.warn('[MessageController] DB fetch failed, falling back to mock messages:', err.message);
+      // DB fetch failed, falling back to mock messages
     }
   }
 
@@ -127,9 +127,10 @@ export const createMessage = async (req, res) => {
           sender: { select: { name: true, avatar: true } }
         }
       });
+      // Broadcast real-time message to channel members
+      if (req.io) req.io.to(channel || 'general').emit('receive_message', message);
       return res.status(201).json(message);
     } catch (err) {
-      console.error('[MessageController] DB Error saving message:', err.message);
       return res.status(500).json({ error: 'Failed to save message to database' });
     }
   }
@@ -148,5 +149,7 @@ export const createMessage = async (req, res) => {
   };
 
   MOCK_MESSAGES.push(newMessage);
+  // Broadcast real-time message to channel members (mock mode)
+  if (req.io) req.io.to(channel || 'general').emit('receive_message', newMessage);
   return res.status(201).json(newMessage);
 };

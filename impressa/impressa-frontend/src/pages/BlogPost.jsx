@@ -21,7 +21,6 @@ export default function BlogPost() {
         const { data } = await api.get(`/blogs/${id}`);
         setPost(data);
       } catch (err) {
-        console.error("Error fetching blog post:", err);
         setError("Failed to load blog post.");
       } finally {
         setLoading(false);
@@ -51,7 +50,6 @@ export default function BlogPost() {
       toast.success("Successfully subscribed to our newsletter!");
       setEmail("");
     } catch (err) {
-      console.error("Subscription failed:", err);
       toast.error(err.response?.data?.message || "Failed to subscribe. Please try again.");
     } finally {
       setSubscribing(false);

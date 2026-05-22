@@ -54,7 +54,7 @@ function Login() {
       await login(form.email, form.password);
       
       // Cart merging
-      try { await mergeCart(); } catch (e) { console.error("Cart merge failed", e); }
+      try { await mergeCart(); } catch (e) { }
 
       // Smart redirection based on role
       const from = location.state?.from?.pathname;
@@ -70,7 +70,6 @@ function Login() {
         navigate("/dashboard");
       }
     } catch (err) {
-      console.error("Login failed:", err);
       if (err.message?.toLowerCase().includes('email not confirmed')) {
         setError(
           <div className="flex flex-col gap-2">

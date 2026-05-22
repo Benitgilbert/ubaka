@@ -12,7 +12,6 @@ function OrderTable({ readOnly = false }) {
       const res = await api.get("/orders");
       setOrders(res.data);
     } catch (err) {
-      console.error("Failed to fetch orders:", err);
     } finally {
       setLoading(false);
     }
@@ -26,7 +25,6 @@ function OrderTable({ readOnly = false }) {
       );
       fetchOrders(); // Refresh after update
     } catch (err) {
-      console.error("Failed to update status:", err);
     }
   };
 

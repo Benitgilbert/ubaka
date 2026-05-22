@@ -20,7 +20,6 @@ import {
   LuGift,
   LuLayoutDashboard
 } from "react-icons/lu";
-import RoleSwitcher from "./RoleSwitcher";
 import api from "../utils/axiosInstance";
 import assetUrl from "../utils/assetUrl";
 import { formatRwf } from "../utils/currency";
@@ -52,7 +51,7 @@ export default function Header() {
     setSettingsDropdownOpen(false);
   };
 
-  const isSellerOrAdminView = location.pathname.startsWith('/seller') || location.pathname.startsWith('/admin');
+  const isSellerOrAdminView = location.pathname.startsWith('/seller');
 
   useEffect(() => {
     setCategoryDropdownOpen(false);
@@ -69,7 +68,6 @@ export default function Header() {
           setCategories(data.data);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
       }
     };
 
@@ -86,7 +84,6 @@ export default function Header() {
           table: 'Category'
         },
         () => {
-          console.log('Categories changed, re-fetching...');
           fetchCategories();
         }
       )
@@ -111,7 +108,6 @@ export default function Header() {
         setSuggestions(res.data);
         setShowSuggestions(true);
       } catch (error) {
-        console.error('Error fetching suggestions:', error);
       } finally {
         setIsSearching(false);
       }
@@ -280,9 +276,6 @@ export default function Header() {
           >
             {theme === 'light' ? <LuMoon className="w-5 h-5" aria-hidden="true" /> : <LuSun className="w-5 h-5" aria-hidden="true" />}
           </button>
-
-          {/* Role Switcher (Admin Only) */}
-          <RoleSwitcher user={user} theme={theme} />
 
           {!isSellerOrAdminView && (
             <>

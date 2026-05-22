@@ -68,7 +68,6 @@ function UserDashboard() {
 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
       // If unauthorized, redirect to login
       if (error.response?.status === 401) navigate("/login");
       setLoading(false);
@@ -116,7 +115,6 @@ function UserDashboard() {
       alert("Profile updated successfully!");
       fetchData(); // refresh
     } catch (error) {
-      console.error("Update failed:", error);
       alert("Failed to update profile.");
     }
   };

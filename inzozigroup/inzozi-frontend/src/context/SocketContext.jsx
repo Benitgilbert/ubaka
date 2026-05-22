@@ -25,7 +25,7 @@ export const SocketProvider = ({ children }) => {
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      console.log('[Socket] Connected to server with ID:', newSocket.id);
+      // Socket connected
     });
 
     return () => {

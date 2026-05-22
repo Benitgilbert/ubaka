@@ -28,7 +28,6 @@ const LedgerView = () => {
             const res = await axios.get(`/finance/ledger/${accountId}`);
             setTransactions(res.data);
         } catch (err) {
-            console.error("Failed to fetch ledger");
         } finally {
             setLoading(false);
         }

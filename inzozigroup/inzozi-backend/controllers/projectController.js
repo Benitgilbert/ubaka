@@ -221,6 +221,11 @@ export const updateImpressaProductStatus = async (req, res) => {
 
   console.log(`[ProjectController] Impressa Product ID ${id} set to ${status}. Note: ${note || 'None'}`);
 
+  // Emit WebSocket real-time update
+  if (req.io) {
+    req.io.emit('impressa_approvals_updated', MOCK_IMPRESSA_APPROVALS);
+  }
+
   return res.json({
     success: true,
     message: `Product successfully ${status}`,
@@ -230,7 +235,127 @@ export const updateImpressaProductStatus = async (req, res) => {
 
 // IMPRESSA Admin Activities: Get Support Tickets
 export const getImpressaTickets = async (req, res) => {
-  res.json(MOCK_IMPRESSA_TICKETS);
+  // Only return tickets that are NOT resolved to keep the support queue focused
+  res.json(MOCK_IMPRESSA_TICKETS.filter(t => t.status !== 'resolved'));
+};
+
+// IMPRESSA Admin Activities: Update Support Ticket (resolve or modify)
+export const updateImpressaTicketStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // 'open', 'in_progress', 'resolved'
+
+  const ticketIndex = MOCK_IMPRESSA_TICKETS.findIndex(t => t.id === id);
+  if (ticketIndex === -1) {
+    return res.status(404).json({ error: 'Ticket not found' });
+  }
+
+  MOCK_IMPRESSA_TICKETS[ticketIndex].status = status;
+
+  console.log(`[ProjectController] Impressa Ticket ID ${id} status updated to ${status}`);
+
+  // Emit WebSocket real-time update
+  if (req.io) {
+    const activeTickets = MOCK_IMPRESSA_TICKETS.filter(t => t.status !== 'resolved');
+    req.io.emit('impressa_tickets_updated', activeTickets);
+  }
+
+  return res.json({
+    success: true,
+    message: `Ticket successfully updated to ${status}`,
+    ticket: MOCK_IMPRESSA_TICKETS[ticketIndex]
+  });
+};
+
+// Background simulation to add products and tickets dynamically for real-time demonstration
+export const startImpressaSimulation = (io) => {
+  let productCounter = 4;
+  let ticketCounter = 3;
+
+  const mockProductNames = [
+    'Handmade Sisal Basket - Urubo',
+    'Akagera Coffee Beans (Medium Roast)',
+    'Traditional Rwandan Imigongo Art',
+    'Safari Leather Sandals',
+    'Organic Ginger Honey Jar',
+    'Inzobe Tea Selection Box',
+    'Volcanoes National Park Photo Print'
+  ];
+
+  const mockSellers = [
+    'Gisenyi Artisans Guild',
+    'Kigali Roasters',
+    'Imigongo Arts Collective',
+    'Rubavu Leatherworks',
+    'Musanze Apiaries',
+    'Rulindo Tea Estates',
+    'Eco-Tourism Prints'
+  ];
+
+  const mockCategories = ['Handicrafts', 'Food & Beverage', 'Art', 'Apparel', 'Beauty'];
+
+  const mockSubjects = [
+    'Help with promotional coupon code',
+    'Delivery delay to Huye district',
+    'Inquiry about bulk vendor discounts',
+    'Refund request: defective headset',
+    'How to change registered phone number'
+  ];
+
+  const mockEmails = [
+    'claudine@yahoo.fr',
+    'habimana@hotmail.com',
+    'eric.mucyo@gmail.com',
+    'uwera@outlook.com',
+    'karangwa@inzozi.com'
+  ];
+
+  setInterval(() => {
+    // Choose randomly whether to add a product (60% chance) or a ticket (40% chance)
+    if (Math.random() < 0.6) {
+      if (MOCK_IMPRESSA_APPROVALS.length < 8) {
+        const name = mockProductNames[Math.floor(Math.random() * mockProductNames.length)];
+        const sellerName = mockSellers[Math.floor(Math.random() * mockSellers.length)];
+        const category = mockCategories[Math.floor(Math.random() * mockCategories.length)];
+        const price = parseFloat((10 + Math.random() * 90).toFixed(2));
+        
+        const newProduct = {
+          id: `prod-approval-${productCounter++}`,
+          name,
+          sellerName,
+          price,
+          category,
+          image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=150', // watch/product placeholder
+          createdAt: new Date().toISOString(),
+          status: 'pending'
+        };
+
+        MOCK_IMPRESSA_APPROVALS.push(newProduct);
+        console.log(`[Simulation] New Impressa Product submitted: ${newProduct.name}`);
+        io.emit('impressa_approvals_updated', MOCK_IMPRESSA_APPROVALS);
+      }
+    } else {
+      const activeTicketsCount = MOCK_IMPRESSA_TICKETS.filter(t => t.status !== 'resolved').length;
+      if (activeTicketsCount < 6) {
+        const subject = mockSubjects[Math.floor(Math.random() * mockSubjects.length)];
+        const userEmail = mockEmails[Math.floor(Math.random() * mockEmails.length)];
+        const priority = Math.random() < 0.3 ? 'high' : 'normal';
+
+        const newTicket = {
+          id: `tick-impressa-${ticketCounter++}`,
+          subject,
+          userEmail,
+          priority,
+          status: 'open',
+          createdAt: new Date().toISOString()
+        };
+
+        MOCK_IMPRESSA_TICKETS.push(newTicket);
+        console.log(`[Simulation] New Impressa Ticket filed: ${newTicket.subject}`);
+        const activeTickets = MOCK_IMPRESSA_TICKETS.filter(t => t.status !== 'resolved');
+        io.emit('impressa_tickets_updated', activeTickets);
+      }
+    }
+  }, 25000); // Trigger every 25 seconds to demonstrate real-time sync with low latency
 };
 
 // UI showcase metadata mapping for public landing page

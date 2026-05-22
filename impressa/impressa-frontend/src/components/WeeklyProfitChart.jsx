@@ -25,7 +25,6 @@ function WeeklyProfitChart({ refreshKey }) {
         ],
       });
     }).catch(err => {
-      console.error("Failed to load weekly profit data:", err);
     });
   }, [refreshKey]);
 

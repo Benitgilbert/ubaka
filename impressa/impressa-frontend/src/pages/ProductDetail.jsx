@@ -95,7 +95,6 @@ export default function ProductDetail() {
             document.getElementById("json-ld-product").innerHTML = JSON.stringify(schema);
           }
         } catch (err) {
-          console.error("Failed to fetch reviews", err);
         }
 
         // Fetch Related Products
@@ -103,7 +102,6 @@ export default function ProductDetail() {
           const relatedRes = await api.get(`/products/${id}/related`);
           setRelatedProducts(relatedRes.data);
         } catch (err) {
-          console.error("Failed to fetch related products", err);
         }
 
         // Fetch Recommendations
@@ -124,7 +122,6 @@ export default function ProductDetail() {
           setSelectedAttributes(initialAttrs);
         }
       } catch (e) {
-        console.error("Failed to load product", e);
         showError("Failed to load product details.");
       } finally {
         setLoading(false);

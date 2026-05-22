@@ -41,7 +41,7 @@ const Sidebar = ({ activePage, setActivePage }) => {
       id: 'impressa-admin', 
       label: 'Impressa Control', 
       icon: ShoppingBag,
-      permissions: ['approve_products', 'moderate_content'] 
+      permissions: ['approve_products', 'moderate_content', 'manage_tickets'] 
     },
     {
       id: 'delegations',

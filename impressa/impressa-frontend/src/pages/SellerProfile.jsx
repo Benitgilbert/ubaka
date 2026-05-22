@@ -39,7 +39,6 @@ const SellerProfile = () => {
                     storeLogo: res.data.storeLogo
                 });
             } catch (err) {
-                console.error("Failed to load profile", err);
                 addToast("Failed to load profile data", "error");
             } finally {
                 setLoading(false);
@@ -83,7 +82,6 @@ const SellerProfile = () => {
 
             addToast("Profile updated successfully!", "success");
         } catch (err) {
-            console.error("Failed to update profile", err);
             addToast(err.response?.data?.message || "Failed to update profile", "error");
         } finally {
             setSaving(false);

@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
                 localStorage.setItem('userRole', res.data.role);
             } catch (error) {
-                console.error("Profile fetch failed:", error);
                 // If backend fetch fails but we have a session, we might be a new user
                 // or backend is down. We'll set a basic user object from the session.
                 setUser({

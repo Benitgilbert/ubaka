@@ -99,20 +99,26 @@ export const createDelegation = async (req, res) => {
         }
       });
 
+      const formattedDelegation = {
+        id: delegation.id,
+        employeeId: delegation.employeeId,
+        employeeName: delegation.employee.name,
+        targetRoleCode: delegation.targetRole.code,
+        targetRoleName: delegation.targetRole.name,
+        startDate: delegation.startDate,
+        endDate: delegation.endDate,
+        reason: delegation.reason,
+        isActive: delegation.isActive,
+        authorizerName: delegation.authorizer.name
+      };
+
+      if (req.io) {
+        req.io.emit('delegation_updated', { action: 'create', delegation: formattedDelegation });
+      }
+
       return res.status(201).json({
         message: 'Delegation created successfully',
-        delegation: {
-          id: delegation.id,
-          employeeId: delegation.employeeId,
-          employeeName: delegation.employee.name,
-          targetRoleCode: delegation.targetRole.code,
-          targetRoleName: delegation.targetRole.name,
-          startDate: delegation.startDate,
-          endDate: delegation.endDate,
-          reason: delegation.reason,
-          isActive: delegation.isActive,
-          authorizerName: delegation.authorizer.name
-        }
+        delegation: formattedDelegation
       });
     } catch (err) {
       console.error('[DelegationController] DB error creating delegation, falling back to memory:', err.message);
@@ -143,6 +149,10 @@ export const createDelegation = async (req, res) => {
   };
 
   MOCK_DELEGATIONS.push(newMockDelegation);
+
+  if (req.io) {
+    req.io.emit('delegation_updated', { action: 'create', delegation: newMockDelegation });
+  }
 
   return res.status(201).json({
     message: 'Delegation created successfully (Offline Mock Mode)',
@@ -224,6 +234,10 @@ export const revokeDelegation = async (req, res) => {
         data: { isActive: false }
       });
 
+      if (req.io) {
+        req.io.emit('delegation_updated', { action: 'revoke', id });
+      }
+
       return res.json({ message: 'Delegation revoked successfully' });
     } catch (err) {
       console.error('[DelegationController] DB error revoking delegation, using memory:', err.message);
@@ -243,6 +257,10 @@ export const revokeDelegation = async (req, res) => {
   }
 
   mockDel.isActive = false;
+
+  if (req.io) {
+    req.io.emit('delegation_updated', { action: 'revoke', id });
+  }
 
   return res.json({ message: 'Delegation revoked successfully (Offline Mock Mode)', id });
 };

@@ -28,7 +28,6 @@ const GiftCards = () => {
                 const response = await getGiftCardProducts();
                 setGiftCardOptions(response.data || []);
             } catch (error) {
-                console.error("Failed to fetch gift card products:", error);
                 // Fallback to defaults if API fails
                 setGiftCardOptions([
                     { id: "gc25", amount: 25000, label: "Starter", color: "from-violet-500 to-indigo-600" },

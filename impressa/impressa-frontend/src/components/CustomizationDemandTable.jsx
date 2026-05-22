@@ -11,7 +11,6 @@ function CustomizationDemandTable({ refreshKey }) {
         const res = await axios.get("/analytics/customization-demand");
         setDemandData(res.data);
       } catch (err) {
-        console.error("Failed to fetch customization demand:", err);
       } finally {
         setLoading(false);
       }

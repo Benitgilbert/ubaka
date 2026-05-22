@@ -24,7 +24,6 @@ const playBeep = () => {
         oscillator.start();
         setTimeout(() => oscillator.stop(), 100);
     } catch (e) {
-        console.log('Audio not available');
     }
 };
 
@@ -186,7 +185,6 @@ export default function SellerPOS() {
                 setClientContractPrices(res.data.data);
             }
         } catch (err) {
-            console.error("Failed to fetch contract prices");
         }
     }, []);
 
@@ -516,7 +514,6 @@ export default function SellerPOS() {
                         alert("Payment Failed. Please try again.");
                     }
                 } catch (err) {
-                    console.error("Polling error", err);
                 }
             }, 3000);
         }

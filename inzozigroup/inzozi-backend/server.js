@@ -3,6 +3,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import { startImpressaSimulation } from './controllers/projectController.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +14,9 @@ const io = new Server(server, {
   }
 });
 
+// Start background real-time simulation for Impressa Command Center
+startImpressaSimulation(io);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -22,6 +26,13 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
+
+// Attach socket.io server instance to request object
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

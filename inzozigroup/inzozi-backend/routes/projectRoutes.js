@@ -5,9 +5,10 @@ import {
   getPendingImpressaApprovals,
   updateImpressaProductStatus,
   getImpressaTickets,
+  updateImpressaTicketStatus,
   getPublicShowcaseProjects
 } from '../controllers/projectController.js';
-import { protect, authorize } from '../middleware/authMiddleware.js';
+import { protect, authorizePermission } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -21,8 +22,9 @@ router.get('/', protect, getProjects);
 router.get('/:slug', protect, getProjectBySlug);
 
 // Impressa integrations (Control plane)
-router.get('/impressa/approvals', protect, authorize('admin', 'content_controller'), getPendingImpressaApprovals);
-router.put('/impressa/approvals/:id', protect, authorize('admin', 'content_controller'), updateImpressaProductStatus);
-router.get('/impressa/tickets', protect, authorize('admin', 'support'), getImpressaTickets);
+router.get('/impressa/approvals', protect, authorizePermission('approve_products'), getPendingImpressaApprovals);
+router.put('/impressa/approvals/:id', protect, authorizePermission('approve_products'), updateImpressaProductStatus);
+router.get('/impressa/tickets', protect, authorizePermission('manage_tickets'), getImpressaTickets);
+router.put('/impressa/tickets/:id', protect, authorizePermission('manage_tickets'), updateImpressaTicketStatus);
 
 export default router;

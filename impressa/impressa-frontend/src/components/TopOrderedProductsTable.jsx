@@ -11,7 +11,6 @@ function TopOrderedProductsTable({ refreshKey }) {
         const res = await axios.get("/analytics/top-products");
         setProducts(res.data);
       } catch (err) {
-        console.error("Failed to fetch top products:", err);
       } finally {
         setLoading(false);
       }

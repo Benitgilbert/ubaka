@@ -27,7 +27,6 @@ function ForgotPassword() {
       if (error) throw error;
       setSuccess("Reset link sent! Please check your email.");
     } catch (err) {
-      console.error("Request failed:", err);
       setError(err.message || "Failed to send reset link.");
     } finally {
       setLoading(false);

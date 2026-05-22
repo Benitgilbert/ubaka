@@ -13,7 +13,6 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                     setLogo(res.data.data.logo);
                 }
             } catch (err) {
-                console.warn("Failed to fetch site logo for receipt");
             }
         };
         fetchLogo();

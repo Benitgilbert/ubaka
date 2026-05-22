@@ -39,7 +39,6 @@ const SellerProducts = () => {
             link.click();
             link.parentNode.removeChild(link);
         } catch (err) {
-            console.error("Report download failed:", err);
             alert("Failed to generate inventory report. Please try again.");
         } finally {
             setDownloadingReport(false);

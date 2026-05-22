@@ -60,7 +60,6 @@ function Register() {
                     setTermsContent(data.data.content);
                 }
             } catch (err) {
-                console.error("Failed to fetch terms");
             }
         };
 
@@ -268,7 +267,6 @@ function Register() {
                 navigate("/login");
             }
         } catch (err) {
-            console.error("Registration error:", err);
             setError(err.message || "Registration failed");
         } finally {
             setLoading(false);

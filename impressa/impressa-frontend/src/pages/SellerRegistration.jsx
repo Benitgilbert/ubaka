@@ -47,7 +47,6 @@ export default function SellerRegistration() {
                     setTermsContent(data.data.content);
                 }
             } catch (err) {
-                console.error('Failed to fetch terms');
             }
         };
         fetchTerms();

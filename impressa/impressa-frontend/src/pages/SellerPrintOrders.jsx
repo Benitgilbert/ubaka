@@ -24,7 +24,6 @@ const SellerPrintOrders = () => {
                 setInquiries(filtered);
             }
         } catch (err) {
-            console.error("Failed to fetch print inquiries", err);
             toast.error("Failed to load inquiries");
         } finally {
             setLoading(false);
@@ -60,7 +59,6 @@ const SellerPrintOrders = () => {
                 fetchInquiries();
             }
         } catch (err) {
-            console.error("Submit quote error:", err);
             toast.error(err.response?.data?.message || "Failed to submit quote");
         } finally {
             setSubmitting(false);

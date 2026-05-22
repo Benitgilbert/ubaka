@@ -329,6 +329,22 @@ export const register = async (req, res) => {
 
       const resolved = await resolveEffectiveUser(user);
 
+      if (req.io) {
+        req.io.emit('employee_updated', {
+          action: 'created',
+          employee: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: resolved.primaryRole,
+            roleName: resolved.roleName,
+            title: user.title,
+            avatar: user.avatar,
+            isActive: true
+          }
+        });
+      }
+
       return res.status(201).json({
         token: generateToken(user, resolved),
         user: {
@@ -350,9 +366,69 @@ export const register = async (req, res) => {
     }
   }
 
-  return res.status(503).json({
-    error: 'Database server is currently unavailable. Registrations are disabled in offline mode.'
-  });
+  // Fallback Mock registration if database is not active
+  console.log('[AuthController] Operating in DB-Disconnected Mock Registration Mode');
+  try {
+    const exists = MOCK_EMPLOYEES.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      return res.status(400).json({ error: 'User with this email already exists' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const avatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
+    const newId = `mock-emp-${Date.now()}`;
+
+    const newEmployee = {
+      id: newId,
+      name,
+      email,
+      passwordHash: hashedPassword,
+      role: role || 'software_engineer',
+      title: title || 'Software Engineer',
+      avatar
+    };
+
+    MOCK_EMPLOYEES.push(newEmployee);
+
+    const resolved = await resolveEffectiveUser(newEmployee);
+
+    if (req.io) {
+      req.io.emit('employee_updated', {
+        action: 'created',
+        employee: {
+          id: newEmployee.id,
+          name: newEmployee.name,
+          email: newEmployee.email,
+          role: resolved.primaryRole,
+          roleName: resolved.roleName,
+          title: newEmployee.title,
+          avatar: newEmployee.avatar,
+          isActive: true
+        }
+      });
+    }
+
+    return res.status(201).json({
+      token: generateToken(newEmployee, resolved),
+      user: {
+        id: newEmployee.id,
+        name: newEmployee.name,
+        email: newEmployee.email,
+        role: resolved.primaryRole,
+        roleName: resolved.roleName,
+        title: newEmployee.title,
+        avatar: newEmployee.avatar,
+        permissions: resolved.permissions,
+        activeDelegation: resolved.activeDelegation,
+        dbMode: 'mocked'
+      }
+    });
+  } catch (err) {
+    console.error('[AuthController] Error saving user to mock roster:', err.message);
+    return res.status(500).json({ error: 'Failed to create user on mock server' });
+  }
 };
 
 // Get current logged-in employee profile

@@ -48,7 +48,6 @@ function SellerReports() {
                 return; 
             }
         } catch (err) {
-            console.error("Failed to check shift status");
         }
     }
 
@@ -111,7 +110,6 @@ function SellerReports() {
       setMessage("✅ Report generated successfully");
       queryClient.invalidateQueries(['report-logs']);
     } catch (err) {
-      console.error("Report generation failed:", err);
       setMessage(`❌ Failed to generate report: ${err.message || "Unknown error"}`);
     } finally {
       setLoading(false);

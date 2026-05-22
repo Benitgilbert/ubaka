@@ -22,7 +22,6 @@ export default function Unsubscribe() {
                 await api.get(`/newsletter/unsubscribe/${email}`);
                 setStatus("success");
             } catch (err) {
-                console.error("Unsubscribe failed:", err);
                 setStatus("error");
                 setMessage(err.response?.data?.message || "Failed to unsubscribe. Please try again.");
             }

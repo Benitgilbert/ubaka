@@ -33,7 +33,6 @@ export default function LandingFooter() {
           }));
         }
       } catch (error) {
-        console.error('Error fetching footer settings:', error);
       }
     };
     fetchFooterSettings();

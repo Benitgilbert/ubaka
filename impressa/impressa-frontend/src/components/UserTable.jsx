@@ -42,7 +42,6 @@ function UserTable({ onCreate }) {
       setUsers(res.data);
       setFiltered(res.data);
     } catch (err) {
-      console.error("Failed to fetch users:", err);
       setMessage("error:Failed to load users");
     } finally {
       setLoading(false);
@@ -61,7 +60,6 @@ function UserTable({ onCreate }) {
       setUsers(users.filter((u) => u.id !== userId));
       setMessage("success:User deleted successfully");
     } catch (err) {
-      console.error("Delete failed:", err);
       setMessage("error:Failed to delete user");
     }
   };
@@ -76,7 +74,6 @@ function UserTable({ onCreate }) {
       document.body.appendChild(link);
       link.click();
     } catch (err) {
-      console.error("CSV export failed:", err);
     }
   };
 
@@ -90,7 +87,6 @@ function UserTable({ onCreate }) {
       document.body.appendChild(link);
       link.click();
     } catch (err) {
-      console.error("PDF export failed:", err);
     }
   };
 

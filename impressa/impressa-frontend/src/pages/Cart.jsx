@@ -25,7 +25,6 @@ export default function CartPage() {
       const res = await api.calculateDelivery(shippingAddress);
       setShippingEstimate(res.data);
     } catch (error) {
-      console.error("Failed to calculate shipping", error);
     } finally {
       setCalculating(false);
     }
@@ -47,7 +46,6 @@ export default function CartPage() {
       await removeCoupon();
       setCouponMessage(null);
     } catch (error) {
-      console.error("Failed to remove coupon", error);
     }
   };
 

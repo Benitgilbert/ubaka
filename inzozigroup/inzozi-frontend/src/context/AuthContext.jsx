@@ -12,35 +12,34 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+  const fetchUser = async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-        } else {
-          // Token expired or invalid
-          logout();
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (err) {
-        console.error('Error fetching user profile:', err);
-        setError('Database connection offline. Operating in local mode.');
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
 
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
+      } else {
+        // Token expired or invalid
+        logout();
+      }
+    } catch (err) {
+      setError('Database connection offline. Operating in local mode.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUser();
   }, [token]);
 
@@ -82,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, logout, setError }}>
+    <AuthContext.Provider value={{ user, token, loading, error, login, logout, setError, refreshUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

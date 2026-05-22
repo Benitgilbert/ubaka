@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { SocketProvider } from './context/SocketContext';
+import { SocketProvider, useSocket } from './context/SocketContext';
 import Sidebar from './components/Sidebar';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -53,8 +53,22 @@ const LoadingScreen = ({ message = 'Loading...' }) => {
 };
 
 const MainLayout = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
+  const socket = useSocket();
   const [activePage, setActivePage] = useState('dashboard');
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleDelegationUpdated = () => {
+      refreshUser();
+    };
+
+    socket.on('delegation_updated', handleDelegationUpdated);
+    return () => {
+      socket.off('delegation_updated', handleDelegationUpdated);
+    };
+  }, [socket, refreshUser]);
 
   if (loading) {
     return <LoadingScreen message="Syncing Inzozi Portal..." />;

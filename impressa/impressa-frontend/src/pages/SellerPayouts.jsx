@@ -28,7 +28,6 @@ const SellerPayouts = () => {
                 setPayouts(payoutRes.data.data);
             }
         } catch (err) {
-            console.error("Failed to load payout data", err);
         } finally {
             setLoading(false);
         }
@@ -54,7 +53,6 @@ const SellerPayouts = () => {
                 fetchData(); // Refresh data
             }
         } catch (err) {
-            console.error("Payout request failed details:", err);
             const errorMsg = err.response?.data?.message
                 || err.response?.data?.error?.message
                 || err.message

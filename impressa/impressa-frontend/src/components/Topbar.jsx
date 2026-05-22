@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import api from "../utils/axiosInstance";
-import RoleSwitcher from "./RoleSwitcher";
 
 function Topbar({ onMenuClick, title }) {
   const { theme, toggleTheme } = useTheme();
@@ -14,7 +13,7 @@ function Topbar({ onMenuClick, title }) {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    api.get("/auth/me").then(res => setUser(res.data)).catch(err => console.error(err));
+    api.get("/auth/me").then(res => setUser(res.data)).catch(() => {});
     fetchNotifications();
 
     // Poll for new notifications every 10 seconds
@@ -30,7 +29,6 @@ function Topbar({ onMenuClick, title }) {
         setUnreadCount(res.data.unreadCount);
       }
     } catch (err) {
-      console.error('Failed to fetch notifications');
     }
   };
 
@@ -40,7 +38,6 @@ function Topbar({ onMenuClick, title }) {
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err) {
-      console.error('Failed to mark as read');
     }
   };
 
@@ -50,7 +47,6 @@ function Topbar({ onMenuClick, title }) {
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch (err) {
-      console.error('Failed to mark all as read');
     }
   };
 
@@ -127,8 +123,7 @@ function Topbar({ onMenuClick, title }) {
           )}
         </button>
 
-        {/* Role Switcher */}
-        <RoleSwitcher user={user} />
+
 
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
@@ -201,7 +196,7 @@ function Topbar({ onMenuClick, title }) {
               {/* Footer */}
               <div className="px-4 py-3 border-t border-cream-200 dark:border-charcoal-700 bg-cream-50 dark:bg-charcoal-900">
                 <Link
-                  to={user?.role === 'seller' ? "/seller/notifications" : "/admin/notifications"}
+                  to={user?.role === 'seller' ? "/seller/notifications" : "/"}
                   className="text-sm font-medium text-terracotta-500 hover:text-terracotta-600 dark:text-terracotta-400 transition-colors"
                 >
                   View all notifications

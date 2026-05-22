@@ -27,7 +27,6 @@ function TrendingProductsSidebar() {
                     setProducts(res.data.slice(0, 5)); // Take top 5
                 }
             } catch (err) {
-                console.error("Failed to fetch trending products:", err);
             }
         };
         fetchTrending();

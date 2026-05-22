@@ -18,7 +18,6 @@ const FlashSaleBanner = () => {
                 setActiveFlashSale(null);
             }
         } catch (err) {
-            console.error('Error fetching flash sale:', err);
         }
     };
 

@@ -99,7 +99,6 @@ export default function CheckoutPage() {
           setShippingCost(0);
         }
       } catch (error) {
-        console.error("Error fetching shipping:", error);
       } finally {
         setLoadingShipping(false);
       }
@@ -124,7 +123,6 @@ export default function CheckoutPage() {
         });
         setTaxData(data.data);
       } catch (error) {
-        console.error("Error calculating tax:", error);
       }
     };
 
@@ -306,7 +304,6 @@ export default function CheckoutPage() {
                 showError("Payment failed. Please try again."); // Failure toast
               }
             } catch (err) {
-              console.error("Polling error", err);
             }
           }, 3000); // Check every 3 seconds
         }
@@ -319,7 +316,6 @@ export default function CheckoutPage() {
       }
 
     } catch (error) {
-      console.error("Order placement failed:", error);
       const msg = error.response?.data?.message || error.message || "Failed to place order. Please try again.";
       showError(msg); // Replaced alert with specific error
       setIsProcessing(false);
