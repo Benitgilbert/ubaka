@@ -80,8 +80,8 @@ const Sidebar = ({ activePage, setActivePage }) => {
       <div className="p-6">
         <div className="flex items-center gap-3">
           <img 
-            src="/inzozi_group_logo.png" 
-            alt="INZOZI Group Logo" 
+            src="/inzozi_symbol.png" 
+            alt="INZOZI Group Symbol" 
             className="w-10 h-10 object-contain"
           />
           <div>

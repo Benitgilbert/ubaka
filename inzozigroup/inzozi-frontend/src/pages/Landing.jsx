@@ -230,8 +230,8 @@ const Landing = ({ onEnterPortal }) => {
           className="flex items-center gap-3 cursor-default select-none group transition-all"
         >
           <img 
-            src="/inzozi_group_logo.png" 
-            alt="INZOZI Group Logo" 
+            src="/inzozi_symbol.png" 
+            alt="INZOZI Group Symbol" 
             className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
           />
           <div>
@@ -545,8 +545,8 @@ const Landing = ({ onEnterPortal }) => {
           <div className="col-span-2 md:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
               <img 
-              src="/inzozi_group_logo.png" 
-              alt="INZOZI Group Logo" 
+              src="/inzozi_symbol.png" 
+              alt="INZOZI Group Symbol" 
               className="w-8 h-8 object-contain"
             />
               <span className="text-sm font-extrabold text-white tracking-tight">INZOZI Group</span>

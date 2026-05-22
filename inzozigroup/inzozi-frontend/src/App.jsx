@@ -29,8 +29,8 @@ const LoadingScreen = ({ message = 'Loading...' }) => {
           {/* Centered Pulsing Logo */}
           <div className="w-14 h-14 bg-slate-900/60 rounded-full p-2.5 flex items-center justify-center shadow-inner shadow-purple-500/10 backdrop-blur-sm animate-pulse">
             <img 
-              src="/inzozi_group_logo.png" 
-              alt="Inzozi Logo" 
+              src="/inzozi_symbol.png" 
+              alt="Inzozi Symbol" 
               className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]"
             />
           </div>
@@ -38,11 +38,6 @@ const LoadingScreen = ({ message = 'Loading...' }) => {
 
         {/* Brand Title with Logo */}
         <div className="flex items-center gap-2 mb-2">
-          <img 
-            src="/inzozi_group_logo.png" 
-            alt="INZOZI Symbol" 
-            className="w-4 h-4 object-contain opacity-80"
-          />
           <h1 className="text-sm font-extrabold tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-200 to-purple-400 uppercase">
             INZOZI GROUP
           </h1>

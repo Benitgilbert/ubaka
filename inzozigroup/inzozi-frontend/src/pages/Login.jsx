@@ -52,17 +52,12 @@ const Login = ({ onBackToLanding }) => {
           <div className="w-20 h-20 bg-slate-900/60 rounded-3xl p-3.5 flex items-center justify-center border border-slate-850 shadow-xl shadow-purple-500/5 backdrop-blur-sm relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
             <img 
-              src="/inzozi_group_logo.png" 
-              alt="INZOZI Group Logo" 
+              src="/inzozi_symbol.png" 
+              alt="INZOZI Group Symbol" 
               className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(168,85,247,0.3)] animate-pulse" 
             />
           </div>
           <div className="flex items-center gap-2">
-            <img 
-              src="/inzozi_group_logo.png" 
-              alt="INZOZI Symbol" 
-              className="w-4 h-4 object-contain opacity-80"
-            />
             <h1 className="text-sm font-extrabold tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-200 to-purple-400 uppercase">
               INZOZI GROUP
             </h1>
