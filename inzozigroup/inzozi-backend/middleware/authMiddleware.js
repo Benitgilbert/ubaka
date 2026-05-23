@@ -1,16 +1,27 @@
 import jwt from 'jsonwebtoken';
+import { resolveEffectiveUser } from '../controllers/authController.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'inzozi_group_super_secret_jwt_key_12345';
 
 // Authenticate user token
-export const protect = (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, JWT_SECRET);
-      req.user = decoded; // Contains id, email, role, name
+      
+      // Resolve latest permissions dynamically
+      const resolved = await resolveEffectiveUser(decoded);
+      req.user = {
+        ...decoded,
+        role: resolved.primaryRole,
+        roleName: resolved.roleName,
+        permissions: resolved.permissions,
+        activeDelegation: resolved.activeDelegation
+      };
+      
       next();
     } catch (error) {
       console.error('[AuthMiddleware] Token verification failed:', error.message);
