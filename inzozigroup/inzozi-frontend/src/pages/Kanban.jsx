@@ -11,7 +11,11 @@ import {
   Grid,
   CheckSquare,
   AlertTriangle,
-  Loader2
+  Loader2,
+  LayoutGrid,
+  UserCircle2,
+  Clock,
+  Flame
 } from 'lucide-react';
 
 const Kanban = () => {
@@ -20,8 +24,10 @@ const Kanban = () => {
 
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState('board'); // 'board' | 'my-tasks'
   
   // New Task Form State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,18 +71,21 @@ const Kanban = () => {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
-        const projRes = await fetch(`${API_BASE_URL}/projects`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const [projRes, empRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/projects`, { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch(`${API_BASE_URL}/auth/employees`, { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
         if (projRes.ok) {
           const projData = await projRes.json();
           setProjects(projData);
-          if (projData.length > 0) {
-            setNewProjId(projData[0].id);
-          }
+          if (projData.length > 0) setNewProjId(projData[0].id);
+        }
+        if (empRes.ok) {
+          const empData = await empRes.json();
+          setEmployees(Array.isArray(empData) ? empData : (empData.employees || []));
         }
       } catch (err) {
-        // Failed to load projects - silent
+        // Failed to load initial data - silent
       }
 
       await fetchTasks();
@@ -228,6 +237,20 @@ const Kanban = () => {
     }
   };
 
+  // Derive visible tasks based on view mode
+  const visibleTasks = viewMode === 'my-tasks'
+    ? tasks.filter(t => t.assigneeId === user?.id || t.assignee?.id === user?.id)
+    : tasks;
+
+  // My Tasks personal stats
+  const myStats = {
+    total: visibleTasks.length,
+    todo: visibleTasks.filter(t => t.status === 'todo').length,
+    inProgress: visibleTasks.filter(t => t.status === 'in_progress').length,
+    critical: visibleTasks.filter(t => t.priority === 'critical' || t.priority === 'high').length,
+    done: visibleTasks.filter(t => t.status === 'done').length,
+  };
+
   return (
     <div className="space-y-6 p-8 max-w-7xl mx-auto h-[calc(100vh-2rem)] flex flex-col justify-between overflow-hidden">
       
@@ -236,23 +259,57 @@ const Kanban = () => {
         <div>
           <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
             <CheckSquare className="w-6 h-6 text-purple-400" />
-            Product Backlog & Kanban
+            {viewMode === 'my-tasks' ? 'My Tasks' : 'Product Backlog & Kanban'}
           </h1>
-          <p className="text-slate-400 text-xs">Drag and drop cards to update progress in real-time</p>
+          <p className="text-slate-400 text-xs">
+            {viewMode === 'my-tasks'
+              ? `Tasks assigned to you across all projects — ${myStats.total} total`
+              : 'Drag and drop cards to update progress in real-time'
+            }
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Project Filtering Dropdown */}
-          <select
-            value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-purple-500 transition-colors"
-          >
-            <option value="">All Projects</option>
-            {projects.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
+
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('board')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                viewMode === 'board'
+                  ? 'bg-purple-600 text-white shadow'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              Board
+            </button>
+            <button
+              onClick={() => setViewMode('my-tasks')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                viewMode === 'my-tasks'
+                  ? 'bg-purple-600 text-white shadow'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <UserCircle2 className="w-3.5 h-3.5" />
+              My Tasks
+            </button>
+          </div>
+
+          {/* Project Filtering Dropdown (only in board mode) */}
+          {viewMode === 'board' && (
+            <select
+              value={selectedProjectId}
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-purple-500 transition-colors"
+            >
+              <option value="">All Projects</option>
+              {projects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          )}
 
           {/* Add Task Button */}
           <button
@@ -265,15 +322,51 @@ const Kanban = () => {
         </div>
       </div>
 
+      {/* My Tasks — Personal Stats Bar */}
+      {viewMode === 'my-tasks' && (
+        <div className="shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'To Do', value: myStats.todo, icon: Clock, color: 'text-slate-400 bg-slate-800/60 border-slate-700/50' },
+            { label: 'In Progress', value: myStats.inProgress, icon: Loader2, color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
+            { label: 'High Priority', value: myStats.critical, icon: Flame, color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+            { label: 'Completed', value: myStats.done, icon: CheckSquare, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${color}`}>
+              <Icon className="w-4 h-4 shrink-0" />
+              <div>
+                <div className="text-lg font-black text-white leading-none">{value}</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wide opacity-70 mt-0.5">{label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Columns Grid */}
       {loading ? (
         <div className="flex-1 flex justify-center items-center">
           <div className="w-10 h-10 border-4 border-slate-800 border-t-purple-500 rounded-full animate-spin" />
         </div>
+      ) : visibleTasks.length === 0 && viewMode === 'my-tasks' ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center">
+            <UserCircle2 className="w-8 h-8 text-slate-600" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white mb-1">No tasks assigned to you yet</h3>
+            <p className="text-xs text-slate-500">Ask your team lead to assign tasks, or switch to Board view to see all tasks.</p>
+          </div>
+          <button
+            onClick={() => setViewMode('board')}
+            className="mt-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer"
+          >
+            View Full Board
+          </button>
+        </div>
       ) : (
         <div className="flex-1 grid md:grid-cols-4 gap-4 overflow-hidden py-2 min-h-0">
           {columns.map((col) => {
-            const colTasks = tasks.filter(t => t.status === col.id);
+            const colTasks = visibleTasks.filter(t => t.status === col.id);
             return (
               <div 
                 key={col.id}
@@ -478,9 +571,20 @@ const Kanban = () => {
                   className="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
                 >
                   <option value="">Unassigned</option>
-                  <option value="mock-dev-id">Benit Gilbert (Developer)</option>
-                  <option value="mock-marketer-id">Growth Marketer (Marketing)</option>
-                  <option value="mock-admin-id">Inzozi Admin (Admin)</option>
+                  {employees.length > 0
+                    ? employees.map(emp => (
+                        <option key={emp.id} value={emp.id}>
+                          {emp.name}{emp.title ? ` — ${emp.title}` : ''}
+                        </option>
+                      ))
+                    : (
+                        <>
+                          <option value="mock-dev-id">Benit Gilbert (Developer)</option>
+                          <option value="mock-marketer-id">Growth Marketer (Marketing)</option>
+                          <option value="mock-admin-id">Inzozi Admin (Admin)</option>
+                        </>
+                      )
+                  }
                 </select>
               </div>
 
