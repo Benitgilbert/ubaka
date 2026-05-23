@@ -2,21 +2,21 @@ import prisma, { isDbConnected } from './db.js';
 
 // Define all granular permissions
 export const ALL_PERMISSIONS = [
-  { code: 'manage_users', name: 'Manage Users', description: 'Create, update, or disable employee accounts' },
-  { code: 'manage_delegations_hr', name: 'Manage HR Delegations', description: 'Create and revoke temporary coverages for operational roles' },
-  { code: 'manage_delegations_admin', name: 'Manage Admin Delegations', description: 'Create and revoke coverages for technical/admin roles' },
-  { code: 'approve_products', name: 'Approve E-Commerce Products', description: 'Review and approve vendor products in Impressa catalog' },
-  { code: 'moderate_content', name: 'Moderate Platform Content', description: 'Review and flag user generated reviews and listings' },
-  { code: 'view_analytics', name: 'View Business Analytics', description: 'View system usage, e-commerce revenues, and performance charts' },
-  { code: 'manage_tasks', name: 'Manage Project Tasks', description: 'Create, assign, edit, and move Kanban board tasks' },
-  { code: 'view_tasks', name: 'View Project Tasks', description: 'Read tasks on the Kanban board' },
-  { code: 'write_code', name: 'Write Code', description: 'Commit code and view repository status' },
-  { code: 'approve_code', name: 'Approve Code merges', description: 'Perform technical design and pull request code reviews' },
-  { code: 'restart_services', name: 'Manage Services & Servers', description: 'DevOps capability to restart production modules and logs' },
-  { code: 'manage_tickets', name: 'Manage Support Tickets', description: 'View and respond to client help requests' },
-  { code: 'log_time', name: 'Log Work Hours', description: 'Submit time logs for tasks' },
-  { code: 'manage_hr', name: 'Manage HR Portal', description: 'Full access to HR onboarding, approvals, hardware fleet, SaaS licenses, and people analytics' },
-  { code: 'submit_requests', name: 'Submit HR Requests', description: 'Submit time-off, expense, and hardware requests via the HR portal' },
+  { code: 'manage_users', name: 'Manage Users', description: 'Create, update, or disable employee accounts', system: 'Inzozi MIS' },
+  { code: 'manage_delegations_hr', name: 'Manage HR Delegations', description: 'Create and revoke temporary coverages for operational roles', system: 'Inzozi MIS' },
+  { code: 'manage_delegations_admin', name: 'Manage Admin Delegations', description: 'Create and revoke coverages for technical/admin roles', system: 'Inzozi MIS' },
+  { code: 'approve_products', name: 'Approve E-Commerce Products', description: 'Review and approve vendor products in Impressa catalog', system: 'Impressa' },
+  { code: 'moderate_content', name: 'Moderate Platform Content', description: 'Review and flag user generated reviews and listings', system: 'Impressa' },
+  { code: 'view_analytics', name: 'View Business Analytics', description: 'View system usage, e-commerce revenues, and performance charts', system: 'Inzozi MIS' },
+  { code: 'manage_tasks', name: 'Manage Project Tasks', description: 'Create, assign, edit, and move Kanban board tasks', system: 'Inzozi MIS' },
+  { code: 'view_tasks', name: 'View Project Tasks', description: 'Read tasks on the Kanban board', system: 'Inzozi MIS' },
+  { code: 'write_code', name: 'Write Code', description: 'Commit code and view repository status', system: 'Developer' },
+  { code: 'approve_code', name: 'Approve Code merges', description: 'Perform technical design and pull request code reviews', system: 'Developer' },
+  { code: 'restart_services', name: 'Manage Services & Servers', description: 'DevOps capability to restart production modules and logs', system: 'Developer' },
+  { code: 'manage_tickets', name: 'Manage Support Tickets', description: 'View and respond to client help requests', system: 'Impressa' },
+  { code: 'log_time', name: 'Log Work Hours', description: 'Submit time logs for tasks', system: 'Inzozi MIS' },
+  { code: 'manage_hr', name: 'Manage HR Portal', description: 'Full access to HR onboarding, approvals, hardware fleet, SaaS licenses, and people analytics', system: 'Inzozi MIS' },
+  { code: 'submit_requests', name: 'Submit HR Requests', description: 'Submit time-off, expense, and hardware requests via the HR portal', system: 'Inzozi MIS' },
 ];
 
 // Define all roles and map their permission codes
@@ -148,6 +148,13 @@ export const ALL_ROLES = [
     description: 'Maintains operational alignment across departments, HR systems, and project execution',
     isTechnical: false,
     permissions: ['view_analytics', 'manage_tasks', 'view_tasks', 'manage_users', 'manage_delegations_hr', 'log_time', 'manage_hr', 'submit_requests']
+  },
+  {
+    code: 'custom_permissions',
+    name: 'Custom Permissions',
+    description: 'Dynamic coverage for specific selected features/permissions',
+    isTechnical: false,
+    permissions: []
   }
 ];
 

@@ -37,7 +37,7 @@ export const getRolesAndPermissions = async (req, res) => {
 
 // Create a new temporary role delegation
 export const createDelegation = async (req, res) => {
-  const { employeeId, targetRoleCode, startDate, endDate, reason } = req.body;
+  const { employeeId, targetRoleCode, startDate, endDate, reason, customPermissions } = req.body;
   const authorizerId = req.user.id; // From protect middleware
   const userPermissions = req.user.permissions || [];
 
@@ -65,6 +65,21 @@ export const createDelegation = async (req, res) => {
     });
   }
 
+  // Check for technical permissions if delegating custom permissions and not admin
+  let customPermissionsStr = null;
+  if (targetRoleCode === 'custom_permissions' && customPermissions && customPermissions.length > 0) {
+    customPermissionsStr = customPermissions.join(',');
+    if (!isAdmin) {
+      const technicalPerms = ALL_PERMISSIONS.filter(p => p.system === 'Developer').map(p => p.code);
+      const hasTechnical = customPermissions.some(cp => technicalPerms.includes(cp) || cp === 'manage_delegations_admin');
+      if (hasTechnical) {
+        return res.status(403).json({
+          error: `Security Violation: HR managers are restricted from delegating technical/developer capabilities. Please contact a System Administrator.`
+        });
+      }
+    }
+  }
+
   const parsedStart = new Date(startDate);
   const parsedEnd = new Date(endDate);
 
@@ -90,7 +105,8 @@ export const createDelegation = async (req, res) => {
           authorizerId,
           startDate: parsedStart,
           endDate: parsedEnd,
-          reason: reason || 'Temporary coverage'
+          reason: reason || 'Temporary coverage',
+          customPermissions: customPermissionsStr
         },
         include: {
           employee: true,
@@ -109,7 +125,9 @@ export const createDelegation = async (req, res) => {
         endDate: delegation.endDate,
         reason: delegation.reason,
         isActive: delegation.isActive,
-        authorizerName: delegation.authorizer.name
+        authorizerName: delegation.authorizer.name,
+        customPermissions: delegation.customPermissions ? delegation.customPermissions.split(',') : [],
+        createdAt: delegation.createdAt
       };
 
       if (req.io) {
@@ -145,7 +163,9 @@ export const createDelegation = async (req, res) => {
     reason: reason || 'Temporary coverage (Mock)',
     isActive: true,
     authorizerId: mockAuth.id,
-    authorizerName: mockAuth.name
+    authorizerName: mockAuth.name,
+    customPermissions: customPermissions || [],
+    createdAt: new Date().toISOString()
   };
 
   MOCK_DELEGATIONS.push(newMockDelegation);
@@ -187,7 +207,9 @@ export const getDelegations = async (req, res) => {
         endDate: del.endDate,
         reason: del.reason,
         isActive: del.isActive,
-        authorizerName: del.authorizer.name
+        authorizerName: del.authorizer.name,
+        customPermissions: del.customPermissions ? del.customPermissions.split(',') : [],
+        createdAt: del.createdAt
       }));
 
       return res.json(formatted);
@@ -224,9 +246,19 @@ export const revokeDelegation = async (req, res) => {
 
       if (!del) return res.status(404).json({ error: 'Delegation not found' });
 
-      // Enforce boundary on revocation
+      // Enforce boundary on revocation of technical roles
       if (del.targetRole.isTechnical && !isAdmin) {
         return res.status(403).json({ error: 'Security Violation: Only System Administrators can revoke technical delegations.' });
+      }
+
+      // Enforce boundary on revocation of custom permissions containing technical items
+      if (del.targetRole.code === 'custom_permissions' && del.customPermissions && !isAdmin) {
+        const customPerms = del.customPermissions.split(',').map(p => p.trim()).filter(Boolean);
+        const technicalPerms = ALL_PERMISSIONS.filter(p => p.system === 'Developer').map(p => p.code);
+        const hasTechnical = customPerms.some(cp => technicalPerms.includes(cp) || cp === 'manage_delegations_admin');
+        if (hasTechnical) {
+          return res.status(403).json({ error: 'Security Violation: Only System Administrators can revoke delegations containing technical permissions.' });
+        }
       }
 
       await prisma.delegation.update({
@@ -254,6 +286,18 @@ export const revokeDelegation = async (req, res) => {
   const targetRole = ALL_ROLES.find(r => r.code === mockDel.targetRoleCode);
   if (targetRole && targetRole.isTechnical && !isAdmin) {
     return res.status(403).json({ error: 'Security Violation: Only System Administrators can revoke technical delegations.' });
+  }
+
+  // Check boundary on mock custom delegations with technical permissions
+  if (mockDel.targetRoleCode === 'custom_permissions' && mockDel.customPermissions && !isAdmin) {
+    const technicalPerms = ALL_PERMISSIONS.filter(p => p.system === 'Developer').map(p => p.code);
+    const customPerms = Array.isArray(mockDel.customPermissions)
+      ? mockDel.customPermissions
+      : mockDel.customPermissions.split(',').map(p => p.trim()).filter(Boolean);
+    const hasTechnical = customPerms.some(cp => technicalPerms.includes(cp) || cp === 'manage_delegations_admin');
+    if (hasTechnical) {
+      return res.status(403).json({ error: 'Security Violation: Only System Administrators can revoke delegations containing technical permissions.' });
+    }
   }
 
   mockDel.isActive = false;

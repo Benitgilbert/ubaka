@@ -211,6 +211,7 @@ model Delegation {
   endDate        DateTime
   reason         String?
   isActive       Boolean   @default(true)
+  customPermissions String?
   createdAt      DateTime  @default(now())
 
   // Relations

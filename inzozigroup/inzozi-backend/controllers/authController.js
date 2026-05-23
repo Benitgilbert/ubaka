@@ -196,21 +196,31 @@ export const resolveEffectiveUser = async (employee) => {
         }
       });
       
-      if (delegation && delegation.targetRole) {
-        activeDelegation = {
-          id: delegation.id,
-          targetRoleCode: delegation.targetRole.code,
-          targetRoleName: delegation.targetRole.name,
-          reason: delegation.reason,
-          endDate: delegation.endDate,
-          authorizerName: delegation.authorizer.name
-        };
+      if (delegation) {
+        if (delegation.targetRole) {
+          activeDelegation = {
+            id: delegation.id,
+            targetRoleCode: delegation.targetRole.code,
+            targetRoleName: delegation.targetRole.name,
+            reason: delegation.reason,
+            endDate: delegation.endDate,
+            authorizerName: delegation.authorizer.name
+          };
+          
+          delegation.targetRole.permissions.forEach(rp => {
+            if (rp.permission) {
+              effectivePermissions.add(rp.permission.code);
+            }
+          });
+        }
         
-        delegation.targetRole.permissions.forEach(rp => {
-          if (rp.permission) {
-            effectivePermissions.add(rp.permission.code);
-          }
-        });
+        // Dynamic custom permissions
+        if (delegation.customPermissions) {
+          const customPerms = Array.isArray(delegation.customPermissions)
+            ? delegation.customPermissions
+            : delegation.customPermissions.split(',').map(p => p.trim()).filter(Boolean);
+          customPerms.forEach(p => effectivePermissions.add(p));
+        }
       }
     } catch (err) {
       console.warn('[AuthController] DB error resolving permissions, using memory:', err.message);
@@ -262,6 +272,14 @@ export const resolveEffectiveUser = async (employee) => {
       
       if (delegatedRoleConfig) {
         delegatedRoleConfig.permissions.forEach(p => effectivePermissions.add(p));
+      }
+
+      // Dynamic custom permissions (Mock Mode)
+      if (mockDelegation.customPermissions) {
+        const customPerms = Array.isArray(mockDelegation.customPermissions)
+          ? mockDelegation.customPermissions
+          : mockDelegation.customPermissions.split(',').map(p => p.trim()).filter(Boolean);
+        customPerms.forEach(p => effectivePermissions.add(p));
       }
     }
   }

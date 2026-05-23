@@ -63,6 +63,19 @@ const Delegations = () => {
     return tomorrow.toISOString().split('T')[0];
   });
   const [reason, setReason] = useState('');
+  const [delegationType, setDelegationType] = useState('role'); // 'role' or 'custom'
+  const [selectedPerms, setSelectedPerms] = useState([]);
+
+  const handleTogglePerm = (code) => {
+    setSelectedPerms(prev =>
+      prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]
+    );
+  };
+
+  const getPermissionName = (code) => {
+    const perm = permissions.find(p => p.code === code);
+    return perm ? perm.name : code;
+  };
 
   // Editing Employee Role Form State
   const [editingEmpId, setEditingEmpId] = useState(null);
@@ -73,6 +86,13 @@ const Delegations = () => {
   const userPermissions = user?.permissions || [];
   const isAdmin = userPermissions.includes('manage_delegations_admin');
   const canManageUsers = userPermissions.includes('manage_users');
+
+  const groupedPermissions = permissions.reduce((acc, perm) => {
+    const sys = perm.system || 'Other';
+    if (!acc[sys]) acc[sys] = [];
+    acc[sys].push(perm);
+    return acc;
+  }, {});
 
   const fetchData = async () => {
     setLoading(true);
@@ -203,11 +223,28 @@ const Delegations = () => {
       return;
     }
 
-    // Client-side block for HR delegating technical role
-    const targetRoleData = roles.find(r => r.code === selectedRole);
-    if (targetRoleData?.isTechnical && !isAdmin) {
-      setErrorMsg(`Security Constraint: Only System Administrators can delegate technical roles (like ${targetRoleData.name}).`);
-      return;
+    if (delegationType === 'custom') {
+      if (selectedPerms.length === 0) {
+        setErrorMsg('Please select at least one permission to delegate.');
+        return;
+      }
+      
+      // Enforce HR boundary client-side
+      if (!isAdmin) {
+        const technicalPerms = permissions.filter(p => p.system === 'Developer').map(p => p.code);
+        const hasTechnical = selectedPerms.some(cp => technicalPerms.includes(cp) || cp === 'manage_delegations_admin');
+        if (hasTechnical) {
+          setErrorMsg('Security Constraint: HR managers are restricted from delegating technical/developer features.');
+          return;
+        }
+      }
+    } else {
+      // Client-side block for HR delegating technical role
+      const targetRoleData = roles.find(r => r.code === selectedRole);
+      if (targetRoleData?.isTechnical && !isAdmin) {
+        setErrorMsg(`Security Constraint: Only System Administrators can delegate technical roles (like ${targetRoleData.name}).`);
+        return;
+      }
     }
 
     setDelegationSubmitting(true);
@@ -223,7 +260,8 @@ const Delegations = () => {
           targetRoleCode: selectedRole,
           startDate: new Date(startDate).toISOString(),
           endDate: new Date(endDate).toISOString(),
-          reason
+          reason,
+          customPermissions: delegationType === 'custom' ? selectedPerms : []
         })
       });
 
@@ -234,6 +272,8 @@ const Delegations = () => {
         setSelectedEmp('');
         setSelectedRole('');
         setReason('');
+        setSelectedPerms([]);
+        setDelegationType('role');
         fetchData();
         setTimeout(() => setSuccessMsg(null), 5000);
       } else {
@@ -555,27 +595,123 @@ const Delegations = () => {
                     </select>
                   </div>
 
-                  {/* Target Role select */}
+                  {/* Delegation Type Toggle */}
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Delegate Role & Dashboards</label>
-                    <select 
-                      value={selectedRole}
-                      onChange={(e) => setSelectedRole(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
-                      disabled={delegationSubmitting}
-                    >
-                      <option value="">-- Choose target role --</option>
-                      {roles.map(r => (
-                        <option 
-                          key={r.code} 
-                          value={r.code}
-                          disabled={r.isTechnical && !isAdmin}
-                        >
-                          {r.name} {r.isTechnical ? '🔒 (Admin Only)' : '👥 (HR Delegatable)'}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Delegation Type</label>
+                    <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-850 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDelegationType('role');
+                          setSelectedRole('');
+                        }}
+                        className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          delegationType === 'role'
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+                        }`}
+                      >
+                        By Role
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDelegationType('custom');
+                          setSelectedRole('custom_permissions');
+                        }}
+                        className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          delegationType === 'custom'
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+                        }`}
+                      >
+                        By Custom Features
+                      </button>
+                    </div>
                   </div>
+
+                  {delegationType === 'role' ? (
+                    /* Target Role select */
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Delegate Role & Dashboards</label>
+                      <select 
+                        value={selectedRole}
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                        disabled={delegationSubmitting}
+                      >
+                        <option value="">-- Choose target role --</option>
+                        {roles.filter(r => r.code !== 'custom_permissions').map(r => (
+                          <option 
+                            key={r.code} 
+                            value={r.code}
+                            disabled={r.isTechnical && !isAdmin}
+                          >
+                            {r.name} {r.isTechnical ? '🔒 (Admin Only)' : '👥 (HR Delegatable)'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    /* Custom Permissions Checkbox Table */
+                    <div className="space-y-2">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Features to Delegate</label>
+                      <div className="max-h-60 overflow-y-auto space-y-4 bg-slate-950 p-3 rounded-lg border border-slate-850 scrollbar-thin">
+                        {Object.entries(groupedPermissions).map(([systemName, perms]) => (
+                          <div key={systemName} className="space-y-1.5">
+                            <div className="flex items-center justify-between border-b border-slate-900 pb-1 mb-1">
+                              <span className="text-[10px] font-extrabold text-purple-400 uppercase tracking-wide">{systemName} Features</span>
+                              <span className="text-[8px] bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded font-semibold">
+                                {perms.filter(p => {
+                                  const isTech = p.system === 'Developer' || p.code === 'manage_delegations_admin';
+                                  return isAdmin || !isTech;
+                                }).length} available
+                              </span>
+                            </div>
+                            <div className="space-y-1">
+                              {perms.map(p => {
+                                const isTech = p.system === 'Developer' || p.code === 'manage_delegations_admin';
+                                const isDisabled = isTech && !isAdmin;
+                                const isSelected = selectedPerms.includes(p.code);
+                                
+                                return (
+                                  <label 
+                                    key={p.code} 
+                                    className={`flex items-start gap-2.5 p-2 rounded-lg border text-left transition-all ${
+                                      isDisabled 
+                                        ? 'bg-slate-950/20 border-slate-950 text-slate-600 opacity-40 cursor-not-allowed'
+                                        : isSelected 
+                                          ? 'bg-purple-950/20 border-purple-500/30 text-slate-200 cursor-pointer' 
+                                          : 'bg-slate-900/30 border-slate-850/50 text-slate-400 hover:border-slate-800 cursor-pointer'
+                                    }`}
+                                  >
+                                    <input 
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      disabled={isDisabled}
+                                      onChange={() => handleTogglePerm(p.code)}
+                                      className="mt-0.5 rounded border-slate-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-950 bg-slate-900 w-3.5 h-3.5"
+                                    />
+                                    <div className="space-y-0.5">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] font-bold">{p.name}</span>
+                                        {isTech && (
+                                          <span className="text-[8px] bg-red-950/30 border border-red-500/20 text-red-400 px-1 rounded flex items-center gap-0.5">
+                                            <Lock className="w-2 h-2" /> Admin Only
+                                          </span>
+                                        )}
+                                      </div>
+                                      <p className="text-[9px] text-slate-500 leading-normal">{p.description}</p>
+                                    </div>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Dates */}
                   <div className="grid grid-cols-2 gap-3">
@@ -743,9 +879,24 @@ const Delegations = () => {
                             <h4 className="text-[11px] font-bold text-slate-200">
                               {del.employeeName}
                             </h4>
-                            <p className="text-[9px] text-purple-400 font-extrabold uppercase mt-0.5">
-                              Granted: {del.targetRoleName}
-                            </p>
+                            {del.targetRoleCode === 'custom_permissions' ? (
+                              <div className="mt-1 space-y-1">
+                                <span className="text-[9px] text-indigo-400 font-extrabold uppercase block">
+                                  Granted: Custom Features ({del.customPermissions?.length || 0})
+                                </span>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {del.customPermissions?.map(cp => (
+                                    <span key={cp} className="inline-block px-1.5 py-0.5 bg-slate-900 border border-slate-800 text-[8px] text-slate-350 rounded font-semibold" title={cp}>
+                                      {getPermissionName(cp)}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-[9px] text-purple-400 font-extrabold uppercase mt-0.5">
+                                Granted: {del.targetRoleName}
+                              </p>
+                            )}
                           </div>
                           
                           <button
@@ -766,8 +917,13 @@ const Delegations = () => {
                           "{del.reason}"
                         </p>
 
-                        <div className="flex items-center justify-between text-[8px] font-bold text-slate-500 uppercase tracking-wider">
-                          <span>Expires: {formattedEnd}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[8px] font-bold text-slate-500 uppercase tracking-wider gap-2 pt-1 border-t border-slate-900/30">
+                          <div className="flex flex-wrap gap-2">
+                            <span>Expires: {formattedEnd}</span>
+                            {del.createdAt && (
+                              <span>Granted: {new Date(del.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                            )}
+                          </div>
                           <span>Authorized By: {del.authorizerName}</span>
                         </div>
                       </div>

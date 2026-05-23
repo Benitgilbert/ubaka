@@ -108,3 +108,8 @@ CREATE TABLE IF NOT EXISTS "Certification" (
 CREATE INDEX IF NOT EXISTS "Certification_employeeId_idx" ON "Certification"("employeeId");
 ALTER TABLE "Certification" ADD CONSTRAINT "Certification_employeeId_fkey"
     FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- =========================================================
+-- Dynamic Feature Delegation Extension (May 2026)
+-- =========================================================
+ALTER TABLE "Delegation" ADD COLUMN IF NOT EXISTS "customPermissions" TEXT;
