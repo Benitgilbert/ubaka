@@ -116,6 +116,34 @@ export const ALL_ROLES = [
     description: 'Tracks metrics and runs campaigns to boost active users',
     isTechnical: false,
     permissions: ['view_analytics', 'log_time']
+  },
+  {
+    code: 'ceo',
+    name: 'Chief Executive Officer (CEO)',
+    description: 'Executive oversight of global operations, business metrics, and strategic project goals',
+    isTechnical: false,
+    permissions: ['view_analytics', 'view_tasks', 'moderate_content', 'manage_tickets', 'log_time']
+  },
+  {
+    code: 'cto',
+    name: 'Chief Technology Officer (CTO)',
+    description: 'Directs the technology strategy, oversees security audits, and guides engineering teams',
+    isTechnical: true,
+    permissions: ['view_analytics', 'write_code', 'approve_code', 'restart_services', 'manage_tasks', 'view_tasks', 'log_time']
+  },
+  {
+    code: 'cfo',
+    name: 'Chief Financial Officer (CFO)',
+    description: 'Oversees financial reporting, revenue audit reconciliations, and budgeting',
+    isTechnical: false,
+    permissions: ['view_analytics', 'log_time']
+  },
+  {
+    code: 'coo',
+    name: 'Chief Operating Officer (COO)',
+    description: 'Maintains operational alignment across departments, HR systems, and project execution',
+    isTechnical: false,
+    permissions: ['view_analytics', 'manage_tasks', 'view_tasks', 'manage_users', 'manage_delegations_hr', 'log_time']
   }
 ];
 

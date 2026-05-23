@@ -17,7 +17,10 @@ import {
   UserCheck,
   Zap,
   ShoppingBag,
-  Loader2
+  Loader2,
+  Edit,
+  Check,
+  X
 } from 'lucide-react';
 
 const Delegations = () => {
@@ -60,6 +63,12 @@ const Delegations = () => {
     return tomorrow.toISOString().split('T')[0];
   });
   const [reason, setReason] = useState('');
+
+  // Editing Employee Role Form State
+  const [editingEmpId, setEditingEmpId] = useState(null);
+  const [editingRole, setEditingRole] = useState('');
+  const [editingTitle, setEditingTitle] = useState('');
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   const userPermissions = user?.permissions || [];
   const isAdmin = userPermissions.includes('manage_delegations_admin');
@@ -130,6 +139,8 @@ const Delegations = () => {
           if (prev.some(e => e.id === data.employee.id)) return prev;
           return [...prev, data.employee].sort((a, b) => a.name.localeCompare(b.name));
         });
+      } else if (data.action === 'updated') {
+        setEmployees(prev => prev.map(e => e.id === data.employee.id ? data.employee : e));
       }
     };
 
@@ -141,6 +152,46 @@ const Delegations = () => {
       socket.off('employee_updated', handleEmployeeUpdate);
     };
   }, [socket]);
+
+  const handleEditEmployeeRole = async (empId) => {
+    if (!editingRole) {
+      setErrorMsg('Please select a valid role.');
+      return;
+    }
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setEditSubmitting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/employees/${empId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          role: editingRole,
+          title: editingTitle
+        })
+      });
+
+      const resData = await response.json();
+
+      if (response.ok) {
+        setSuccessMsg(resData.message || 'Employee role updated successfully!');
+        setEditingEmpId(null);
+        setEditingRole('');
+        setEditingTitle('');
+        fetchData(); // Trigger full refresh to sync
+        setTimeout(() => setSuccessMsg(null), 5000);
+      } else {
+        setErrorMsg(resData.error || 'Failed to update employee role');
+      }
+    } catch (err) {
+      setErrorMsg('Network error. Failed to update employee details.');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
 
   const handleSubmitDelegation = async (e) => {
     e.preventDefault();
@@ -334,33 +385,112 @@ const Delegations = () => {
               <div className="space-y-4">
                 {employees.map((emp) => {
                   const activeDel = getActiveDelegationForEmployee(emp.id);
-                  return (
-                    <div key={emp.id} className="bg-slate-950 border border-slate-850 rounded-xl p-4 flex items-center justify-between gap-4 hover:border-slate-800 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-900" />
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-xs font-bold text-slate-200">{emp.name}</h4>
-                            <span className="text-[9px] bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded font-semibold">{emp.title}</span>
-                          </div>
-                          <p className="text-[10px] text-slate-500">{emp.email}</p>
-                          
-                          {/* Active Delegation Tag */}
-                          {activeDel && (
-                            <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 text-[9px] font-bold text-purple-400 rounded-md">
-                              <Zap className="w-2.5 h-2.5" />
-                              Acting: {activeDel.targetRoleName} (Covering)
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                  const isEditing = editingEmpId === emp.id;
 
-                      {/* Primary Role Badge */}
-                      <div className="text-right shrink-0">
-                        <span className="inline-block px-2.5 py-1 bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-400 rounded-lg">
-                          {emp.roleName}
-                        </span>
-                      </div>
+                  return (
+                    <div key={emp.id} className="bg-slate-950 border border-slate-850 rounded-xl p-4 hover:border-slate-800 transition-colors">
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-900" />
+                            <div>
+                              <h4 className="text-xs font-bold text-slate-200">{emp.name}</h4>
+                              <p className="text-[10px] text-slate-500">{emp.email}</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                            <div>
+                              <label className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-1">Job Title</label>
+                              <input 
+                                type="text"
+                                value={editingTitle}
+                                onChange={(e) => setEditingTitle(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-250 outline-none focus:border-purple-500 transition-colors"
+                                placeholder="e.g. Senior Frontend Dev"
+                                disabled={editSubmitting}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-1">Company Role</label>
+                              <select 
+                                value={editingRole}
+                                onChange={(e) => setEditingRole(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                                disabled={editSubmitting}
+                              >
+                                {roles.map(r => (
+                                  <option key={r.code} value={r.code}>{r.name}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+                          <div className="flex justify-end gap-2 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => setEditingEmpId(null)}
+                              disabled={editSubmitting}
+                              className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 text-slate-455 hover:text-slate-200 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleEditEmployeeRole(emp.id)}
+                              disabled={editSubmitting}
+                              className="px-2.5 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 text-purple-400 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                            >
+                              {editSubmitting ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Check className="w-3.5 h-3.5" />
+                              )}
+                              Save Role
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-900" />
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-xs font-bold text-slate-200">{emp.name}</h4>
+                                <span className="text-[9px] bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded font-semibold">{emp.title}</span>
+                              </div>
+                              <p className="text-[10px] text-slate-500">{emp.email}</p>
+                              
+                              {/* Active Delegation Tag */}
+                              {activeDel && (
+                                <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 text-[9px] font-bold text-purple-400 rounded-md">
+                                  <Zap className="w-2.5 h-2.5" />
+                                  Acting: {activeDel.targetRoleName} (Covering)
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Primary Role Badge & Action */}
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="inline-block px-2.5 py-1 bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-400 rounded-lg">
+                              {emp.roleName}
+                            </span>
+                            {canManageUsers && (
+                              <button
+                                onClick={() => {
+                                  setEditingEmpId(emp.id);
+                                  setEditingRole(emp.role);
+                                  setEditingTitle(emp.title || '');
+                                }}
+                                className="p-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-lg transition-all cursor-pointer hover:scale-105 active:scale-95"
+                                title="Edit employee role and title"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}

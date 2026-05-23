@@ -14,7 +14,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-admin-id',
     name: 'Inzozi Admin',
     email: 'admin@inzozi.com',
-    passwordHash: '$2a$10$U9Hk2V.L6t9xR1WwS5i6zO.gM/1X5X6B1nKzP9fW4l1r.3D7E8lJy', // admin123
+    passwordHash: '$2a$10$SPs2pWhlJhrTNPzxpAB0qOcRFfTcgq4VDSQLRF2uB6Vm/Z.H.jRoW', // admin123
     role: 'sysadmin',
     title: 'System Administrator',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin'
@@ -23,7 +23,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-dev-id',
     name: 'Benit Gilbert',
     email: 'dev@inzozi.com',
-    passwordHash: '$2a$10$i/R114w.eD3yN5k8Y8R0h.7L9.JkP7U2D/g7TzK6lB6aD9f2Gkpyq', // dev123
+    passwordHash: '$2a$10$a3fcW0JpN46EPd8cgJ2HyOYbr7/QHP.Mj4QkFdOo7Esm/k1EgNp36', // dev123
     role: 'software_engineer',
     title: 'Software Engineer (Impressa Dev)',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=benit'
@@ -32,7 +32,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-manager-id',
     name: 'HR Manager',
     email: 'manager@inzozi.com',
-    passwordHash: '$2a$10$N2Gk.b2y.R1d5k8Y8R0h.2V9.JkP7U2D/g7TzK6lB6aD9f2Gkpyq', // manager123
+    passwordHash: '$2a$10$fVe4ooL0bGV01iNq/m2CI.l13o4rCd/Y2g3taGAPJz3dsoOT0p1x.', // manager123
     role: 'hr_manager',
     title: 'Human Resources Director',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=manager'
@@ -41,7 +41,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-content-id',
     name: 'Gaju E-Commerce Moderator',
     email: 'content@inzozi.com',
-    passwordHash: '$2a$10$K7Gk.b2y.R1d5k8Y8R0h.3V9.JkP7U2D/g7TzK6lB6aD9f2Gkpyq', // content123
+    passwordHash: '$2a$10$9qa.ksW92LAE3k9rrtGIAu7AJZdBA4irEwbyqY3.4cgeelWvy68vO', // content123
     role: 'content_controller',
     title: 'Impressa Content Controller',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=content'
@@ -50,7 +50,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-marketer-id',
     name: 'Growth Marketer',
     email: 'marketer@inzozi.com',
-    passwordHash: '$2a$10$O8Gk.b2y.R1d5k8Y8R0h.4V9.JkP7U2D/g7TzK6lB6aD9f2Gkpyq', // marketer123
+    passwordHash: '$2a$10$kNiTrQzbLQ0hQw.TLnUgTOxwoLdIO4Cu0fP3TtMuaSUd0.eewvJFm', // marketer123
     role: 'growth_marketer',
     title: 'Digital Marketing Lead',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=marketer'
@@ -59,7 +59,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-support-id',
     name: 'Support Agent',
     email: 'support@inzozi.com',
-    passwordHash: '$2a$10$P9Gk.b2y.R1d5k8Y8R0h.5V9.JkP7U2D/g7TzK6lB6aD9f2Gkpyq', // support123
+    passwordHash: '$2a$10$6p2S.xpXSERByQozKsj/7ONwDLnh.s52dtJMaWwDtD9qYVXdCjRmC', // support123
     role: 'customer_support',
     title: 'Customer Experience agent',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=support'
@@ -68,7 +68,7 @@ export const MOCK_EMPLOYEES = [
     id: 'mock-pm-id',
     name: 'Product Manager',
     email: 'pm@inzozi.com',
-    passwordHash: '$2a$10$i/R114w.eD3yN5k8Y8R0h.7L9.JkP7U2D/g7TzK6lB6aD9f2Gkpyq', // dev123 (mapped to pm)
+    passwordHash: '$2a$10$npO3TrKp5689VLtwBZqxe.Xz2jb4PgOGrKN8dt.5mAAOrZQoz2ajG', // pm123
     role: 'product_manager',
     title: 'Senior Product Manager',
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=pm'
@@ -600,4 +600,107 @@ export const getEmployees = async (req, res) => {
     };
   });
   return res.json(formattedMocks);
+};
+
+// Update employee role and title
+export const updateEmployee = async (req, res) => {
+  const { id } = req.params;
+  const { role, title } = req.body;
+
+  // Check for manage_users permission
+  const userPermissions = req.user.permissions || [];
+  if (!userPermissions.includes('manage_users')) {
+    return res.status(403).json({ error: 'Forbidden: You do not have permission to manage employee roles.' });
+  }
+
+  const dbActive = await isDbConnected();
+
+  if (dbActive) {
+    try {
+      // Find the role first to get its ID
+      const dbRole = await prisma.role.findFirst({
+        where: { code: role }
+      });
+
+      if (!dbRole && role) {
+        return res.status(404).json({ error: `Role '${role}' not found.` });
+      }
+
+      const updated = await prisma.employee.update({
+        where: { id },
+        data: {
+          roleId: dbRole ? dbRole.id : undefined,
+          title: title !== undefined ? title : undefined
+        },
+        include: { role: true }
+      });
+
+      const resolved = await resolveEffectiveUser(updated);
+      const employeeData = {
+        id: updated.id,
+        name: updated.name,
+        email: updated.email,
+        role: resolved.primaryRole,
+        roleName: resolved.roleName,
+        title: updated.title,
+        avatar: updated.avatar,
+        isActive: updated.isActive
+      };
+
+      if (req.io) {
+        req.io.emit('employee_updated', {
+          action: 'updated',
+          employee: employeeData
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Employee role and title updated successfully.',
+        employee: employeeData
+      });
+    } catch (err) {
+      console.error('[AuthController] DB error updating employee:', err.message);
+      return res.status(500).json({ error: 'Failed to update employee on database server.' });
+    }
+  }
+
+  // Mock Mode Fallback
+  const employeeIndex = MOCK_EMPLOYEES.findIndex(e => e.id === id);
+  if (employeeIndex === -1) {
+    return res.status(404).json({ error: 'Employee not found in mock registry.' });
+  }
+
+  const updatedEmployee = {
+    ...MOCK_EMPLOYEES[employeeIndex],
+    role: role !== undefined ? role : MOCK_EMPLOYEES[employeeIndex].role,
+    title: title !== undefined ? title : MOCK_EMPLOYEES[employeeIndex].title
+  };
+
+  MOCK_EMPLOYEES[employeeIndex] = updatedEmployee;
+
+  const resolved = await resolveEffectiveUser(updatedEmployee);
+  const employeeData = {
+    id: updatedEmployee.id,
+    name: updatedEmployee.name,
+    email: updatedEmployee.email,
+    role: resolved.primaryRole,
+    roleName: resolved.roleName,
+    title: updatedEmployee.title,
+    avatar: updatedEmployee.avatar,
+    isActive: true
+  };
+
+  if (req.io) {
+    req.io.emit('employee_updated', {
+      action: 'updated',
+      employee: employeeData
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: 'Employee updated successfully in mock store.',
+    employee: employeeData
+  });
 };
