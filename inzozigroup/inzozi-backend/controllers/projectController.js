@@ -40,7 +40,7 @@ const INITIAL_PROJECTS = [
       activeUsers: 1420,
       apiHealth: 'healthy',
       serverLoad: '28%',
-      weeklyRevenue: '$14,240'
+      weeklyRevenue: '14,240,000 Rwf'
     }
   }
 ];

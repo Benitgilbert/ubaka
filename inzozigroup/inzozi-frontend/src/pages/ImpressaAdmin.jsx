@@ -275,7 +275,7 @@ const ImpressaAdmin = () => {
                               <span>•</span>
                               <span>Category: {prod.category}</span>
                               <span>•</span>
-                              <span className="text-purple-400">${prod.price.toFixed(2)}</span>
+                              <span className="text-purple-400">{prod.price.toLocaleString()} Rwf</span>
                             </div>
                           </div>
                         </div>
