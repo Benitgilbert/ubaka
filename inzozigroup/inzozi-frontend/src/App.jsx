@@ -9,6 +9,7 @@ import Kanban from './pages/Kanban';
 import Chat from './pages/Chat';
 import ImpressaAdmin from './pages/ImpressaAdmin';
 import Delegations from './pages/Delegations';
+import HRPortal from './pages/HRPortal';
 
 const LoadingScreen = ({ message = 'Loading...' }) => {
   return (
@@ -87,6 +88,8 @@ const MainLayout = () => {
         return <ImpressaAdmin />;
       case 'delegations':
         return <Delegations />;
+      case 'hr-portal':
+        return <HRPortal />;
       default:
         return <Dashboard />;
     }

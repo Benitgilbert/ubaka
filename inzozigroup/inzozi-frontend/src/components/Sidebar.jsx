@@ -9,7 +9,8 @@ import {
   Settings, 
   Briefcase,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 
 const Sidebar = ({ activePage, setActivePage }) => {
@@ -48,6 +49,12 @@ const Sidebar = ({ activePage, setActivePage }) => {
       label: 'Roster & Coverage',
       icon: ShieldCheck,
       permissions: ['manage_delegations_hr', 'manage_delegations_admin']
+    },
+    {
+      id: 'hr-portal',
+      label: 'HR & People Ops',
+      icon: Users,
+      permissions: ['manage_hr', 'submit_requests']
     }
   ];
 

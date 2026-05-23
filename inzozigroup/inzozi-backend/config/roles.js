@@ -15,6 +15,8 @@ export const ALL_PERMISSIONS = [
   { code: 'restart_services', name: 'Manage Services & Servers', description: 'DevOps capability to restart production modules and logs' },
   { code: 'manage_tickets', name: 'Manage Support Tickets', description: 'View and respond to client help requests' },
   { code: 'log_time', name: 'Log Work Hours', description: 'Submit time logs for tasks' },
+  { code: 'manage_hr', name: 'Manage HR Portal', description: 'Full access to HR onboarding, approvals, hardware fleet, SaaS licenses, and people analytics' },
+  { code: 'submit_requests', name: 'Submit HR Requests', description: 'Submit time-off, expense, and hardware requests via the HR portal' },
 ];
 
 // Define all roles and map their permission codes
@@ -37,7 +39,9 @@ export const ALL_ROLES = [
       'approve_code',
       'restart_services',
       'manage_tickets',
-      'log_time'
+      'log_time',
+      'manage_hr',
+      'submit_requests'
     ]
   },
   {
@@ -45,84 +49,84 @@ export const ALL_ROLES = [
     name: 'HR Manager',
     description: 'Manages company staff directory and schedules operational coverage',
     isTechnical: false,
-    permissions: ['manage_users', 'manage_delegations_hr', 'view_analytics', 'view_tasks', 'log_time']
+    permissions: ['manage_users', 'manage_delegations_hr', 'view_analytics', 'view_tasks', 'log_time', 'manage_hr', 'submit_requests']
   },
   {
     code: 'product_manager',
     name: 'Product Manager',
     description: 'Orchestrates project tasks and coordinates deliverables',
     isTechnical: false,
-    permissions: ['manage_tasks', 'view_tasks', 'view_analytics', 'log_time']
+    permissions: ['manage_tasks', 'view_tasks', 'view_analytics', 'log_time', 'submit_requests']
   },
   {
     code: 'ux_designer',
     name: 'UX/UI Designer',
     description: 'Designs beautiful human-centered user experiences',
     isTechnical: false,
-    permissions: ['view_tasks', 'log_time']
+    permissions: ['view_tasks', 'log_time', 'submit_requests']
   },
   {
     code: 'lead_engineer',
     name: 'Lead Software Architect',
     description: 'Architects codebase structures and reviews developer contributions',
     isTechnical: true,
-    permissions: ['write_code', 'approve_code', 'manage_tasks', 'view_tasks', 'log_time']
+    permissions: ['write_code', 'approve_code', 'manage_tasks', 'view_tasks', 'log_time', 'submit_requests']
   },
   {
     code: 'software_engineer',
     name: 'Software Engineer',
     description: 'Develops features and fixes bugs across monorepo packages',
     isTechnical: true,
-    permissions: ['write_code', 'view_tasks', 'log_time']
+    permissions: ['write_code', 'view_tasks', 'log_time', 'submit_requests']
   },
   {
     code: 'qa_engineer',
     name: 'Quality Assurance Engineer',
     description: 'Tests applications, logs bug tasks, and audits release readiness',
     isTechnical: false,
-    permissions: ['manage_tasks', 'view_tasks', 'log_time']
+    permissions: ['manage_tasks', 'view_tasks', 'log_time', 'submit_requests']
   },
   {
     code: 'devops',
     name: 'DevOps / SRE Engineer',
     description: 'Deploys updates, scales databases, and keeps servers healthy',
     isTechnical: true,
-    permissions: ['restart_services', 'view_analytics', 'log_time']
+    permissions: ['restart_services', 'view_analytics', 'log_time', 'submit_requests']
   },
   {
     code: 'security_engineer',
     name: 'Security Analyst',
     description: 'Audits logs, enforces access tokens, and scans for threats',
     isTechnical: true,
-    permissions: ['view_analytics', 'log_time']
+    permissions: ['view_analytics', 'log_time', 'submit_requests']
   },
   {
     code: 'content_controller',
     name: 'Content Controller',
     description: 'Reviews and approves e-commerce product listings for Impressa',
     isTechnical: false,
-    permissions: ['approve_products', 'moderate_content', 'log_time']
+    permissions: ['approve_products', 'moderate_content', 'log_time', 'submit_requests']
   },
   {
     code: 'customer_support',
     name: 'Customer Support Agent',
     description: 'Resolves merchant questions and escalates technical issues',
     isTechnical: false,
-    permissions: ['manage_tickets', 'log_time']
+    permissions: ['manage_tickets', 'log_time', 'submit_requests']
   },
   {
     code: 'growth_marketer',
     name: 'Growth Marketer',
     description: 'Tracks metrics and runs campaigns to boost active users',
     isTechnical: false,
-    permissions: ['view_analytics', 'log_time']
+    permissions: ['view_analytics', 'log_time', 'submit_requests']
   },
   {
     code: 'ceo',
     name: 'Chief Executive Officer (CEO)',
     description: 'Executive oversight of global operations, business metrics, and strategic project goals',
     isTechnical: false,
-    permissions: ['view_analytics', 'view_tasks', 'moderate_content', 'manage_tickets', 'log_time']
+    permissions: ['view_analytics', 'view_tasks', 'moderate_content', 'manage_tickets', 'log_time', 'submit_requests']
   },
   {
     code: 'cto',
@@ -143,7 +147,7 @@ export const ALL_ROLES = [
     name: 'Chief Operating Officer (COO)',
     description: 'Maintains operational alignment across departments, HR systems, and project execution',
     isTechnical: false,
-    permissions: ['view_analytics', 'manage_tasks', 'view_tasks', 'manage_users', 'manage_delegations_hr', 'log_time']
+    permissions: ['view_analytics', 'manage_tasks', 'view_tasks', 'manage_users', 'manage_delegations_hr', 'log_time', 'manage_hr', 'submit_requests']
   }
 ];
 

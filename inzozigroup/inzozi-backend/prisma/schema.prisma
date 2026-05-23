@@ -75,19 +75,134 @@ model Employee {
   role          Role?       @relation(fields: [roleId], references: [id])
   title         String?     // e.g. "Lead React Dev", "UX/UI Designer"
   avatar        String?     // URL or color code
+  department    String?     // e.g. "Engineering", "Product", "HR"
+  location      String?     // e.g. "Remote", "Kigali", "Nairobi"
   isActive      Boolean     @default(true)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
   // Relations
-  assignedTasks Task[]      @relation("AssignedTasks")
-  createdTasks  Task[]      @relation("CreatedTasks")
-  messages      Message[]
-  timeEntries   TimeEntry[]
-  
+  assignedTasks    Task[]               @relation("AssignedTasks")
+  createdTasks     Task[]               @relation("CreatedTasks")
+  messages         Message[]
+  timeEntries      TimeEntry[]
+
   // Delegations
-  delegations   Delegation[] @relation("UserDelegations")
-  authorized    Delegation[] @relation("AuthorizedDelegations")
+  delegations      Delegation[]         @relation("UserDelegations")
+  authorized       Delegation[]         @relation("AuthorizedDelegations")
+
+  // HR Relations
+  onboardingTasks  OnboardingChecklist[]
+  approvalRequests ApprovalRequest[]    @relation("EmployeeRequests")
+  reviewedRequests ApprovalRequest[]    @relation("ReviewedRequests")
+  hardwareAssets   HardwareAsset[]
+  certifications   Certification[]
+}
+
+// ─── HR Models ────────────────────────────────────────────────────────────────
+
+model OnboardingChecklist {
+  id          String    @id @default(uuid())
+  employeeId  String
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  task        String    // "Sign Contract", "Complete Security Training", etc.
+  category    String    @default("General") // "Legal", "IT Setup", "HR Admin", "Culture"
+  isComplete  Boolean   @default(false)
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([employeeId])
+}
+
+enum ApprovalType {
+  time_off
+  hardware
+  expense
+  other
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+model ApprovalRequest {
+  id          String         @id @default(uuid())
+  type        ApprovalType
+  status      ApprovalStatus @default(pending)
+  title       String
+  description String?
+  startDate   DateTime?      // For time_off
+  endDate     DateTime?      // For time_off
+  amount      Float?         // For expense (USD)
+  employeeId  String
+  employee    Employee       @relation("EmployeeRequests", fields: [employeeId], references: [id], onDelete: Cascade)
+  reviewerId  String?
+  reviewer    Employee?      @relation("ReviewedRequests", fields: [reviewerId], references: [id])
+  reviewNote  String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+}
+
+enum AssetStatus {
+  available
+  assigned
+  maintenance
+  retired
+}
+
+model HardwareAsset {
+  id            String      @id @default(uuid())
+  name          String      // "MacBook Pro M3 Max"
+  serialNumber  String      @unique
+  type          String      // "laptop", "monitor", "phone", "tablet"
+  brand         String?
+  specs         String?     // "64GB RAM, 2TB SSD"
+  status        AssetStatus @default(available)
+  purchasedAt   DateTime?
+  warrantyUntil DateTime?
+  assignedToId  String?
+  assignedTo    Employee?   @relation(fields: [assignedToId], references: [id])
+  assignedAt    DateTime?
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([assignedToId])
+  @@index([status])
+}
+
+model SaasLicense {
+  id           String    @id @default(uuid())
+  tool         String    @unique // "GitHub Enterprise", "Figma", "Slack"
+  category     String    @default("Productivity") // "DevOps", "Design", "Communication"
+  totalSeats   Int       @default(0)
+  usedSeats    Int       @default(0)
+  costPerSeat  Float?    // Monthly USD per seat
+  renewalDate  DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Certification {
+  id         String    @id @default(uuid())
+  employeeId String
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  name       String    // "AWS Solutions Architect", "Kubernetes CKA"
+  issuer     String?   // "Amazon Web Services", "CNCF"
+  issuedAt   DateTime?
+  expiresAt  DateTime?
+  cost       Float?    // Education budget spent (USD)
+  badgeUrl   String?   // Link to credential badge
+  createdAt  DateTime  @default(now())
+
+  @@index([employeeId])
 }
 
 model Delegation {
