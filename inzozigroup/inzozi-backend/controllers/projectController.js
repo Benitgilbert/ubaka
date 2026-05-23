@@ -45,59 +45,7 @@ const INITIAL_PROJECTS = [
   }
 ];
 
-// Mock Impressa products waiting for admin approval
-let MOCK_IMPRESSA_APPROVALS = [
-  {
-    id: 'prod-approval-1',
-    name: 'Custom Linen Shirt - Summer Collection',
-    sellerName: 'Kigali Threads Ltd',
-    price: 32.50,
-    category: 'Apparel',
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=150',
-    createdAt: '2026-05-20T10:30:00Z',
-    status: 'pending'
-  },
-  {
-    id: 'prod-approval-2',
-    name: 'Bamboo Bluetooth Wireless Headphones',
-    sellerName: 'GreenTech Rwanda',
-    price: 89.00,
-    category: 'Electronics',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150',
-    createdAt: '2026-05-21T08:15:00Z',
-    status: 'pending'
-  },
-  {
-    id: 'prod-approval-3',
-    name: 'Organic Shea Butter Soap (Pack of 3)',
-    sellerName: 'Nyungwe Natural Cosmetics',
-    price: 15.00,
-    category: 'Beauty',
-    image: 'https://images.unsplash.com/photo-1607006342411-9a3363b63b2f?w=150',
-    createdAt: '2026-05-21T14:45:00Z',
-    status: 'pending'
-  }
-];
-
-// Mock Impressa support tickets
-let MOCK_IMPRESSA_TICKETS = [
-  {
-    id: 'tick-impressa-1',
-    subject: 'Failed payment on Order #IMP-20412',
-    userEmail: 'jean.paul@gmail.com',
-    priority: 'high',
-    status: 'open',
-    createdAt: '2026-05-21T11:20:00Z'
-  },
-  {
-    id: 'tick-impressa-2',
-    subject: 'Vendor verification approval delay',
-    userEmail: 'boutique.chic@inzozi.com',
-    priority: 'normal',
-    status: 'in_progress',
-    createdAt: '2026-05-20T15:40:00Z'
-  }
-];
+// Mock Impressa lists removed for production real-data enforcement
 
 // Get all projects
 export const getProjects = async (req, res) => {
@@ -166,6 +114,10 @@ export const getProjectBySlug = async (req, res) => {
 
 // IMPRESSA Admin Activities: List products pending approval
 export const getPendingImpressaApprovals = async (req, res) => {
+  if (!process.env.IMPRESSA_DATABASE_URL) {
+    return res.status(500).json({ error: 'Impressa database connection is not configured (IMPRESSA_DATABASE_URL is missing).' });
+  }
+
   try {
     const realProducts = await queryImpressa(`
       SELECT p.id, p.name, p.price, p."approvalStatus" as status, p."createdAt", p.image, 
@@ -178,13 +130,11 @@ export const getPendingImpressaApprovals = async (req, res) => {
       ORDER BY p."createdAt" DESC
     `);
     
-    if (realProducts) {
-      return res.json(realProducts);
-    }
+    return res.json(realProducts || []);
   } catch (err) {
-    console.error("⚠️ Failed to fetch pending products from real Impressa DB, falling back to mock:", err.message);
+    console.error("⚠️ Failed to fetch pending products from real Impressa DB:", err.message);
+    return res.status(500).json({ error: `Failed to fetch pending products: ${err.message}` });
   }
-  res.json(MOCK_IMPRESSA_APPROVALS);
 };
 
 // IMPRESSA Admin Activities: Approve/Reject product
@@ -196,66 +146,44 @@ export const updateImpressaProductStatus = async (req, res) => {
     return res.status(400).json({ error: 'Status must be approved or rejected' });
   }
 
+  if (!process.env.IMPRESSA_DATABASE_URL) {
+    return res.status(500).json({ error: 'Impressa database connection is not configured (IMPRESSA_DATABASE_URL is missing).' });
+  }
+
   try {
-    if (process.env.IMPRESSA_DATABASE_URL) {
-      const visibility = status === 'approved' ? 'public' : 'hidden';
-      const approvedBy = req.user?.id || 'inzozi-admin';
-      const approvedAt = new Date();
+    const visibility = status === 'approved' ? 'public' : 'hidden';
+    const approvedBy = req.user?.id || 'inzozi-admin';
+    const approvedAt = new Date();
 
-      const result = await queryImpressa(`
-        UPDATE "Product" 
-        SET "approvalStatus" = $1, "approvalNote" = $2, "approvedBy" = $3, "approvedAt" = $4, "visibility" = $5
-        WHERE id = $6
-        RETURNING id, name, "approvalStatus"
-      `, [status, note || '', approvedBy, approvedAt, visibility, id]);
+    const result = await queryImpressa(`
+      UPDATE "Product" 
+      SET "approvalStatus" = $1, "approvalNote" = $2, "approvedBy" = $3, "approvedAt" = $4, "visibility" = $5
+      WHERE id = $6
+      RETURNING id, name, "approvalStatus"
+    `, [status, note || '', approvedBy, approvedAt, visibility, id]);
 
-      if (result && result.length > 0) {
-        console.log(`[ProjectController] Real Impressa Product ID ${id} set to ${status}. Note: ${note || 'None'}`);
-        return res.json({
-          success: true,
-          message: `Product successfully ${status} in real Impressa database.`,
-          product: result[0]
-        });
-      } else {
-        return res.status(404).json({ error: 'Product not found in real Impressa database.' });
-      }
+    if (result && result.length > 0) {
+      console.log(`[ProjectController] Real Impressa Product ID ${id} set to ${status}. Note: ${note || 'None'}`);
+      return res.json({
+        success: true,
+        message: `Product successfully ${status} in real Impressa database.`,
+        product: result[0]
+      });
+    } else {
+      return res.status(404).json({ error: 'Product not found in real Impressa database.' });
     }
   } catch (err) {
     console.error("⚠️ Failed to update product in real Impressa DB:", err.message);
     return res.status(500).json({ error: `Failed to update product in database: ${err.message}` });
   }
-
-  // Update in mock store
-  const productIndex = MOCK_IMPRESSA_APPROVALS.findIndex(p => p.id === id);
-  
-  if (productIndex === -1) {
-    return res.status(404).json({ error: 'Product approval request not found' });
-  }
-
-  const updatedProduct = {
-    ...MOCK_IMPRESSA_APPROVALS[productIndex],
-    status: status
-  };
-
-  // Remove from pending list (in-memory)
-  MOCK_IMPRESSA_APPROVALS = MOCK_IMPRESSA_APPROVALS.filter(p => p.id !== id);
-
-  console.log(`[ProjectController] Impressa Product ID ${id} set to ${status}. Note: ${note || 'None'}`);
-
-  // Emit WebSocket real-time update
-  if (req.io) {
-    req.io.emit('impressa_approvals_updated', MOCK_IMPRESSA_APPROVALS);
-  }
-
-  return res.json({
-    success: true,
-    message: `Product successfully ${status}`,
-    product: updatedProduct
-  });
 };
 
 // IMPRESSA Admin Activities: Get Support Tickets
 export const getImpressaTickets = async (req, res) => {
+  if (!process.env.IMPRESSA_DATABASE_URL) {
+    return res.status(500).json({ error: 'Impressa database connection is not configured (IMPRESSA_DATABASE_URL is missing).' });
+  }
+
   try {
     const realTickets = await queryImpressa(`
       SELECT t.id, t.subject, t.description, t.status, t.priority, t."createdAt", u.email as "userEmail"
@@ -265,13 +193,11 @@ export const getImpressaTickets = async (req, res) => {
       ORDER BY t."createdAt" DESC
     `);
     
-    if (realTickets) {
-      return res.json(realTickets);
-    }
+    return res.json(realTickets || []);
   } catch (err) {
-    console.error("⚠️ Failed to fetch tickets from real Impressa DB, falling back to mock:", err.message);
+    console.error("⚠️ Failed to fetch tickets from real Impressa DB:", err.message);
+    return res.status(500).json({ error: `Failed to fetch tickets: ${err.message}` });
   }
-  res.json(MOCK_IMPRESSA_TICKETS.filter(t => t.status !== 'resolved'));
 };
 
 // IMPRESSA Admin Activities: Update Support Ticket (resolve or modify)
@@ -279,51 +205,32 @@ export const updateImpressaTicketStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body; // 'open', 'in_progress', 'resolved'
 
-  try {
-    if (process.env.IMPRESSA_DATABASE_URL) {
-      const result = await queryImpressa(`
-        UPDATE "Ticket"
-        SET status = $1
-        WHERE id = $2
-        RETURNING id, subject, status
-      `, [status, id]);
+  if (!process.env.IMPRESSA_DATABASE_URL) {
+    return res.status(500).json({ error: 'Impressa database connection is not configured (IMPRESSA_DATABASE_URL is missing).' });
+  }
 
-      if (result && result.length > 0) {
-        console.log(`[ProjectController] Real Impressa Ticket ID ${id} status updated to ${status}`);
-        return res.json({
-          success: true,
-          message: `Ticket successfully updated to ${status} in real Impressa database.`,
-          ticket: result[0]
-        });
-      } else {
-        return res.status(404).json({ error: 'Ticket not found in real Impressa database.' });
-      }
+  try {
+    const result = await queryImpressa(`
+      UPDATE "Ticket"
+      SET status = $1
+      WHERE id = $2
+      RETURNING id, subject, status
+    `, [status, id]);
+
+    if (result && result.length > 0) {
+      console.log(`[ProjectController] Real Impressa Ticket ID ${id} status updated to ${status}`);
+      return res.json({
+        success: true,
+        message: `Ticket successfully updated to ${status} in real Impressa database.`,
+        ticket: result[0]
+      });
+    } else {
+      return res.status(404).json({ error: 'Ticket not found in real Impressa database.' });
     }
   } catch (err) {
     console.error("⚠️ Failed to update ticket in real Impressa DB:", err.message);
     return res.status(500).json({ error: `Failed to update ticket in database: ${err.message}` });
   }
-
-  const ticketIndex = MOCK_IMPRESSA_TICKETS.findIndex(t => t.id === id);
-  if (ticketIndex === -1) {
-    return res.status(404).json({ error: 'Ticket not found' });
-  }
-
-  MOCK_IMPRESSA_TICKETS[ticketIndex].status = status;
-
-  console.log(`[ProjectController] Impressa Ticket ID ${id} status updated to ${status}`);
-
-  // Emit WebSocket real-time update
-  if (req.io) {
-    const activeTickets = MOCK_IMPRESSA_TICKETS.filter(t => t.status !== 'resolved');
-    req.io.emit('impressa_tickets_updated', activeTickets);
-  }
-
-  return res.json({
-    success: true,
-    message: `Ticket successfully updated to ${status}`,
-    ticket: MOCK_IMPRESSA_TICKETS[ticketIndex]
-  });
 };
 
 
