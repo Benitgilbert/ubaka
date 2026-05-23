@@ -364,11 +364,22 @@ const Delegations = () => {
     return delegations.find(d => d.employeeId === empId && d.isActive);
   };
 
+  // Resolve dynamic approver for live routing diagram
+  const activeApprover = delegations.find(d => 
+    d.isActive && 
+    (d.targetRoleCode === 'content_controller' || d.customPermissions?.includes('approve_products'))
+  );
+
   return (
-    <div className="space-y-8 p-8 max-w-7xl mx-auto h-[calc(100vh-2rem)] flex flex-col min-h-0 overflow-hidden">
+    <div className="relative min-h-screen text-slate-100 p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-16 overflow-x-hidden">
+      
+      {/* Dynamic Background Glowing Blobs */}
+      <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" style={{ animationDuration: '8s' }} />
+      <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" style={{ animationDuration: '12s' }} />
       
       {/* Page Header */}
-      <div className="shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-purple-950/20 via-slate-900 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+      <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 shadow-2xl overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
         <div>
           <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
             <Users className="w-6 h-6 text-purple-400" />
@@ -379,12 +390,12 @@ const Delegations = () => {
         
         <div className="flex gap-2">
           {isAdmin ? (
-            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold text-indigo-400 rounded-xl">
-              <Lock className="w-3.5 h-3.5" />
+            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-bold text-indigo-400 rounded-xl shadow-inner shadow-indigo-500/5">
+              <Lock className="w-3.5 h-3.5 animate-pulse" />
               SysAdmin Mode
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 text-[10px] font-bold text-amber-400 rounded-xl">
+            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-[10px] font-bold text-amber-400 rounded-xl shadow-inner shadow-amber-500/5">
               <Unlock className="w-3.5 h-3.5" />
               HR Operations Mode
             </span>
@@ -394,82 +405,89 @@ const Delegations = () => {
 
       {/* Messages */}
       {successMsg && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-xl flex items-center gap-2 shrink-0 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-xl flex items-center gap-2 shrink-0 animate-fade-in shadow-lg shadow-emerald-500/5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-xl flex items-center gap-2 shrink-0 animate-fade-in">
-          <AlertTriangle className="w-4 h-4" />
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-xl flex items-center gap-2 shrink-0 animate-fade-in shadow-lg shadow-red-500/5">
+          <AlertTriangle className="w-4 h-4 text-red-400" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {loading ? (
-        <div className="flex-grow flex items-center justify-center">
+        <div className="h-64 flex items-center justify-center">
           <div className="w-10 h-10 border-4 border-slate-800 border-t-purple-500 rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="flex-1 grid lg:grid-cols-12 gap-8 min-h-0 overflow-hidden pb-4">
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Staff Directory */}
-          <div className="lg:col-span-7 flex flex-col min-h-0 overflow-hidden space-y-4">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 shrink-0">
-              <FileText className="w-4.5 h-4.5 text-purple-400" />
+          <div className="lg:col-span-7 space-y-4">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <FileText className="w-4 h-4 text-purple-400" />
               INZOZI Group Staff Roster
             </h3>
             
-            <div className="flex-1 overflow-y-auto bg-slate-950/40 border border-slate-850 rounded-2xl p-4 scrollbar-thin">
-              <div className="space-y-4">
+            <div className="bg-slate-900/15 backdrop-blur-md border border-slate-900 rounded-2xl p-5 shadow-2xl space-y-4">
+              <div className="space-y-3">
                 {employees.map((emp) => {
                   const activeDel = getActiveDelegationForEmployee(emp.id);
                   const isEditing = editingEmpId === emp.id;
 
                   return (
-                    <div key={emp.id} className="bg-slate-950 border border-slate-850 rounded-xl p-4 hover:border-slate-800 transition-colors">
+                    <div 
+                      key={emp.id} 
+                      className={`relative bg-slate-950/40 backdrop-blur-sm border ${
+                        isEditing 
+                          ? 'border-purple-500/40 bg-slate-900/60 shadow-lg shadow-purple-500/5' 
+                          : 'border-slate-900/80 hover:border-slate-850 hover:bg-slate-900/20'
+                      } rounded-xl p-4 transition-all duration-300`}
+                    >
                       {isEditing ? (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           <div className="flex items-center gap-3">
-                            <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-900" />
+                            <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-950" />
                             <div>
                               <h4 className="text-xs font-bold text-slate-200">{emp.name}</h4>
                               <p className="text-[10px] text-slate-500">{emp.email}</p>
                             </div>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                            <div>
-                              <label className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-1">Job Title</label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                            <div className="space-y-1">
+                              <label className="block text-[8px] font-black text-slate-500 uppercase tracking-wider">Job Title</label>
                               <input 
                                 type="text"
                                 value={editingTitle}
                                 onChange={(e) => setEditingTitle(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-250 outline-none focus:border-purple-500 transition-colors"
+                                className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-all duration-200"
                                 placeholder="e.g. Senior Frontend Dev"
                                 disabled={editSubmitting}
                               />
                             </div>
-                            <div>
-                              <label className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-1">Company Role</label>
+                            <div className="space-y-1">
+                              <label className="block text-[8px] font-black text-slate-500 uppercase tracking-wider">Company Role</label>
                               <select 
                                 value={editingRole}
                                 onChange={(e) => setEditingRole(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                                className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-all duration-200"
                                 disabled={editSubmitting}
                               >
                                 {roles.map(r => (
-                                  <option key={r.code} value={r.code}>{r.name}</option>
+                                  <option key={r.code} value={r.code} className="bg-slate-950 text-slate-200">{r.name}</option>
                                 ))}
                               </select>
                             </div>
                           </div>
-                          <div className="flex justify-end gap-2 pt-2">
+                          <div className="flex justify-end gap-2 pt-2 border-t border-slate-900/50">
                             <button
                               type="button"
                               onClick={() => setEditingEmpId(null)}
                               disabled={editSubmitting}
-                              className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 text-slate-455 hover:text-slate-200 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                              className="px-3 py-1.5 bg-slate-900 border border-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-250 rounded-lg text-xs font-bold transition-all duration-200 active:scale-95 cursor-pointer flex items-center gap-1.5"
                             >
                               <X className="w-3.5 h-3.5" />
                               Cancel
@@ -478,7 +496,7 @@ const Delegations = () => {
                               type="button"
                               onClick={() => handleEditEmployeeRole(emp.id)}
                               disabled={editSubmitting}
-                              className="px-2.5 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 text-purple-400 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                              className="px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 hover:text-purple-300 rounded-lg text-xs font-bold transition-all duration-200 active:scale-95 cursor-pointer flex items-center gap-1.5"
                             >
                               {editSubmitting ? (
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -490,29 +508,32 @@ const Delegations = () => {
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-3">
-                            <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-900" />
+                            <div className="relative">
+                              <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full border border-slate-800 bg-slate-950" />
+                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-950 rounded-full" />
+                            </div>
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-2">
                                 <h4 className="text-xs font-bold text-slate-200">{emp.name}</h4>
-                                <span className="text-[9px] bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded font-semibold">{emp.title}</span>
+                                <span className="text-[9px] bg-slate-900 border border-slate-850 text-slate-400 px-1.5 py-0.5 rounded font-bold tracking-wide">{emp.title}</span>
                               </div>
                               <p className="text-[10px] text-slate-500">{emp.email}</p>
                               
-                              {/* Active Delegation Tag */}
+                              {/* Active Coverage Tag */}
                               {activeDel && (
-                                <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 text-[9px] font-bold text-purple-400 rounded-md">
-                                  <Zap className="w-2.5 h-2.5" />
-                                  Acting: {activeDel.targetRoleName} (Covering)
+                                <div className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 bg-purple-500/10 border border-purple-500/20 text-[9px] font-bold text-purple-400 rounded-md animate-pulse">
+                                  <Zap className="w-2.5 h-2.5 fill-purple-400/20 text-purple-400" />
+                                  Covering: {activeDel.targetRoleName}
                                 </div>
                               )}
                             </div>
                           </div>
 
                           {/* Primary Role Badge & Action */}
-                          <div className="flex items-center gap-3 shrink-0">
-                            <span className="inline-block px-2.5 py-1 bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-400 rounded-lg">
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="inline-block px-2.5 py-1 bg-slate-900 border border-slate-850 text-[10px] font-bold text-slate-400 rounded-lg">
                               {emp.roleName}
                             </span>
                             {canManageUsers && (
@@ -522,7 +543,7 @@ const Delegations = () => {
                                   setEditingRole(emp.role);
                                   setEditingTitle(emp.title || '');
                                 }}
-                                className="p-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-lg transition-all cursor-pointer hover:scale-105 active:scale-95"
+                                className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-lg transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
                                 title="Edit employee role and title"
                               >
                                 <Edit className="w-3.5 h-3.5" />
@@ -539,16 +560,16 @@ const Delegations = () => {
           </div>
 
           {/* Right Column: Delegation Creator & Timelines */}
-          <div className="lg:col-span-5 flex flex-col min-h-0 overflow-hidden space-y-6">
+          <div className="lg:col-span-5 space-y-6">
             
             {/* Form Container (Delegation or Hire) */}
-            <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-850 rounded-2xl p-5 shadow-xl shrink-0 space-y-4">
+            <div className="bg-slate-900/15 backdrop-blur-md border border-slate-900 rounded-2xl p-5 shadow-2xl space-y-4">
               {canManageUsers ? (
-                <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-850 shrink-0">
+                <div className="flex bg-slate-950/80 p-1 rounded-xl border border-slate-900 shrink-0">
                   <button
                     type="button"
                     onClick={() => setActiveRightTab('delegation')}
-                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
+                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
                       activeRightTab === 'delegation'
                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
@@ -560,7 +581,7 @@ const Delegations = () => {
                   <button
                     type="button"
                     onClick={() => setActiveRightTab('hire')}
-                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
+                    className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
                       activeRightTab === 'hire'
                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
@@ -578,34 +599,34 @@ const Delegations = () => {
               )}
               
               {activeRightTab === 'delegation' || !canManageUsers ? (
-                <form onSubmit={handleSubmitDelegation} className="space-y-3">
+                <form onSubmit={handleSubmitDelegation} className="space-y-4">
                   {/* Employee select */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Cover Worker</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Select Cover Worker</label>
                     <select 
                       value={selectedEmp}
                       onChange={(e) => setSelectedEmp(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                       disabled={delegationSubmitting}
                     >
-                      <option value="">-- Choose employee --</option>
+                      <option value="" className="bg-slate-950 text-slate-400">-- Choose employee --</option>
                       {employees.map(e => (
-                        <option key={e.id} value={e.id}>{e.name} ({e.roleName})</option>
+                        <option key={e.id} value={e.id} className="bg-slate-950 text-slate-200">{e.name} ({e.roleName})</option>
                       ))}
                     </select>
                   </div>
 
                   {/* Delegation Type Toggle */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Delegation Type</label>
-                    <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-850 shrink-0">
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Delegation Type</label>
+                    <div className="flex bg-slate-950/80 p-1 rounded-lg border border-slate-900 shrink-0">
                       <button
                         type="button"
                         onClick={() => {
                           setDelegationType('role');
                           setSelectedRole('');
                         }}
-                        className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
                           delegationType === 'role'
                             ? 'bg-purple-600 text-white shadow-md'
                             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
@@ -619,7 +640,7 @@ const Delegations = () => {
                           setDelegationType('custom');
                           setSelectedRole('custom_permissions');
                         }}
-                        className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
                           delegationType === 'custom'
                             ? 'bg-purple-600 text-white shadow-md'
                             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
@@ -632,20 +653,21 @@ const Delegations = () => {
 
                   {delegationType === 'role' ? (
                     /* Target Role select */
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Delegate Role & Dashboards</label>
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Delegate Role & Dashboards</label>
                       <select 
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                         disabled={delegationSubmitting}
                       >
-                        <option value="">-- Choose target role --</option>
+                        <option value="" className="bg-slate-950 text-slate-400">-- Choose target role --</option>
                         {roles.filter(r => r.code !== 'custom_permissions').map(r => (
                           <option 
                             key={r.code} 
                             value={r.code}
                             disabled={r.isTechnical && !isAdmin}
+                            className="bg-slate-950"
                           >
                             {r.name} {r.isTechnical ? '🔒 (Admin Only)' : '👥 (HR Delegatable)'}
                           </option>
@@ -655,97 +677,104 @@ const Delegations = () => {
                   ) : (
                     /* Custom Permissions Checkbox Table */
                     <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Features to Delegate</label>
-                      <div className="max-h-60 overflow-y-auto space-y-4 bg-slate-950 p-3 rounded-lg border border-slate-850 scrollbar-thin">
-                        {Object.entries(groupedPermissions).map(([systemName, perms]) => (
-                          <div key={systemName} className="space-y-1.5">
-                            <div className="flex items-center justify-between border-b border-slate-900 pb-1 mb-1">
-                              <span className="text-[10px] font-extrabold text-purple-400 uppercase tracking-wide">{systemName} Features</span>
-                              <span className="text-[8px] bg-slate-900 text-slate-500 px-1.5 py-0.5 rounded font-semibold">
-                                {perms.filter(p => {
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Select Features to Delegate</label>
+                      <div className="max-h-72 overflow-y-auto space-y-4 bg-slate-950/80 p-3 rounded-xl border border-slate-900 scrollbar-thin">
+                        {Object.entries(groupedPermissions).map(([systemName, perms]) => {
+                          let sysBadgeColor = 'text-purple-400 bg-purple-400/5 border-purple-500/20';
+                          let sysIcon = <Zap className="w-3 h-3 text-purple-400" />;
+                          if (systemName === 'Impressa') {
+                            sysBadgeColor = 'text-amber-400 bg-amber-400/5 border-amber-500/20';
+                            sysIcon = <ShoppingBag className="w-3 h-3 text-amber-400" />;
+                          } else if (systemName === 'Developer') {
+                            sysBadgeColor = 'text-rose-400 bg-rose-400/5 border-rose-500/20';
+                            sysIcon = <Lock className="w-3 h-3 text-rose-400" />;
+                          }
+
+                          return (
+                            <div key={systemName} className="space-y-2">
+                              <div className="flex items-center gap-1.5 pb-1 border-b border-slate-900">
+                                {sysIcon}
+                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-wide">{systemName} Features</span>
+                              </div>
+                              <div className="space-y-1.5">
+                                {perms.map(p => {
                                   const isTech = p.system === 'Developer' || p.code === 'manage_delegations_admin';
-                                  return isAdmin || !isTech;
-                                }).length} available
-                              </span>
-                            </div>
-                            <div className="space-y-1">
-                              {perms.map(p => {
-                                const isTech = p.system === 'Developer' || p.code === 'manage_delegations_admin';
-                                const isDisabled = isTech && !isAdmin;
-                                const isSelected = selectedPerms.includes(p.code);
-                                
-                                return (
-                                  <label 
-                                    key={p.code} 
-                                    className={`flex items-start gap-2.5 p-2 rounded-lg border text-left transition-all ${
-                                      isDisabled 
-                                        ? 'bg-slate-950/20 border-slate-950 text-slate-600 opacity-40 cursor-not-allowed'
-                                        : isSelected 
-                                          ? 'bg-purple-950/20 border-purple-500/30 text-slate-200 cursor-pointer' 
-                                          : 'bg-slate-900/30 border-slate-850/50 text-slate-400 hover:border-slate-800 cursor-pointer'
-                                    }`}
-                                  >
-                                    <input 
-                                      type="checkbox"
-                                      checked={isSelected}
-                                      disabled={isDisabled}
-                                      onChange={() => handleTogglePerm(p.code)}
-                                      className="mt-0.5 rounded border-slate-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-950 bg-slate-900 w-3.5 h-3.5"
-                                    />
-                                    <div className="space-y-0.5">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-[10px] font-bold">{p.name}</span>
-                                        {isTech && (
-                                          <span className="text-[8px] bg-red-950/30 border border-red-500/20 text-red-400 px-1 rounded flex items-center gap-0.5">
-                                            <Lock className="w-2 h-2" /> Admin Only
-                                          </span>
-                                        )}
+                                  const isDisabled = isTech && !isAdmin;
+                                  const isSelected = selectedPerms.includes(p.code);
+                                  
+                                  return (
+                                    <label 
+                                      key={p.code} 
+                                      className={`flex items-start gap-2.5 p-2 rounded-lg border text-left transition-all duration-200 ${
+                                        isDisabled 
+                                          ? 'bg-slate-950/40 border-slate-900/60 opacity-30 cursor-not-allowed'
+                                          : isSelected 
+                                            ? 'bg-purple-950/20 border-purple-500/40 text-purple-200' 
+                                            : 'bg-slate-900/20 border-slate-850/60 text-slate-400 hover:border-slate-800 cursor-pointer'
+                                      }`}
+                                    >
+                                      <input 
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        disabled={isDisabled}
+                                        onChange={() => handleTogglePerm(p.code)}
+                                        className="mt-0.5 rounded border-slate-850 text-purple-650 focus:ring-purple-500/50 focus:ring-offset-slate-950 bg-slate-950 w-3.5 h-3.5 cursor-pointer disabled:cursor-not-allowed"
+                                      />
+                                      <div className="space-y-0.5">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className="text-[10px] font-bold tracking-tight">{p.name}</span>
+                                          {isTech && (
+                                            <span className="text-[7px] font-black bg-rose-500/10 border border-rose-500/20 text-rose-450 px-1 rounded uppercase tracking-wide">
+                                              Admin Only
+                                            </span>
+                                          )}
+                                        </div>
+                                        <p className="text-[9px] text-slate-500 leading-normal">{p.description}</p>
                                       </div>
-                                      <p className="text-[9px] text-slate-500 leading-normal">{p.description}</p>
-                                    </div>
-                                  </label>
-                                );
-                              })}
+                                    </label>
+                                  );
+                                })}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
 
                   {/* Dates */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Start Date</label>
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Start Date</label>
                       <input 
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                         disabled={delegationSubmitting}
                       />
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">End Date</label>
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">End Date</label>
                       <input 
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                         disabled={delegationSubmitting}
                       />
                     </div>
                   </div>
 
                   {/* Reason */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Coverage Reason</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Coverage Reason</label>
                     <input 
                       type="text"
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                       placeholder="e.g. Gaju sick leave, moderating storefront queue"
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-650 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                       disabled={delegationSubmitting}
                     />
                   </div>
@@ -753,7 +782,7 @@ const Delegations = () => {
                   <button
                     type="submit"
                     disabled={delegationSubmitting}
-                    className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+                    className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99] hover:shadow-purple-500/10"
                   >
                     {delegationSubmitting ? (
                       <>
@@ -771,64 +800,64 @@ const Delegations = () => {
               ) : (
                 <form onSubmit={handleHireEmployee} className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</label>
                       <input 
                         type="text"
                         value={hireName}
                         onChange={(e) => setHireName(e.target.value)}
                         placeholder="Benit Gilbert"
-                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-650 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                         disabled={hireSubmitting}
                       />
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Job Title</label>
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Job Title</label>
                       <input 
                         type="text"
                         value={hireTitle}
                         onChange={(e) => setHireTitle(e.target.value)}
                         placeholder="Content Moderator"
-                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-655 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                         disabled={hireSubmitting}
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
                     <input 
                       type="email"
                       value={hireEmail}
                       onChange={(e) => setHireEmail(e.target.value)}
                       placeholder="moderator@inzozi.com"
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-655 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                       disabled={hireSubmitting}
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Password</label>
                     <input 
                       type="password"
                       value={hirePassword}
                       onChange={(e) => setHirePassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 outline-none focus:border-purple-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-655 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                       disabled={hireSubmitting}
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Primary Role</label>
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Primary Role</label>
                     <select 
                       value={hireRole}
                       onChange={(e) => setHireRole(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                       disabled={hireSubmitting}
                     >
                       {roles.map(r => (
-                        <option key={r.code} value={r.code}>
+                        <option key={r.code} value={r.code} className="bg-slate-950">
                           {r.name}
                         </option>
                       ))}
@@ -838,7 +867,7 @@ const Delegations = () => {
                   <button
                     type="submit"
                     disabled={hireSubmitting}
-                    className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
+                    className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 border border-purple-500/20 text-xs font-bold text-white rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99] hover:shadow-purple-500/10"
                   >
                     {hireSubmitting ? (
                       <>
@@ -857,13 +886,13 @@ const Delegations = () => {
             </div>
 
             {/* Active Delegations Log */}
-            <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-3">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 shrink-0">
-                <Clock className="w-4.5 h-4.5 text-purple-400" />
+            <div className="flex-1 flex flex-col space-y-3 pt-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <Clock className="w-4 h-4 text-purple-400" />
                 Active & Scheduled Coverages
               </h3>
 
-              <div className="flex-grow overflow-y-auto space-y-3 pr-1 scrollbar-thin">
+              <div className="space-y-3 max-h-96 overflow-y-auto pr-1 scrollbar-thin">
                 {delegations.filter(d => d.isActive).length === 0 ? (
                   <div className="h-28 border border-dashed border-slate-850 rounded-2xl flex flex-col items-center justify-center text-center p-4">
                     <span className="text-[10px] text-slate-500">No active coverage delegations found.</span>
@@ -873,27 +902,30 @@ const Delegations = () => {
                     const expiryDate = new Date(del.endDate);
                     const formattedEnd = expiryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     return (
-                      <div key={del.id} className="bg-slate-950 border border-slate-850 rounded-xl p-4 space-y-2 hover:border-slate-800 transition-colors">
+                      <div 
+                        key={del.id} 
+                        className="bg-slate-950/45 border border-slate-900 hover:border-slate-850 rounded-2xl p-4 space-y-3 transition-all duration-300 hover:bg-slate-950/60"
+                      >
                         <div className="flex justify-between items-start gap-2">
                           <div>
-                            <h4 className="text-[11px] font-bold text-slate-200">
+                            <h4 className="text-[11px] font-extrabold text-slate-200">
                               {del.employeeName}
                             </h4>
                             {del.targetRoleCode === 'custom_permissions' ? (
-                              <div className="mt-1 space-y-1">
-                                <span className="text-[9px] text-indigo-400 font-extrabold uppercase block">
+                              <div className="mt-1.5 space-y-1.5">
+                                <span className="text-[9px] text-indigo-400 font-extrabold uppercase tracking-wide block">
                                   Granted: Custom Features ({del.customPermissions?.length || 0})
                                 </span>
-                                <div className="flex flex-wrap gap-1 mt-1">
+                                <div className="flex flex-wrap gap-1">
                                   {del.customPermissions?.map(cp => (
-                                    <span key={cp} className="inline-block px-1.5 py-0.5 bg-slate-900 border border-slate-800 text-[8px] text-slate-350 rounded font-semibold" title={cp}>
+                                    <span key={cp} className="inline-block px-2 py-0.5 bg-slate-900 border border-slate-850 text-[8px] text-slate-400 rounded-md font-bold tracking-tight" title={cp}>
                                       {getPermissionName(cp)}
                                     </span>
                                   ))}
                                 </div>
                               </div>
                             ) : (
-                              <p className="text-[9px] text-purple-400 font-extrabold uppercase mt-0.5">
+                              <p className="text-[9px] text-purple-400 font-extrabold uppercase tracking-wide mt-0.5">
                                 Granted: {del.targetRoleName}
                               </p>
                             )}
@@ -902,8 +934,8 @@ const Delegations = () => {
                           <button
                             onClick={() => handleRevoke(del.id)}
                             disabled={revokingId === del.id}
-                            className="p-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.05] active:scale-[0.95]"
-                            title="Revoke coverage instantly"
+                            className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 hover:text-red-300 rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.05] active:scale-[0.95]"
+                            title="Revoke coverage privilege"
                           >
                             {revokingId === del.id ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -913,18 +945,18 @@ const Delegations = () => {
                           </button>
                         </div>
 
-                        <p className="text-[10px] text-slate-500 italic bg-slate-900/40 p-2 rounded-lg border border-slate-900">
+                        <p className="text-[10px] text-slate-500 italic bg-slate-900/10 p-2.5 rounded-xl border border-slate-900/60">
                           "{del.reason}"
                         </p>
 
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[8px] font-bold text-slate-500 uppercase tracking-wider gap-2 pt-1 border-t border-slate-900/30">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[8px] font-bold text-slate-500 uppercase tracking-widest gap-2 pt-2 border-t border-slate-900">
                           <div className="flex flex-wrap gap-2">
-                            <span>Expires: {formattedEnd}</span>
+                            <span className="flex items-center gap-1"><Calendar className="w-2.5 h-2.5" /> Ends: {formattedEnd}</span>
                             {del.createdAt && (
-                              <span>Granted: {new Date(del.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                              <span className="text-purple-500/90 font-bold">Authorized: {new Date(del.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                             )}
                           </div>
-                          <span>Authorized By: {del.authorizerName}</span>
+                          <span>By: {del.authorizerName}</span>
                         </div>
                       </div>
                     );
@@ -934,25 +966,30 @@ const Delegations = () => {
             </div>
 
             {/* Task Routing Diagram Widget */}
-            <div className="bg-slate-950/60 border border-slate-850 rounded-xl p-4 shrink-0 space-y-3">
-              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
+            <div className="bg-slate-950/45 border border-slate-900 rounded-2xl p-4.5 shrink-0 space-y-3 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+              <h4 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <ShoppingBag className="w-3.5 h-3.5 text-purple-400 animate-bounce" />
                 Live Impressa Approval Routing
               </h4>
               
-              <div className="flex items-center justify-between bg-slate-950 p-2.5 rounded-lg border border-slate-900 text-[10px]">
+              <div className="flex items-center justify-between bg-slate-950/80 p-3 rounded-xl border border-slate-900 text-[10px]">
                 <div className="flex flex-col space-y-0.5">
-                  <span className="text-slate-500 font-semibold">Impressa Catalog</span>
-                  <span className="text-white font-bold">12 Pending items</span>
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[8px]">Catalog Queue</span>
+                  <span className="text-white font-extrabold tracking-tight">12 Pending items</span>
                 </div>
                 
-                <ArrowRight className="w-4 h-4 text-purple-500 animate-pulse" />
+                <div className="flex items-center gap-1 px-2.5">
+                  <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-ping" />
+                  <ArrowRight className="w-4 h-4 text-purple-500" />
+                </div>
 
                 <div className="flex flex-col items-center space-y-0.5">
-                  <span className="text-slate-500 font-semibold">Moderator</span>
-                  {delegations.some(d => d.targetRoleCode === 'content_controller' && d.isActive) ? (
-                    <span className="text-emerald-400 font-bold bg-emerald-400/5 px-2 py-0.5 border border-emerald-400/20 rounded">
-                      Routed to Cover {`(${delegations.find(d => d.targetRoleCode === 'content_controller' && d.isActive)?.employeeName.split(' ')[0]})`}
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[8px] mb-0.5">Assigned Approver</span>
+                  {activeApprover ? (
+                    <span className="text-emerald-400 font-bold bg-emerald-400/5 px-2 py-0.5 border border-emerald-400/20 rounded shadow-sm flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                      {activeApprover.employeeName.split(' ')[0]} (Cover)
                     </span>
                   ) : (
                     <span className="text-purple-400 font-bold bg-purple-400/5 px-2 py-0.5 border border-purple-400/20 rounded">
