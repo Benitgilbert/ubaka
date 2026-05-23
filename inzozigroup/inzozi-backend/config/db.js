@@ -10,13 +10,16 @@ try {
 
 export default prisma;
 export const isDbConnected = async () => {
+  if (!process.env.DATABASE_URL) {
+    return false;
+  }
   if (!prisma) return false;
   try {
     // Simple raw query check to confirm database connection
     await prisma.$queryRaw`SELECT 1`;
     return true;
   } catch (err) {
-    console.error("❌ Database connection check failed:", err);
+    console.error("❌ Database connection check failed:", err.message || err);
     return false;
   }
 };
