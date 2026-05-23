@@ -17,54 +17,6 @@ const INITIAL_PROJECTS = [
       serverLoad: '28%',
       weeklyRevenue: '$14,240'
     }
-  },
-  {
-    id: 'proj-gesture-id',
-    name: 'Gesture to Speech',
-    slug: 'gesture-to-speech',
-    description: 'AI-powered rwandan sign language translation platform converting gesture video feeds to spoken audio.',
-    status: 'development',
-    repositoryUrl: 'https://github.com/Benitgilbert/gesture-to-speech.git',
-    liveUrl: null,
-    metrics: {
-      uptime: '100%',
-      activeUsers: 8,
-      apiHealth: 'healthy',
-      serverLoad: '4%',
-      weeklyRevenue: '$0'
-    }
-  },
-  {
-    id: 'proj-linker-id',
-    name: 'Linker',
-    slug: 'linker',
-    description: 'Smart bus ticketing, routing, and real-time scheduling system for transport operators and commuters.',
-    status: 'testing',
-    repositoryUrl: 'https://github.com/Benitgilbert/linker.git',
-    liveUrl: 'https://linker-staging.inzozi.com',
-    metrics: {
-      uptime: '98.85%',
-      activeUsers: 84,
-      apiHealth: 'warning',
-      serverLoad: '67%',
-      weeklyRevenue: '$180'
-    }
-  },
-  {
-    id: 'proj-homland-id',
-    name: 'Homland',
-    slug: 'homland',
-    description: 'Smart virtual real-estate portal connecting tenants directly with property owners without physical visits.',
-    status: 'planning',
-    repositoryUrl: 'https://github.com/Benitgilbert/homland.git',
-    liveUrl: null,
-    metrics: {
-      uptime: 'N/A',
-      activeUsers: 0,
-      apiHealth: 'inactive',
-      serverLoad: '0%',
-      weeklyRevenue: '$0'
-    }
   }
 ];
 

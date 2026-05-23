@@ -13,9 +13,41 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const getAverageUptime = () => {
+    if (projects.length === 0) return '0%';
+    let total = 0;
+    let count = 0;
+    projects.forEach(p => {
+      const uptimeStr = p.metrics?.uptime;
+      if (uptimeStr && uptimeStr !== 'N/A') {
+        const val = parseFloat(uptimeStr.replace('%', ''));
+        if (!isNaN(val)) {
+          total += val;
+          count++;
+        }
+      }
+    });
+    if (count === 0) return '100%';
+    return (total / count).toFixed(2) + '%';
+  };
+
+  const getTotalActiveUsers = () => {
+    return projects.reduce((sum, p) => sum + (p.metrics?.activeUsers || 0), 0).toLocaleString();
+  };
+
+  const getDbModeDisplay = () => {
+    if (!user) return 'Mock Mode';
+    return user.dbMode === 'production' ? 'Production' : 'Mock Mode';
+  };
+
+  const getDbModeSub = () => {
+    if (!user) return 'In-Memory Mock Active';
+    return user.dbMode === 'production' ? 'Supabase Connected' : 'In-Memory Mock Active';
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -85,10 +117,34 @@ const Dashboard = () => {
       {/* Aggregate Stats Summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Products', value: '4', sub: 'Impressa, Linker, Homland, Gesture', icon: FolderGit2, color: 'text-purple-400' },
-          { label: 'System Health', value: '99.4%', sub: 'Global Uptime Average', icon: Activity, color: 'text-emerald-400' },
-          { label: 'Active Users', value: '1,512', sub: 'Across live services', icon: Users, color: 'text-blue-400' },
-          { label: 'Run Mode', value: 'MIS Portal', sub: 'Control Plane Connected', icon: CheckCircle2, color: 'text-purple-400' }
+          { 
+            label: 'Total Products', 
+            value: projects.length.toString(), 
+            sub: projects.map(p => p.name).join(', ') || 'No products registered', 
+            icon: FolderGit2, 
+            color: 'text-purple-400' 
+          },
+          { 
+            label: 'System Health', 
+            value: getAverageUptime(), 
+            sub: 'Global Uptime Average', 
+            icon: Activity, 
+            color: 'text-emerald-400' 
+          },
+          { 
+            label: 'Active Users', 
+            value: getTotalActiveUsers(), 
+            sub: 'Across live services', 
+            icon: Users, 
+            color: 'text-blue-400' 
+          },
+          { 
+            label: 'Run Mode', 
+            value: getDbModeDisplay(), 
+            sub: getDbModeSub(), 
+            icon: CheckCircle2, 
+            color: 'text-purple-400' 
+          }
         ].map((stat, i) => {
           const Icon = stat.icon;
           return (
