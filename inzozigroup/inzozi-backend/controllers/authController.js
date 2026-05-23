@@ -121,7 +121,6 @@ export const syncEmployeesFromAuth = async () => {
         update: {
           name,
           password: u.encrypted_password || '', // sync the encrypted password directly
-          roleId,
           avatar,
           isActive: true
         },
