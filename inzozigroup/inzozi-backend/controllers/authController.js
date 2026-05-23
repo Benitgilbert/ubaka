@@ -634,6 +634,23 @@ export const updateEmployee = async (req, res) => {
         include: { role: true }
       });
 
+      // Synchronize back to auth.users raw_user_meta_data to keep Supabase auth metadata in sync
+      if (role || title) {
+        try {
+          const metaUpdates = {};
+          if (role) metaUpdates.role = role;
+          if (title) metaUpdates.title = title;
+          
+          await prisma.$executeRawUnsafe(
+            'UPDATE auth.users SET raw_user_meta_data = raw_user_meta_data || $1::jsonb WHERE id = $2::uuid',
+            JSON.stringify(metaUpdates),
+            id
+          );
+        } catch (metaErr) {
+          console.warn(`[AuthController] Failed to update auth.users metadata:`, metaErr.message);
+        }
+      }
+
       const resolved = await resolveEffectiveUser(updated);
       const employeeData = {
         id: updated.id,
