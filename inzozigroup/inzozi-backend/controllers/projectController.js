@@ -10,7 +10,10 @@ const queryImpressa = async (text, params) => {
   }
   if (!impressaPool) {
     impressaPool = new Pool({
-      connectionString: process.env.IMPRESSA_DATABASE_URL
+      connectionString: process.env.IMPRESSA_DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
     });
   }
   const client = await impressaPool.connect();
