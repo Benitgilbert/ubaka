@@ -1,7 +1,7 @@
 {
-  "name": "inzozi-backend",
+  "name": "ubaka-tech-backend",
   "version": "1.0.0",
-  "description": "Backend API for INZOZI Group MIS",
+  "description": "Backend API for Ubaka Tech MIS",
   "main": "server.js",
   "type": "module",
   "scripts": {

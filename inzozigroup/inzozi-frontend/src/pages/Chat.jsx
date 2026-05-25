@@ -201,7 +201,7 @@ const Chat = () => {
                 />
                 <div className="space-y-1">
                   <div className="flex items-baseline gap-2.5">
-                    <span className="text-xs font-bold text-slate-200">{msg.sender?.name || 'Inzozi Member'}</span>
+                    <span className="text-xs font-bold text-slate-200">{msg.sender?.name || 'Ubaka Member'}</span>
                     <span className="text-[9px] text-slate-500 font-semibold">
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>

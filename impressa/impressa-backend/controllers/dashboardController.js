@@ -1,11 +1,11 @@
-import prisma from "../prisma.js";
+﻿import prisma from "../prisma.js";
 import generateAISummary from "../utils/aiSummary.js";
 import { getDashboardAnalyticsData } from "../utils/dashboardAnalytics.js";
 import { getForecastData } from "../utils/forecastUtils.js";
 import { getAnomalyAlerts } from "../utils/anomalyUtils.js";
 
 /**
- * 📊 Get comprehensive dashboard analytics
+ * ðŸ“Š Get comprehensive dashboard analytics
  */
 export const getDashboardAnalytics = async (req, res) => {
   try {
@@ -318,7 +318,7 @@ export const getDashboardAnalytics = async (req, res) => {
 };
 
 /**
- * 📊 Simple forecasting based on monthly trends
+ * ðŸ“Š Simple forecasting based on monthly trends
  */
 export const getForecast = async (req, res) => {
   try {
@@ -370,7 +370,7 @@ export const getForecast = async (req, res) => {
 };
 
 /**
- * 📊 Product recommendation engine
+ * ðŸ“Š Product recommendation engine
  */
 export const getProductRecommendations = async (req, res) => {
   try {
@@ -415,7 +415,7 @@ export const getProductRecommendations = async (req, res) => {
 };
 
 /**
- * 📊 AI-driven chatbot query for dashboard insights
+ * ðŸ“Š AI-driven chatbot query for dashboard insights
  */
 export const handleChatbotQueryLLM = async (req, res) => {
   try {
@@ -435,11 +435,11 @@ export const handleChatbotQueryLLM = async (req, res) => {
         where: { sellerId: userId, status: { in: ["confirmed", "paid"] } }
       });
       systemContext = `SELLER DATA: Total Earnings: ${earnings._sum.netAmount || 0} RWF`;
-      systemPrompt = "You are the AI Assistant for a Seller on impressa.";
+      systemPrompt = "You are the AI Assistant for a Seller on Kuri Macye.";
     } else {
       const totalOrders = await prisma.order.count();
       systemContext = `ADMIN DATA: Total Orders: ${totalOrders}`;
-      systemPrompt = "You are the AI Admin Assistant for impressa.";
+      systemPrompt = "You are the AI Admin Assistant for Kuri Macye.";
     }
 
     res.json({ message: "AI response would go here. Data gathered successfully." });
@@ -450,7 +450,7 @@ export const handleChatbotQueryLLM = async (req, res) => {
 };
 
 /**
- * 📊 Get anomaly alerts for the dashboard
+ * ðŸ“Š Get anomaly alerts for the dashboard
  */
 export const getAnomalies = async (req, res) => {
   try {

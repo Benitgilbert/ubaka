@@ -8,7 +8,7 @@ describe('Checkout Integration Tests', () => {
     vi.clearAllMocks();
   });
 
-  describe('POST /api/checkout/create-order', () => {
+  describe('POST /api/checkout/order', () => {
     const validCheckoutData = {
       shippingAddress: {
         fullName: 'John Doe',
@@ -50,8 +50,8 @@ describe('Checkout Integration Tests', () => {
       vi.mocked(prisma.product.updateMany).mockResolvedValue({ count: 1 });
 
       const response = await request(app)
-        .post('/api/checkout/create-order')
-        .set('x-cart-session', 'cart-123') // Simulate session token
+        .post('/api/checkout/order')
+        .set('x-cart-session', '12345678-1234-1234-1234-1234567890ab') // Simulate session token
         .send(validCheckoutData);
 
       expect(response.status).toBe(201);
@@ -66,12 +66,12 @@ describe('Checkout Integration Tests', () => {
       vi.mocked(prisma.cart.findUnique).mockResolvedValue(null);
 
       const response = await request(app)
-        .post('/api/checkout/create-order')
+        .post('/api/checkout/order')
         .set('x-cart-session', 'empty-cart')
         .send(validCheckoutData);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Cart is empty');
+      expect(response.body.error.message).toContain('Cart is empty');
     });
 
     it('should return 400 if product is out of stock', async () => {
@@ -96,12 +96,12 @@ describe('Checkout Integration Tests', () => {
       vi.mocked(prisma.product.updateMany).mockResolvedValue({ count: 0 }); // Simulate update failed due to WHERE stock >= quantity
 
       const response = await request(app)
-        .post('/api/checkout/create-order')
-        .set('x-cart-session', 'cart-123')
+        .post('/api/checkout/order')
+        .set('x-cart-session', '12345678-1234-1234-1234-1234567890ab')
         .send(validCheckoutData);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain('Insufficient stock');
+      expect(response.body.error.message).toContain('Insufficient stock');
     });
   });
 });

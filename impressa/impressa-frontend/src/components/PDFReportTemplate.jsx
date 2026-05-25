@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Reusable PDF Report Template Component for Impressa
+ * Reusable PDF Report Template Component for Kuri Macye
  * 
  * This component generates a professional PDF-ready layout with:
  * - Company header with logo
@@ -218,9 +218,9 @@ const PDFReportTemplate = ({
       {/* Header */}
       <header style={styles.header}>
         <div style={styles.headerLeft}>
-          <img src={logoUrl} alt="Impressa Logo" style={styles.logo} />
+          <img src={logoUrl} alt="Kuri Macye Logo" style={styles.logo} />
           <div style={styles.companyInfo}>
-            <h1 style={styles.companyName}>Impressa</h1>
+            <h1 style={styles.companyName}>Kuri Macye</h1>
             <p style={styles.tagline}>Custom Solutions</p>
           </div>
         </div>
@@ -303,8 +303,8 @@ const PDFReportTemplate = ({
       {/* Footer */}
       <footer style={styles.footer}>
         <div style={styles.footerContent}>
-          <span>Impressa Custom Solutions | Gicumbi, Byumba</span>
-          <span>info@Impressa.rw | +250 788 000 000</span>
+          <span>Kuri Macye Custom Solutions | Gicumbi, Byumba</span>
+          <span>info@kurimacye.rw | +250 788 000 000</span>
           <span>Page 1</span>
         </div>
       </footer>

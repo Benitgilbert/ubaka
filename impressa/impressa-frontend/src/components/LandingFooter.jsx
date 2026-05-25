@@ -14,8 +14,8 @@ export default function LandingFooter() {
     contactEmail: 'ishfabzele2@gmail.com',
     contactPhone: '+250 789 079 978',
     contactAddress: 'Building near Gicumbi distict office (Eudiose Building)',
-    siteName: 'Impressa',
-    logo: '/Impressa.jpeg',
+    siteName: 'Kuri Macye',
+    logo: '/logo.png',
     socialLinks: { facebook: '', twitter: '', instagram: '', linkedin: '' }
   });
 
@@ -29,7 +29,7 @@ export default function LandingFooter() {
             ...prev,
             footerTagline: data.data.footerTagline || prev.footerTagline,
             socialLinks: data.data.socialLinks || prev.socialLinks
-            // Ignored backend overrides for siteName, logo, and contact info to enforce Impressa branding
+            // Ignored backend overrides for siteName, logo, and contact info to enforce Kuri Macye branding
           }));
         }
       } catch (error) {
@@ -54,9 +54,9 @@ export default function LandingFooter() {
           {/* Brand Column */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-6 no-underline">
-              <img src="/Impressa.jpeg" alt={footerData.siteName || "Impressa"} className="h-10 w-auto object-contain rounded-md" />
+              <img src="/logo-icon.svg" alt={footerData.siteName || "Kuri Macye"} className="h-10 w-auto object-contain" />
               <span className="text-2xl font-bold text-charcoal-800 dark:text-white tracking-tight">
-                Impressa
+                Kuri Macye
               </span>
             </Link>
 
@@ -160,7 +160,7 @@ export default function LandingFooter() {
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-charcoal-400 dark:text-charcoal-500 text-sm">
-              © {new Date().getFullYear()} Impressa. {t('footer.rights')}
+              © {new Date().getFullYear()} Kuri Macye. {t('footer.rights')}
             </p>
             <div className="flex gap-6 text-sm">
               <Link to="/privacy" className="text-charcoal-400 dark:text-charcoal-500 hover:text-terracotta-500 dark:hover:text-terracotta-400 transition-colors no-underline">

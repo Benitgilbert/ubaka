@@ -97,7 +97,7 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`==================================================`);
-  console.log(`🚀 INZOZI Group MIS Backend Server is running!`);
+  console.log(`🚀 Ubaka Tech MIS Backend Server is running!`);
   console.log(`📡 Listening on port ${PORT}`);
   console.log(`🔗 Healthcheck: http://localhost:${PORT}/api/health`);
   console.log(`==================================================`);

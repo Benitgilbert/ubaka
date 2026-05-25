@@ -4,6 +4,7 @@ import logger from "../config/logger.js";
 import { recordTransaction } from "./financeController.js";
 import { sendOrderConfirmation, sendGiftCardEmail, sendStatusUpdate } from "../utils/emailService.js";
 import { notifyAdminNewOrder, notifyOrderPlaced, notifyOrderStatus } from "./notificationController.js";
+import rraEbmService from "../services/rraEbmService.js";
 
 // --- UTILITIES ---
 
@@ -893,8 +894,30 @@ export const createPOSOrder = async (req, res) => {
       console.error("[POS] Financial recording failed:", finErr);
     }
 
-    console.log(`[POS] Order ${order.publicId} created successfully`);
-    res.status(201).json(order);
+    try {
+      await rraEbmService.generateEbmReceiptsForOrder(order.id);
+    } catch (ebmErr) {
+      console.error("[POS] Failed to generate EBM receipts during POS order creation:", ebmErr);
+    }
+
+    // Fetch the updated order with items and product/seller relations
+    const finalOrder = await prisma.order.findUnique({
+      where: { id: order.id },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                seller: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    console.log(`[POS] Order ${finalOrder.publicId} created successfully`);
+    res.status(201).json(finalOrder);
   } catch (err) {
     console.error("[POS] CRITICAL FAILURE:", err);
     res.status(500).json({ 

@@ -1,14 +1,14 @@
-export const NEWSLETTER_TEMPLATES = {
+﻿export const NEWSLETTER_TEMPLATES = {
     general_update: {
         label: "General Update",
-        subject: "Latest Updates from Impressa",
+        subject: "Latest Updates from Kuri Macye",
         fields: [
             { name: "title", label: "Main Title", type: "text", placeholder: "Latest News" },
             { name: "intro", label: "Intro Text", type: "textarea", placeholder: "Hello, We wanted to share..." },
             { name: "subtitle", label: "Section Title", type: "text", placeholder: "What's New?" },
             { name: "points", label: "Bullet Points (one per line)", type: "textarea", placeholder: "New feature updates\nPlatform improvements" },
-            { name: "ctaText", label: "Button Text", type: "text", placeholder: "Visit Impressa" },
-            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Impressa.com" }
+            { name: "ctaText", label: "Button Text", type: "text", placeholder: "Visit Kuri Macye" },
+            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Kuri Macye.com" }
         ],
         html: (values) => {
             const pointsList = values.points
@@ -19,7 +19,7 @@ export const NEWSLETTER_TEMPLATES = {
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px;">
     <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <h2 style="color: #333333; margin-top: 0;">${values.title || 'Latest News'}</h2>
-        <p style="color: #666666; line-height: 1.6;">${(values.intro || 'Hello, we wanted to share the latest updates happening at Impressa.').replace(/\n/g, '<br>')}</p>
+        <p style="color: #666666; line-height: 1.6;">${(values.intro || 'Hello, we wanted to share the latest updates happening at Kuri Macye.').replace(/\n/g, '<br>')}</p>
         
         <h3 style="color: #4a4a4a; margin-top: 25px;">${values.subtitle || "What's New?"}</h3>
         <ul style="color: #666666; line-height: 1.6;">
@@ -27,13 +27,13 @@ export const NEWSLETTER_TEMPLATES = {
         </ul>
 
         <div style="margin-top: 30px; text-align: center;">
-            <a href="${values.ctaLink || 'https://Impressa.com'}" style="background-color: #6366f1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">${values.ctaText || 'Visit Impressa'}</a>
+            <a href="${values.ctaLink || 'https://Kuri Macye.com'}" style="background-color: #6366f1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">${values.ctaText || 'Visit Kuri Macye'}</a>
         </div>
 
         <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;">
         <p style="color: #999999; font-size: 12px; text-align: center;">
             You received this email because you are subscribed to our newsletter.<br>
-            © ${new Date().getFullYear()} Impressa. All rights reserved.
+            Â© ${new Date().getFullYear()} Kuri Macye. All rights reserved.
         </p>
     </div>
 </div>`;
@@ -41,21 +41,21 @@ export const NEWSLETTER_TEMPLATES = {
     },
     flash_sale: {
         label: "Flash Sale Alert",
-        subject: "⚡ FLASH SALE: Limited Time Offers!",
+        subject: "âš¡ FLASH SALE: Limited Time Offers!",
         fields: [
             { name: "title", label: "Sale Title", type: "text", placeholder: "FLASH SALE" },
             { name: "subtitle", label: "Subtitle", type: "text", placeholder: "Don't miss out! Incredible deals are live right now." },
             { name: "discount", label: "Discount Highlight", type: "text", placeholder: "Up to 50% OFF" },
             { name: "details", label: "Sale Details", type: "textarea", placeholder: "On selected categories. Offer ends soon!" },
             { name: "ctaText", label: "Button Text", type: "text", placeholder: "Shop The Sale Now" },
-            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Impressa.com/flash-sales" },
+            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Kuri Macye.com/flash-sales" },
             { name: "terms", label: "Footer Terms", type: "text", placeholder: "*Terms and conditions apply. While stocks last." }
         ],
         html: (values) => {
             return `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #fff0f0; padding: 20px;">
     <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; border-top: 5px solid #ef4444; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.1);">
-        <h1 style="color: #ef4444; text-align: center; margin-top: 0; font-size: 28px;">⚡ ${values.title || 'FLASH SALE'} ⚡</h1>
+        <h1 style="color: #ef4444; text-align: center; margin-top: 0; font-size: 28px;">âš¡ ${values.title || 'FLASH SALE'} âš¡</h1>
         
         <p style="color: #333333; font-size: 18px; text-align: center; line-height: 1.5;">
             ${(values.subtitle || "Don't miss out! Incredible deals are live right now.").replace(/\n/g, '<br>')}
@@ -67,7 +67,7 @@ export const NEWSLETTER_TEMPLATES = {
         </div>
 
         <div style="text-align: center; margin-bottom: 30px;">
-            <a href="${values.ctaLink || 'https://Impressa.com/flash-sales'}" style="background-color: #ef4444; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; display: inline-block;">
+            <a href="${values.ctaLink || 'https://Kuri Macye.com/flash-sales'}" style="background-color: #ef4444; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; display: inline-block;">
                 ${values.ctaText || 'Shop The Sale Now'}
             </a>
         </div>
@@ -87,7 +87,7 @@ export const NEWSLETTER_TEMPLATES = {
             { name: "intro", label: "Greeting Text", type: "textarea", placeholder: "Dear Partner,\nWe have some important updates..." },
             { name: "highlights", label: "Key Highlights (one per line)", type: "textarea", placeholder: "New analytics tools\nUpdated payout schedule" },
             { name: "ctaText", label: "Button Text", type: "text", placeholder: "Go to Dashboard" },
-            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Impressa.com/seller/dashboard" }
+            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Kuri Macye.com/seller/dashboard" }
         ],
         html: (values) => {
             const highlightsList = values.highlights
@@ -108,8 +108,8 @@ export const NEWSLETTER_TEMPLATES = {
         </div>
 
         <div style="margin-top: 25px;">
-            <a href="${values.ctaLink || 'https://Impressa.com/seller/dashboard'}" style="color: #059669; text-decoration: none; font-weight: bold;">
-                ${values.ctaText || 'Go to Dashboard'} →
+            <a href="${values.ctaLink || 'https://Kuri Macye.com/seller/dashboard'}" style="color: #059669; text-decoration: none; font-weight: bold;">
+                ${values.ctaText || 'Go to Dashboard'} â†’
             </a>
         </div>
     </div>
@@ -126,7 +126,7 @@ export const NEWSLETTER_TEMPLATES = {
             { name: "heading", label: "Body Heading", type: "text", placeholder: "Elevate Your Experience" },
             { name: "message", label: "Body Message", type: "textarea", placeholder: "We've curated a selection of premium products..." },
             { name: "ctaText", label: "Button Text", type: "text", placeholder: "Explore Collection" },
-            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Impressa.com" }
+            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Kuri Macye.com" }
         ],
         html: (values) => {
             return `
@@ -135,8 +135,8 @@ export const NEWSLETTER_TEMPLATES = {
         
         <!-- Header -->
         <div style="padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9;">
-            <div style="font-weight: 800; font-size: 22px; color: #4f46e5; letter-spacing: -0.5px;">Impressa</div>
-            <a href="${values.ctaLink || '#'}" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: 600;">Shop Now →</a>
+            <div style="font-weight: 800; font-size: 22px; color: #4f46e5; letter-spacing: -0.5px;">Kuri Macye</div>
+            <a href="${values.ctaLink || '#'}" style="color: #6366f1; text-decoration: none; font-size: 14px; font-weight: 600;">Shop Now â†’</a>
         </div>
 
         <!-- Hero Section with Brand Gradient -->
@@ -175,8 +175,8 @@ export const NEWSLETTER_TEMPLATES = {
             </div>
 
             <p style="color: #94a3b8; font-size: 11px; line-height: 1.6; margin: 0;">
-                Sent with ♥ by Impressa.<br>
-                © ${new Date().getFullYear()} Impressa Inc. All rights reserved.
+                Sent with â™¥ by Kuri Macye.<br>
+                Â© ${new Date().getFullYear()} Kuri Macye Inc. All rights reserved.
             </p>
         </div>
     </div>
@@ -193,8 +193,8 @@ export const NEWSLETTER_TEMPLATES = {
             { name: "tag", label: "Tag Text", type: "text", placeholder: "Limited Time Only" },
             { name: "heading", label: "Body Heading", type: "textarea", placeholder: "Better products.\nBetter prices." },
             { name: "message", label: "Body Message", type: "textarea", placeholder: "Whether you're shopping for the latest tech..." },
-            { name: "ctaText", label: "Button Text", type: "text", placeholder: "Get Impressa Pro" },
-            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Impressa.com/pro" },
+            { name: "ctaText", label: "Button Text", type: "text", placeholder: "Get Kuri Macye Pro" },
+            { name: "ctaLink", label: "Button Link", type: "text", placeholder: "https://Kuri Macye.com/pro" },
             { name: "footerText", label: "Expiration Notice", type: "text", placeholder: "Grab this deal before it expires on Jan 14, 2026." }
         ],
         html: (values) => {
@@ -204,8 +204,8 @@ export const NEWSLETTER_TEMPLATES = {
         
         <!-- Header -->
         <div style="padding: 20px 30px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-weight: bold; font-size: 20px; color: #1f2937;">Impressa</div>
-            <a href="${values.ctaLink || '#'}" style="color: #0d9488; text-decoration: none; font-size: 14px; font-weight: 600;">Redeem your offer →</a>
+            <div style="font-weight: bold; font-size: 20px; color: #1f2937;">Kuri Macye</div>
+            <a href="${values.ctaLink || '#'}" style="color: #0d9488; text-decoration: none; font-size: 14px; font-weight: 600;">Redeem your offer â†’</a>
         </div>
 
         <!-- Hero Section with Gradient -->
@@ -215,7 +215,7 @@ export const NEWSLETTER_TEMPLATES = {
             
             <!-- Decorative Elements (CSS Shapes) -->
             <div style="margin-top: 30px;">
-                <span style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 14px;">✨ ${values.tag || 'Limited Time Only'}</span>
+                <span style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 14px;">âœ¨ ${values.tag || 'Limited Time Only'}</span>
             </div>
         </div>
 
@@ -223,11 +223,11 @@ export const NEWSLETTER_TEMPLATES = {
         <div style="padding: 40px 40px 60px 40px; text-align: center;">
             <h2 style="color: #111827; font-size: 28px; margin-bottom: 20px; line-height: 1.3;">${(values.heading || 'Better products.\nBetter prices.').replace(/\n/g, '<br>')}</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 30px; max-width: 480px; margin-left: auto; margin-right: auto;">
-                ${(values.message || "Whether you're shopping for the latest tech or trending fashion, Impressa Pro helps you save more with exclusive deals and free shipping. Upgrade today to unlock premium benefits.").replace(/\n/g, '<br>')}
+                ${(values.message || "Whether you're shopping for the latest tech or trending fashion, Kuri Macye Pro helps you save more with exclusive deals and free shipping. Upgrade today to unlock premium benefits.").replace(/\n/g, '<br>')}
             </p>
 
             <a href="${values.ctaLink || '#'}" style="display: inline-block; background-color: #0f766e; color: white; padding: 16px 40px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.4);">
-                ${values.ctaText || 'Get Impressa Pro'}
+                ${values.ctaText || 'Get Kuri Macye Pro'}
             </a>
             
             <p style="margin-top: 25px; font-size: 13px; color: #6b7280;">
@@ -252,7 +252,7 @@ export const NEWSLETTER_TEMPLATES = {
 
             <p style="color: #9ca3af; font-size: 11px; line-height: 1.5; margin: 0;">
                 Promotional price only valid for the first month. Terms apply.<br>
-                © ${new Date().getFullYear()} Impressa, Inc. All rights reserved.
+                Â© ${new Date().getFullYear()} Kuri Macye, Inc. All rights reserved.
             </p>
         </div>
     </div>
@@ -260,3 +260,4 @@ export const NEWSLETTER_TEMPLATES = {
         }
     },
 };
+

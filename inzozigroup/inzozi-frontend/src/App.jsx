@@ -30,8 +30,8 @@ const LoadingScreen = ({ message = 'Loading...' }) => {
           {/* Centered Pulsing Logo */}
           <div className="w-14 h-14 bg-slate-900/60 rounded-full p-2.5 flex items-center justify-center shadow-inner shadow-purple-500/10 backdrop-blur-sm animate-pulse">
             <img 
-              src="/inzozi_symbol.png" 
-              alt="Inzozi Symbol" 
+              src="/ubaka_symbol.png" 
+              alt="Ubaka Tech Symbol" 
               className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]"
             />
           </div>
@@ -40,7 +40,7 @@ const LoadingScreen = ({ message = 'Loading...' }) => {
         {/* Brand Title with Logo */}
         <div className="flex items-center gap-2 mb-2">
           <h1 className="text-sm font-extrabold tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-200 to-purple-400 uppercase">
-            INZOZI GROUP
+            UBAKA TECH
           </h1>
         </div>
 
@@ -72,7 +72,7 @@ const MainLayout = () => {
   }, [socket, refreshUser]);
 
   if (loading) {
-    return <LoadingScreen message="Syncing Inzozi Portal..." />;
+    return <LoadingScreen message="Syncing Ubaka Tech Portal..." />;
   }
 
   // Render active view based on state selection
@@ -153,7 +153,7 @@ const NavigationWrapper = () => {
   }
 
   // User is NOT authenticated -> Obscured route router
-  if (path === '/inzozi-secure-gateway') {
+  if (path === '/ubaka-secure-gateway') {
     return (
       <Login 
         onBackToLanding={() => {
@@ -175,8 +175,8 @@ const NavigationWrapper = () => {
   return (
     <Landing 
       onEnterPortal={() => {
-        window.history.pushState({}, '', '/inzozi-secure-gateway');
-        setPath('/inzozi-secure-gateway');
+        window.history.pushState({}, '', '/ubaka-secure-gateway');
+        setPath('/ubaka-secure-gateway');
       }}
     />
   );

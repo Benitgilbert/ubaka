@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import path from "path";
 import passport from "./config/passport.js";
 import cors from "cors";
@@ -66,7 +66,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   "https://pastorbonus.vercel.app",
   "https://pastorbonuss.vercel.app",
-  "https://impressa.rw",
+  "https://kurimacye.rw",
   "https://www.impressa.rw",
   "https://impressa-backend.vercel.app",
   "http://localhost:5000",
@@ -204,7 +204,7 @@ const isTest = process.env.NODE_ENV === 'test';
 if (!isVercel && !isTest) {
   const startServer = async () => {
     try {
-      logger.info("Starting server initialization...");
+      logger.info("Starting server initialization... URL: " + (process.env.DATABASE_URL || "NOT SET").replace(/:[^@]+@/, ":****@"));
       await prisma.$connect();
       logger.info("✅ Prisma connected to Supabase");
 
@@ -244,3 +244,4 @@ if (!isVercel && !isTest) {
 
 // ✅ Export app for Vercel
 export default app;
+

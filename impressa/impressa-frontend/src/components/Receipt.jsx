@@ -29,32 +29,30 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                     @page { margin: 0; }
                     body {
                         font-family: 'Courier New', Courier, monospace;
-                        font-size: 13px;
+                        font-size: 12px;
                         width: 80mm;
                         margin: 0 auto;
-                        padding: 10px;
+                        padding: 8px;
                         color: #000;
                     }
                     /* Map Tailwind classes for the print window */
                     .text-center { text-align: center; }
                     .text-right { text-align: right; }
-                    .text-lg { font-size: 18px; }
-                    .text-sm { font-size: 14px; }
-                    .text-xs { font-size: 11px; }
+                    .text-lg { font-size: 16px; }
+                    .text-sm { font-size: 13px; }
+                    .text-xs { font-size: 10px; }
                     .font-bold { font-weight: bold; }
                     .font-mono { font-family: 'Courier New', monospace; }
                     .italic { font-style: italic; }
-                    .mb-4 { margin-bottom: 16px; }
-                    .mb-2 { margin-bottom: 8px; }
-                    .mt-1 { margin-top: 4px; }
-                    .mt-2 { margin-top: 8px; }
-                    .mt-6 { margin-top: 24px; }
-                    .my-3 { margin: 12px 0; }
+                    .mb-4 { margin-bottom: 12px; }
+                    .mb-2 { margin-bottom: 6px; }
+                    .mt-1 { margin-top: 3px; }
+                    .mt-2 { margin-top: 6px; }
+                    .mt-6 { margin-top: 18px; }
+                    .my-3 { margin: 8px 0; }
                     .flex { display: flex; }
                     .justify-between { justify-content: space-between; }
                     .w-full { width: 100%; }
-                    .space-y-0\\.5 > * + * { margin-top: 2px; }
-                    .space-y-1 > * + * { margin-top: 4px; }
                     
                     /* Divider styling */
                     .border-t { border-top: 1px solid #000; }
@@ -64,11 +62,41 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                     table { width: 100%; border-collapse: collapse; }
                     td { vertical-align: top; }
                     
-                    /* Hide scrollbars and UI elements */
-                    img { max-height: 50px; display: block; margin: 0 auto 8px; }
+                    /* SDC Thermal box rules */
+                    .sdc-box {
+                        margin-top: 8px;
+                        margin-bottom: 8px;
+                        padding: 6px;
+                        border: 1px dashed #000;
+                        font-size: 9px;
+                        font-family: 'Courier New', monospace;
+                        text-align: center;
+                    }
+                    .sdc-title {
+                        font-weight: bold;
+                        text-align: center;
+                        border-bottom: 1px dashed #000;
+                        padding-bottom: 2px;
+                        margin-bottom: 4px;
+                    }
+                    .sdc-row {
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .sdc-qr {
+                        display: block;
+                        margin: 6px auto 0;
+                        width: 75px;
+                        height: 75px;
+                    }
+                    .break-all {
+                        word-break: break-all;
+                    }
+                    
+                    img { max-height: 45px; display: block; margin: 0 auto 6px; }
 
                     @media print {
-                        body { width: 72mm; margin: 0; padding: 5mm; }
+                        body { width: 72mm; margin: 0; padding: 4mm; }
                         .no-print { display: none; }
                     }
                 </style>
@@ -98,17 +126,46 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                 month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                second: '2-digit'
             });
         } catch (e) {
             return new Date().toLocaleString('en-RW');
         }
     };
 
+    const formatDashed = (str) => {
+        if (!str) return '';
+        return str.replace(/(.{4})/g, '$1-').replace(/-$/, '');
+    };
+
     const subtotal = order.subtotal || order.totals?.subtotal || 0;
     const grandTotal = order.grandTotal || order.totals?.grandTotal || 0;
     const tax = order.tax || order.totals?.tax || 0;
     const paymentMethod = order.paymentMethod || order.payment?.method || 'CASH';
+
+    // Group items by seller
+    const groups = {};
+    order.items?.forEach(item => {
+        const itemSeller = item.product?.seller || seller || {
+            id: item.sellerId || 'unknown',
+            storeName: 'Kuri Macye Merchant',
+            storeAddress: 'Gicumbi, Byumba',
+            rraTin: '123456789',
+            rraSdcId: 'SDC007001254',
+            rraMrcNo: 'WIS01001254'
+        };
+        const sellerId = itemSeller.id || itemSeller.rraTin || 'unknown';
+        if (!groups[sellerId]) {
+            groups[sellerId] = {
+                seller: itemSeller,
+                items: []
+            };
+        }
+        groups[sellerId].items.push(item);
+    });
+
+    const sellerGroups = Object.values(groups);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -124,11 +181,8 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                                 style={{ maxHeight: '50px' }}
                             />
                         )}
-                        <div className="text-lg font-bold text-gray-900">{seller?.storeName || seller?.name || 'Impressa STORE'}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                            {seller?.storeAddress || 'Gicumbi, Byumba'}
-                        </div>
-                        {seller?.phone && <div className="text-xs text-gray-500">Tel: {seller.phone}</div>}
+                        <div className="text-lg font-bold text-gray-900">KURI MACYE MARKETPLACE</div>
+                        <div className="text-xs text-gray-500 mt-0.5">Unified Payment Receipt</div>
                     </div>
 
                     <div className="border-t border-dashed border-gray-300 my-3"></div>
@@ -137,23 +191,67 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                     <div className="text-xs text-gray-600 space-y-0.5 font-mono">
                         <div>Date: {formatDate(order.createdAt)}</div>
                         <div>Receipt: {order.publicId}</div>
-                        <div>Cashier: {order.cashierName || 'Staff'}</div>
+                        <div>Cashier: {order.cashierName || 'System'}</div>
                     </div>
 
                     <div className="border-t border-dashed border-gray-300 my-3"></div>
 
-                    {/* Items */}
-                    <table className="w-full text-xs font-mono">
-                        <tbody>
-                            {order.items?.map((item, i) => (
-                                <tr key={i}>
-                                    <td className="py-0.5 pr-2">{item.productName || item.name}</td>
-                                    <td className="py-0.5 px-1 text-center">x{item.quantity}</td>
-                                    <td className="py-0.5 pl-2 text-right">{(item.price * item.quantity).toLocaleString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    {/* Grouped Items & SDC Blocks */}
+                    {sellerGroups.map((group, index) => {
+                        const firstItem = group.items[0];
+                        const hasEbm = firstItem && firstItem.ebmRcptNo;
+                        return (
+                            <div key={index} className="mb-4">
+                                <div className="font-mono text-[11px] font-bold text-gray-900 border-b border-dashed border-gray-200 pb-1 mb-1.5 uppercase">
+                                    Merchant: {group.seller.storeName || group.seller.name || 'Seller'}
+                                    {group.seller.rraTin && (
+                                        <div className="text-[9px] font-normal text-gray-500 lowercase mt-0.5">
+                                            tin: {group.seller.rraTin} {group.seller.storeAddress ? `| ${group.seller.storeAddress}` : ''}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <table className="w-full text-xs font-mono mb-2">
+                                    <tbody>
+                                        {group.items.map((item, i) => (
+                                            <tr key={i}>
+                                                <td className="py-0.5 pr-2">{item.productName || item.name}</td>
+                                                <td className="py-0.5 px-1 text-center">x{item.quantity}</td>
+                                                <td className="py-0.5 pl-2 text-right">{(item.price * item.quantity).toLocaleString()}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                {/* RRA SDC Receipt block for this seller */}
+                                {hasEbm && (
+                                    <div className="sdc-box">
+                                        <div className="sdc-title">AMAKURU YA SDC / SDC INFO</div>
+                                        <div className="sdc-row"><span>SDC ID:</span><span className="font-bold">{group.seller.rraSdcId || firstItem.product?.seller?.rraSdcId || 'SDC007001254'}</span></div>
+                                        <div className="sdc-row"><span>RECEIPT NO:</span><span className="font-bold">{firstItem.ebmRcptNo}</span></div>
+                                        <div className="sdc-row"><span>DATE:</span><span>{formatDate(firstItem.ebmDate || order.createdAt)}</span></div>
+                                        <div className="mt-1 text-[8px] text-left break-all">
+                                            <div className="font-bold">INTERNAL DATA:</div>
+                                            <div>{formatDashed(firstItem.ebmInternalData)}</div>
+                                            <div className="font-bold mt-0.5">RECEIPT SIGNATURE:</div>
+                                            <div>{formatDashed(firstItem.ebmSignature)}</div>
+                                        </div>
+                                        {firstItem.ebmQrCode && (
+                                            <img
+                                                src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(firstItem.ebmQrCode)}`}
+                                                alt="RRA QR Code"
+                                                className="sdc-qr"
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {index < sellerGroups.length - 1 && (
+                                    <div className="border-t border-dashed border-gray-300 my-3"></div>
+                                )}
+                            </div>
+                        );
+                    })}
 
                     <div className="border-t border-dashed border-gray-300 my-3"></div>
 
@@ -163,23 +261,35 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                             <span>Subtotal:</span>
                             <span>RWF {subtotal.toLocaleString()}</span>
                         </div>
+                        {order.shippingCost > 0 && (
+                            <div className="flex justify-between">
+                                <span>Delivery Fee:</span>
+                                <span>RWF {order.shippingCost.toLocaleString()}</span>
+                            </div>
+                        )}
+                        {order.discount > 0 && (
+                            <div className="flex justify-between text-red-500">
+                                <span>Discount:</span>
+                                <span>- RWF {order.discount.toLocaleString()}</span>
+                            </div>
+                        )}
                         {tax > 0 && (
                             <div className="flex justify-between">
                                 <span>Tax:</span>
                                 <span>RWF {tax.toLocaleString()}</span>
                             </div>
                         )}
-                        <div className="flex justify-between text-sm font-bold text-gray-900 mt-2">
-                            <span>TOTAL:</span>
+                        <div className="flex justify-between text-sm font-bold text-gray-900 mt-2 border-t border-dashed border-gray-300 pt-1">
+                            <span>TOTAL PAID:</span>
                             <span>RWF {grandTotal.toLocaleString()}</span>
                         </div>
                     </div>
 
                     <div className="border-t border-dashed border-gray-300 my-3"></div>
 
-                    {/* Payment */}
+                    {/* Payment info */}
                     <div className="text-xs text-gray-600 font-mono space-y-0.5">
-                        <div>Payment: {paymentMethod.toUpperCase()}</div>
+                        <div>Payment Method: {paymentMethod.toUpperCase()}</div>
                         {paymentMethod.toLowerCase() === 'cash' && order.cashReceived && (
                             <>
                                 <div>Cash Received: RWF {order.cashReceived.toLocaleString()}</div>
@@ -188,8 +298,9 @@ export default function Receipt({ order, seller, onClose, onPrint }) {
                         )}
                     </div>
 
-                    <div className="text-center mt-6 text-xs text-gray-500 italic font-serif">
-                        Thank you for shopping!
+                    <div className="text-center mt-6 text-xs text-gray-400 italic font-mono">
+                        ~ Umusoro wubaka igihugu ~<br />
+                        Thank you for shopping at Kuri Macye!
                     </div>
                 </div>
 

@@ -6,7 +6,11 @@ import {
   updateImpressaProductStatus,
   getImpressaTickets,
   updateImpressaTicketStatus,
-  getPublicShowcaseProjects
+  getPublicShowcaseProjects,
+  handleImpressaDataGet,
+  handleImpressaDataCreate,
+  handleImpressaDataUpdate,
+  handleImpressaDataDelete
 } from '../controllers/projectController.js';
 import { protect, authorizePermission } from '../middleware/authMiddleware.js';
 
@@ -15,16 +19,22 @@ const router = express.Router();
 // Get public portfolio showcase details for the landing page
 router.get('/public/showcase', getPublicShowcaseProjects);
 
-// Get list of all projects managed by Inzozi Group
+// Get list of all projects managed by Ubaka Tech
 router.get('/', protect, getProjects);
 
 // Get details of a specific project (e.g. linker, homland, etc.)
 router.get('/:slug', protect, getProjectBySlug);
 
 // Impressa integrations (Control plane)
-router.get('/impressa/approvals', protect, authorizePermission('approve_products'), getPendingImpressaApprovals);
-router.put('/impressa/approvals/:id', protect, authorizePermission('approve_products'), updateImpressaProductStatus);
-router.get('/impressa/tickets', protect, authorizePermission('manage_tickets'), getImpressaTickets);
-router.put('/impressa/tickets/:id', protect, authorizePermission('manage_tickets'), updateImpressaTicketStatus);
+router.get('/impressa/approvals', protect, authorizePermission('approve_impressa_products'), getPendingImpressaApprovals);
+router.put('/impressa/approvals/:id', protect, authorizePermission('approve_impressa_products'), updateImpressaProductStatus);
+router.get('/impressa/tickets', protect, authorizePermission('manage_impressa_tickets'), getImpressaTickets);
+router.put('/impressa/tickets/:id', protect, authorizePermission('manage_impressa_tickets'), updateImpressaTicketStatus);
+
+// Generic Impressa CRUD endpoints for all 32 features
+router.get('/impressa/data/:feature', protect, handleImpressaDataGet);
+router.post('/impressa/data/:feature', protect, handleImpressaDataCreate);
+router.put('/impressa/data/:feature/:id', protect, handleImpressaDataUpdate);
+router.delete('/impressa/data/:feature/:id', protect, handleImpressaDataDelete);
 
 export default router;

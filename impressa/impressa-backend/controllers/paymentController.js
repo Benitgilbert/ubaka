@@ -1,6 +1,7 @@
 import prisma from "../prisma.js";
 import { requestToPay, getTransactionStatus } from "../services/momoService.js";
 import { recordTransaction } from "./financeController.js";
+import rraEbmService from "../services/rraEbmService.js";
 
 // Helper to ensure default accounts exist
 const ensureAccount = async (name, type, code) => {
@@ -41,6 +42,12 @@ export const processPayment = async (req, res, next) => {
             paidAt: new Date()
           }
         });
+
+        try {
+          await rraEbmService.generateEbmReceiptsForOrder(orderId);
+        } catch (ebmErr) {
+          console.error("Failed to generate POS MoMo EBM receipts:", ebmErr);
+        }
 
         return res.json({
           success: true,
@@ -149,6 +156,12 @@ export const checkPaymentStatus = async (req, res, next) => {
             }
         });
 
+        try {
+          await rraEbmService.generateEbmReceiptsForOrder(orderId);
+        } catch (ebmErr) {
+          console.error("Failed to generate EBM receipts during checkPaymentStatus:", ebmErr);
+        }
+
         // Record Financial Transaction
         const cashAccountId = await ensureAccount("Cash on Hand", "Asset", "1000");
         const salesAccountId = await ensureAccount("Sales Revenue", "Revenue", "4000");
@@ -176,11 +189,25 @@ export const checkPaymentStatus = async (req, res, next) => {
         });
       }
 
-      const latestOrder = await prisma.order.findUnique({ where: { id: orderId } });
+      const latestOrder = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: {
+            include: {
+              product: {
+                include: {
+                  seller: true
+                }
+              }
+            }
+          }
+        }
+      });
       return res.json({
         success: true,
         status: latestOrder.paymentStatus,
-        momoStatus: statusData.status
+        momoStatus: statusData.status,
+        order: latestOrder
       });
     }
 
@@ -214,6 +241,12 @@ export const handleMomoWebhook = async (req, res) => {
                   status: "processing"
               }
           });
+
+          try {
+            await rraEbmService.generateEbmReceiptsForOrder(order.id);
+          } catch (ebmErr) {
+            console.error("Failed to generate EBM receipts during handleMomoWebhook:", ebmErr);
+          }
       } else if (status === "FAILED") {
           await prisma.order.update({
               where: { id: order.id },

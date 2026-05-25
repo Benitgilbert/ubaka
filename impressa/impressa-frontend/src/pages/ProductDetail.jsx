@@ -45,10 +45,10 @@ export default function ProductDetail() {
         setProduct(productData);
 
         // Update SEO Tags
-        document.title = `${productData.name} | Impressa`;
+        document.title = `${productData.name} | Kuri Macye`;
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
-          metaDesc.setAttribute("content", productData.description || `Buy ${productData.name} at Impressa. Premium custom printing solutions.`);
+          metaDesc.setAttribute("content", productData.description || `Buy ${productData.name} at Kuri Macye. Premium custom printing solutions.`);
         }
 
         // Inject JSON-LD Structured Data for Google
@@ -60,7 +60,7 @@ export default function ProductDetail() {
           "description": productData.description,
           "brand": {
             "@type": "Brand",
-            "name": "Impressa"
+            "name": "Kuri Macye"
           },
           "offers": {
             "@type": "Offer",

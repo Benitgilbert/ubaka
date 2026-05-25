@@ -4,12 +4,12 @@ import prisma, { isDbConnected } from '../config/db.js';
 let MOCK_MESSAGES = [
   {
     id: 'msg-1',
-    content: 'Hello everyone! Welcome to the brand new INZOZI Group internal MIS and Control Plane.',
+    content: 'Hello everyone! Welcome to the brand new Ubaka Tech internal MIS and Control Plane.',
     channel: 'general',
     isDirect: false,
     recipientId: null,
     senderId: 'mock-admin-id',
-    sender: { name: 'Inzozi Admin', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' },
+    sender: { name: 'Ubaka Admin', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' },
     createdAt: '2026-05-21T09:00:00Z'
   },
   {
@@ -67,7 +67,7 @@ let MOCK_MESSAGES = [
 // Helper to get sender details
 const getSenderDetails = (senderId) => {
   const users = {
-    'mock-admin-id': { name: 'Inzozi Admin', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' },
+    'mock-admin-id': { name: 'Ubaka Admin', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' },
     'mock-dev-id': { name: 'Benit Gilbert', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=benit' },
     'mock-manager-id': { name: 'Project Manager', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=manager' },
     'mock-content-id': { name: 'Content Controller', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=content' },

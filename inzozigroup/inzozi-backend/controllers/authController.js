@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import prisma, { isDbConnected } from '../config/db.js';
 import { ALL_ROLES, ALL_PERMISSIONS } from '../config/roles.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'inzozi_group_super_secret_jwt_key_12345';
+const JWT_SECRET = process.env.JWT_SECRET || 'ubaka_tech_super_secret_jwt_key_12345';
 
 // Dynamic mock delegations stored in memory for offline mode
 export let MOCK_DELEGATIONS = [];
@@ -12,8 +12,8 @@ export let MOCK_DELEGATIONS = [];
 export const MOCK_EMPLOYEES = [
   {
     id: 'mock-admin-id',
-    name: 'Inzozi Admin',
-    email: 'admin@inzozi.com',
+    name: 'Ubaka Admin',
+    email: 'admin@ubakatech.com',
     passwordHash: '$2a$10$SPs2pWhlJhrTNPzxpAB0qOcRFfTcgq4VDSQLRF2uB6Vm/Z.H.jRoW', // admin123
     role: 'sysadmin',
     title: 'System Administrator',
@@ -22,7 +22,7 @@ export const MOCK_EMPLOYEES = [
   {
     id: 'mock-dev-id',
     name: 'Benit Gilbert',
-    email: 'dev@inzozi.com',
+    email: 'dev@ubakatech.com',
     passwordHash: '$2a$10$a3fcW0JpN46EPd8cgJ2HyOYbr7/QHP.Mj4QkFdOo7Esm/k1EgNp36', // dev123
     role: 'software_engineer',
     title: 'Software Engineer (Impressa Dev)',
@@ -31,7 +31,7 @@ export const MOCK_EMPLOYEES = [
   {
     id: 'mock-manager-id',
     name: 'HR Manager',
-    email: 'manager@inzozi.com',
+    email: 'manager@ubakatech.com',
     passwordHash: '$2a$10$fVe4ooL0bGV01iNq/m2CI.l13o4rCd/Y2g3taGAPJz3dsoOT0p1x.', // manager123
     role: 'hr_manager',
     title: 'Human Resources Director',
@@ -40,7 +40,7 @@ export const MOCK_EMPLOYEES = [
   {
     id: 'mock-content-id',
     name: 'Gaju E-Commerce Moderator',
-    email: 'content@inzozi.com',
+    email: 'content@ubakatech.com',
     passwordHash: '$2a$10$9qa.ksW92LAE3k9rrtGIAu7AJZdBA4irEwbyqY3.4cgeelWvy68vO', // content123
     role: 'content_controller',
     title: 'Impressa Content Controller',
@@ -49,7 +49,7 @@ export const MOCK_EMPLOYEES = [
   {
     id: 'mock-marketer-id',
     name: 'Growth Marketer',
-    email: 'marketer@inzozi.com',
+    email: 'marketer@ubakatech.com',
     passwordHash: '$2a$10$kNiTrQzbLQ0hQw.TLnUgTOxwoLdIO4Cu0fP3TtMuaSUd0.eewvJFm', // marketer123
     role: 'growth_marketer',
     title: 'Digital Marketing Lead',
@@ -58,7 +58,7 @@ export const MOCK_EMPLOYEES = [
   {
     id: 'mock-support-id',
     name: 'Support Agent',
-    email: 'support@inzozi.com',
+    email: 'support@ubakatech.com',
     passwordHash: '$2a$10$6p2S.xpXSERByQozKsj/7ONwDLnh.s52dtJMaWwDtD9qYVXdCjRmC', // support123
     role: 'customer_support',
     title: 'Customer Experience agent',
@@ -67,7 +67,7 @@ export const MOCK_EMPLOYEES = [
   {
     id: 'mock-pm-id',
     name: 'Product Manager',
-    email: 'pm@inzozi.com',
+    email: 'pm@ubakatech.com',
     passwordHash: '$2a$10$npO3TrKp5689VLtwBZqxe.Xz2jb4PgOGrKN8dt.5mAAOrZQoz2ajG', // pm123
     role: 'product_manager',
     title: 'Senior Product Manager',

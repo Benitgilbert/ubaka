@@ -309,7 +309,7 @@ function Register() {
                                 <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-slate-800 pb-3">What happens next?</h3>
                                 {successType === 'confirm_email' ? (
                                     <ul className="space-y-4 font-bold text-gray-700 dark:text-gray-300">
-                                        <li className="flex gap-3 items-center"><span className="text-blue-500">1️⃣</span> Open the confirmation email from Impressa</li>
+                                        <li className="flex gap-3 items-center"><span className="text-blue-500">1️⃣</span> Open the confirmation email from Kuri Macye</li>
                                         <li className="flex gap-3 items-center"><span className="text-blue-500">2️⃣</span> Click the confirmation link</li>
                                         <li className="flex gap-3 items-center"><span className="text-blue-500">3️⃣</span> Log in and go to Become a Seller to complete your application</li>
                                     </ul>
@@ -572,7 +572,7 @@ function Register() {
                                 <div className="bg-blue-50 dark:bg-blue-900/10 border-2 border-blue-500/20 p-6 rounded-3xl flex items-start gap-4">
                                     <FaInfoCircle className="text-blue-500 text-2xl mt-1 shrink-0" />
                                     <p className="text-sm font-bold text-blue-800 dark:text-blue-400 leading-relaxed">
-                                        To sell on Impressa, you need a valid TIN number and RDB certificate issued by the Rwanda Development Board.
+                                        To sell on Kuri Macye, you need a valid TIN number and RDB certificate issued by the Rwanda Development Board.
                                     </p>
                                 </div>
 
@@ -713,7 +713,7 @@ function Register() {
                                         disabled={!termsScrolled}
                                     />
                                     <label htmlFor="termsAccepted" className="text-sm font-bold text-gray-800 dark:text-gray-300 cursor-pointer leading-tight">
-                                        I have read and agree to the Terms & Conditions and understand that Impressa will verify my RDB documents.
+                                        I have read and agree to the Terms & Conditions and understand that Kuri Macye will verify my RDB documents.
                                     </label>
                                 </div>
 

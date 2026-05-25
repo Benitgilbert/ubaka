@@ -106,7 +106,7 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-purple-950/20 via-slate-900 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Executive Dashboard</h1>
-          <p className="text-slate-400 text-xs mt-1">Operational view of INZOZI Group's digital product portfolio</p>
+          <p className="text-slate-400 text-xs mt-1">Operational view of Ubaka Tech's digital product portfolio</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-slate-800/80 rounded-xl text-slate-300 text-xs font-semibold">
           <Activity className="w-4 h-4 text-purple-400 animate-pulse" />
@@ -181,7 +181,7 @@ const Dashboard = () => {
                         {proj.name}
                         {getStatusIcon(proj.status)}
                       </h4>
-                      <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mt-0.5">/inzozigroup/{proj.slug}</span>
+                      <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mt-0.5">/ubakatech/{proj.slug}</span>
                     </div>
                     <span className={`inline-flex px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide border ${
                       proj.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :

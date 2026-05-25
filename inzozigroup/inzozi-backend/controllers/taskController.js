@@ -81,7 +81,7 @@ const enrichMockTask = (task) => {
   const assignees = {
     'mock-dev-id': { name: 'Benit Gilbert', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=benit' },
     'mock-marketer-id': { name: 'Growth Marketer', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=marketer' },
-    'mock-admin-id': { name: 'Inzozi Admin', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' }
+    'mock-admin-id': { name: 'Ubaka Admin', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' }
   };
   return {
     ...task,

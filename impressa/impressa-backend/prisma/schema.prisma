@@ -94,6 +94,14 @@ model User {
   // Terms
   termsAcceptance   Json?        // Stores accepted, acceptedAt, version, ip, signature
 
+  // RRA & DPO Integration Configs
+  rraTin            String?
+  rraSdcId          String?
+  rraMrcNo          String?
+  rraIntrlKey       String?
+  rraSignKey        String?
+  dpoMerchantToken  String?
+
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
@@ -307,6 +315,13 @@ model OrderItem {
   product       Product  @relation(fields: [productId], references: [id])
 
   sellerId      String?
+  
+  // RRA EBM Receipt Fields
+  ebmRcptNo         Int?
+  ebmInternalData   String?
+  ebmSignature      String?
+  ebmQrCode         String?
+  ebmDate           DateTime?
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -638,7 +653,7 @@ model Subscriber {
 
 model SiteSettings {
   id                String   @id @default(uuid())
-  siteName          String   @default("impressa")
+  siteName          String   @default("Kuri Macye")
   logo              String?  // Cloudinary URL for the logo
   tagline           String?
   footerTagline     String?
@@ -934,3 +949,4 @@ model Expense {
   @@index([shiftId])
   @@index([date])
 }
+

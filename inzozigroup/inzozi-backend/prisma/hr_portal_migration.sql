@@ -1,5 +1,5 @@
 -- =========================================================
--- HR Portal Migration: New Tables for INZOZI Group MIS
+-- HR Portal Migration: New Tables for Ubaka Tech MIS
 -- Run this in Supabase SQL Editor → SQL Editor → New Query
 -- =========================================================
 

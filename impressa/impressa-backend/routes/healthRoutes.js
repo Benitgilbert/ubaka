@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import prisma from "../prisma.js";
 import logger from "../config/logger.js";
 
@@ -8,7 +8,7 @@ const router = express.Router();
  * Root endpoint for basic connectivity check (Render default health check)
  */
 router.get("/", (req, res) => {
-  res.status(200).send("Impressa Backend is running");
+  res.status(200).send("Kuri Macye Backend is running");
 });
 
 /**
@@ -86,3 +86,4 @@ router.get("/live", (req, res) => {
 });
 
 export default router;
+

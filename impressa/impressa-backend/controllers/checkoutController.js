@@ -199,7 +199,7 @@ export const createOrderFromCart = async (req, res, next) => {
       return createdOrder;
     }); // End $transaction
 
-    logger.info({ orderId: order.id, publicId }, "Order created from cart");
+    logger.info({ orderId: order.id, publicId: order.publicId }, "Order created from cart");
 
     res.status(201).json({
       success: true,

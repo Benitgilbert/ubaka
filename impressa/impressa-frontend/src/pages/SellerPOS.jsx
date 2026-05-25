@@ -465,7 +465,7 @@ export default function SellerPOS() {
                 ...res.data,
                 cashReceived: receivedAmount,
                 cashierName: seller?.name,
-                items: cart.map(item => ({
+                items: (res.data.items && res.data.items.length > 0) ? res.data.items : cart.map(item => ({
                     productName: item.name,
                     quantity: item.quantity,
                     price: getItemPrice(item)
@@ -495,10 +495,11 @@ export default function SellerPOS() {
                         clearInterval(interval);
                         setPendingOrder(null);
                         setProcessing(false);
+                        const orderData = res.data.order || res.data;
                         setCompletedOrder({
-                            ...res.data,
+                            ...orderData,
                             cashierName: seller?.name,
-                            items: cart.map(item => ({
+                            items: (orderData.items && orderData.items.length > 0) ? orderData.items : cart.map(item => ({
                                 productName: item.name,
                                 quantity: item.quantity,
                                 price: getItemPrice(item)

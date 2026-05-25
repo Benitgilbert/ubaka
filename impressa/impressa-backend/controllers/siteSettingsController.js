@@ -1,14 +1,14 @@
-import prisma from "../prisma.js";
+﻿import prisma from "../prisma.js";
 
 /**
- * ⚙️ Helper to get or create settings
+ * âš™ï¸ Helper to get or create settings
  */
 const getSettingsHelper = async () => {
     let settings = await prisma.siteSettings.findFirst();
     if (!settings) {
         settings = await prisma.siteSettings.create({
             data: {
-                siteName: "impressa",
+                siteName: "Kuri Macye",
                 tagline: "Your Marketplace",
                 trustBadges: [
                     { icon: 'truck', title: 'Free Delivery', description: 'On orders over 50,000 Rwf', isActive: true, order: 0 },
@@ -26,7 +26,7 @@ const getSettingsHelper = async () => {
 };
 
 /**
- * ⚙️ Get site settings (public - for frontend)
+ * âš™ï¸ Get site settings (public - for frontend)
  */
 export const getPublicSettings = async (req, res, next) => {
     try {
@@ -59,7 +59,7 @@ export const getPublicSettings = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Get all site settings (admin)
+ * âš™ï¸ Get all site settings (admin)
  */
 export const getAllSettings = async (req, res, next) => {
     try {
@@ -75,7 +75,7 @@ export const getAllSettings = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Update trust badges
+ * âš™ï¸ Update trust badges
  */
 export const updateTrustBadges = async (req, res, next) => {
     try {
@@ -104,7 +104,7 @@ export const updateTrustBadges = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Update general site settings
+ * âš™ï¸ Update general site settings
  */
 export const updateGeneralSettings = async (req, res, next) => {
     try {
@@ -140,7 +140,7 @@ export const updateGeneralSettings = async (req, res, next) => {
 
 
 /**
- * ⚙️ Update footer settings
+ * âš™ï¸ Update footer settings
  */
 export const updateFooterSettings = async (req, res, next) => {
     try {
@@ -178,7 +178,7 @@ export const updateFooterSettings = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Reset trust badges to default
+ * âš™ï¸ Reset trust badges to default
  */
 export const resetTrustBadges = async (req, res, next) => {
     try {
@@ -207,7 +207,7 @@ export const resetTrustBadges = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Update seller auto-approval settings
+ * âš™ï¸ Update seller auto-approval settings
  */
 export const updateSellerAutoApproval = async (req, res, next) => {
     try {
@@ -237,7 +237,7 @@ export const updateSellerAutoApproval = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Update payout settings
+ * âš™ï¸ Update payout settings
  */
 export const updatePayoutSettings = async (req, res, next) => {
     try {
@@ -269,7 +269,7 @@ export const updatePayoutSettings = async (req, res, next) => {
 };
 
 /**
- * ⚙️ Update commission rate
+ * âš™ï¸ Update commission rate
  */
 export const updateCommissionRate = async (req, res, next) => {
     try {
@@ -297,3 +297,4 @@ export const updateCommissionRate = async (req, res, next) => {
         next(error);
     }
 };
+

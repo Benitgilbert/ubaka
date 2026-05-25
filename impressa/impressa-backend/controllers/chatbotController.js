@@ -1,8 +1,8 @@
-import prisma from "../prisma.js";
+﻿import prisma from "../prisma.js";
 import Fuse from "fuse.js";
 
 /**
- * 🤖 Handle Public Customer Questions
+ * ðŸ¤– Handle Public Customer Questions
  */
 export const handlePublicChatbot = async (req, res) => {
     try {
@@ -53,7 +53,7 @@ export const handlePublicChatbot = async (req, res) => {
             .join("\n");
 
         const prompt = `
-You are the Sales & Support AI Assistant for impressa Marketplace.
+You are the Sales & Support AI Assistant for Kuri Macye Marketplace.
 Use the PRODUCT DATA, ACTIVE DEALS, and CHAT HISTORY to answer the Customer.
 
 PRODUCT DATA:
@@ -136,7 +136,7 @@ Response:
 };
 
 /**
- * 🤖 Get Chat Logs for Admin
+ * ðŸ¤– Get Chat Logs for Admin
  */
 export const getChatLogs = async (req, res) => {
     try {
@@ -152,7 +152,7 @@ export const getChatLogs = async (req, res) => {
 };
 
 /**
- * 🤖 Bulk Delete Chat Logs
+ * ðŸ¤– Bulk Delete Chat Logs
  */
 export const deleteChatLogs = async (req, res) => {
     try {
@@ -170,3 +170,4 @@ export const deleteChatLogs = async (req, res) => {
         res.status(500).json({ message: "Failed to delete chat logs" });
     }
 };
+

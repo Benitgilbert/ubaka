@@ -152,10 +152,7 @@ export default function Header() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 shrink-0">
-          <img src="/Impressa.jpeg" alt="Impressa" className="h-10 w-auto object-contain rounded-md" />
-          <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
-            Impressa
-          </span>
+          <img src="/logo.svg" alt="Kuri Macye" className="h-10 w-auto object-contain" />
         </Link>
 
 
@@ -385,7 +382,7 @@ export default function Header() {
                           {t('auth.sign_in')}
                         </Link>
                         <div className="py-2 text-center">
-                          <p className="text-[10px] text-charcoal-500 uppercase font-bold tracking-widest mb-1">New to Impressa?</p>
+                          <p className="text-[10px] text-charcoal-500 uppercase font-bold tracking-widest mb-1">New to Kuri Macye?</p>
                           <Link 
                             to="/register" 
                             onClick={() => setSettingsDropdownOpen(false)}

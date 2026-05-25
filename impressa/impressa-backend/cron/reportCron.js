@@ -1,9 +1,9 @@
-import cron from "node-cron";
+﻿import cron from "node-cron";
 import prisma from "../prisma.js";
 import { sendEmail } from "../utils/emailService.js";
 
 /**
- * 📊 Report Generation Cron - Monthly seller performance reports
+ * ðŸ“Š Report Generation Cron - Monthly seller performance reports
  */
 
 /**
@@ -171,7 +171,7 @@ export const sendReportEmail = async (reportId) => {
 
     const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #6366f1;">📊 Your ${monthName} Performance Report</h2>
+        <h2 style="color: #6366f1;">ðŸ“Š Your ${monthName} Performance Report</h2>
         <p>Hi ${seller.name},</p>
         <p>Here's your monthly summary for <strong>${seller.storeName}</strong>:</p>
         <div style="background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 20px 0;">
@@ -186,7 +186,7 @@ export const sendReportEmail = async (reportId) => {
 
     const result = await sendEmail({
         to: seller.email,
-        subject: `📊 Your ${monthName} Performance Report - impressa`,
+        subject: `ðŸ“Š Your ${monthName} Performance Report - Kuri Macye`,
         html
     });
 
@@ -222,3 +222,4 @@ export default {
     sendReportEmail,
     initReportCron
 };
+

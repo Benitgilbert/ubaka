@@ -1,14 +1,14 @@
 ﻿/**
- * impressa Marketplace - Seller Terms & Conditions
+ * Kuri Macye Marketplace - Seller Terms & Conditions
  * Version 1.0 - December 2024
  * 
- * This document outlines the terms and conditions for selling on the impressa platform.
+ * This document outlines the terms and conditions for selling on the Kuri Macye platform.
  */
 
 export const SELLER_TERMS_VERSION = "1.0";
 
 export const SELLER_TERMS_CONTENT = `
-# IMPRESSA MARKETPLACE
+# KURI MACYE MARKETPLACE
 ## SELLER TERMS AND CONDITIONS
 ### Version 1.0 - December 2024
 
@@ -16,7 +16,7 @@ export const SELLER_TERMS_CONTENT = `
 
 ## 1. INTRODUCTION AND ACCEPTANCE
 
-By registering as a seller on the impressa Marketplace ("Platform"), you ("Seller") agree to be bound by these Terms and Conditions ("Agreement"). This Agreement constitutes a legally binding contract between you and impressa Ltd ("impressa", "we", "us", or "our").
+By registering as a seller on the Kuri Macye Marketplace ("Platform"), you ("Seller") agree to be bound by these Terms and Conditions ("Agreement"). This Agreement constitutes a legally binding contract between you and Kuri Macye Ltd ("Kuri Macye", "we", "us", or "our").
 
 **IMPORTANT:** Please read these terms carefully before completing your seller registration. By checking the acceptance box and providing your digital signature, you acknowledge that you have read, understood, and agree to be bound by all terms herein.
 
@@ -24,7 +24,7 @@ By registering as a seller on the impressa Marketplace ("Platform"), you ("Selle
 
 ## 2. SELLER ELIGIBILITY
 
-To become a seller on impressa, you must:
+To become a seller on Kuri Macye, you must:
 
 2.1. Be at least 18 years of age.
 
@@ -54,15 +54,15 @@ To become a seller on impressa, you must:
 
 ## 4. PLATFORM FEES AND COMMISSIONS
 
-4.1. **Commission Rate:** impressa charges a commission on each successful sale. The current commission rate is displayed in your seller dashboard and may be updated with 30 days' notice.
+4.1. **Commission Rate:** Kuri Macye charges a commission on each successful sale. The current commission rate is displayed in your seller dashboard and may be updated with 30 days' notice.
 
-4.2. **Payment Processing:** All customer payments are processed through impressa. Net earnings (after commission) are transferred to your designated payout account.
+4.2. **Payment Processing:** All customer payments are processed through Kuri Macye. Net earnings (after commission) are transferred to your designated payout account.
 
 4.3. **Payout Schedule:** Payouts are processed according to the schedule configured in your account (weekly, bi-weekly, or monthly).
 
 4.4. **Minimum Payout:** A minimum balance threshold applies before payouts are processed.
 
-4.5. **Tax Obligations:** You are solely responsible for all applicable taxes on your sales. impressa may withhold taxes as required by Rwandan law.
+4.5. **Tax Obligations:** You are solely responsible for all applicable taxes on your sales. Kuri Macye may withhold taxes as required by Rwandan law.
 
 ---
 
@@ -81,7 +81,7 @@ To become a seller on impressa, you must:
    - Products that infringe intellectual property rights
    - Hazardous materials without proper certification
 
-5.4. **Approval Process:** All product listings are subject to review. impressa reserves the right to reject or remove any listing.
+5.4. **Approval Process:** All product listings are subject to review. Kuri Macye reserves the right to reject or remove any listing.
 
 ---
 
@@ -101,7 +101,7 @@ To become a seller on impressa, you must:
 
 7.1. **Response Time:** You must respond to customer inquiries within 24 hours during business days.
 
-7.2. **Dispute Resolution:** Work in good faith to resolve customer disputes. impressa may intervene in disputes and make binding decisions.
+7.2. **Dispute Resolution:** Work in good faith to resolve customer disputes. Kuri Macye may intervene in disputes and make binding decisions.
 
 7.3. **Returns and Refunds:** Honor the platform's return policy. Refunds for valid returns must be processed within 5 business days.
 
@@ -127,11 +127,11 @@ To become a seller on impressa, you must:
 
 ## 9. INTELLECTUAL PROPERTY
 
-9.1. You grant impressa a non-exclusive license to use your product images and descriptions for marketing purposes.
+9.1. You grant Kuri Macye a non-exclusive license to use your product images and descriptions for marketing purposes.
 
 9.2. You warrant that your listings do not infringe on any third-party intellectual property rights.
 
-9.3. impressa's trademarks, logos, and platform design are our exclusive property.
+9.3. Kuri Macye's trademarks, logos, and platform design are our exclusive property.
 
 ---
 
@@ -147,7 +147,7 @@ To become a seller on impressa, you must:
 
 ## 11. LIMITATION OF LIABILITY
 
-11.1. impressa is not liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform.
+11.1. Kuri Macye is not liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform.
 
 11.2. Our total liability shall not exceed the commissions paid by you in the 12 months preceding any claim.
 
@@ -159,7 +159,7 @@ To become a seller on impressa, you must:
 
 12.1. **By You:** You may close your seller account at any time by completing all pending orders and requesting account closure.
 
-12.2. **By impressa:** We may suspend or terminate your account for violation of these terms, with or without prior notice.
+12.2. **By Kuri Macye:** We may suspend or terminate your account for violation of these terms, with or without prior notice.
 
 12.3. **Effect of Termination:** Upon termination, all pending payouts will be processed after a 30-day hold period to account for returns and disputes.
 
@@ -167,7 +167,7 @@ To become a seller on impressa, you must:
 
 ## 13. AMENDMENTS
 
-13.1. impressa reserves the right to modify these terms at any time.
+13.1. Kuri Macye reserves the right to modify these terms at any time.
 
 13.2. Material changes will be communicated via email at least 30 days in advance.
 
@@ -202,7 +202,7 @@ For questions about these terms:
 
 ✓ I understand that violations may result in account termination
 
-✓ I acknowledge that impressa may modify these terms with notice
+✓ I acknowledge that Kuri Macye may modify these terms with notice
 
 ---
 
@@ -214,3 +214,4 @@ export default {
    SELLER_TERMS_VERSION,
    SELLER_TERMS_CONTENT
 };
+

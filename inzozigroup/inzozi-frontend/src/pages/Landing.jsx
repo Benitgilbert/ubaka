@@ -140,7 +140,7 @@ const DEFAULT_PRODUCTS = [
         '180° and 360° virtual property walk-throughs.',
         'Direct in-app messaging between landlord and prospective tenants.',
         'Standardized digital lease drafting and rent payment tracking.',
-        'Direct validation system (INZOZI staff physically inspect listed listings).'
+        'Direct validation system (Ubaka Tech staff physically inspect listed listings).'
       ]
     }
   }
@@ -231,12 +231,12 @@ const Landing = ({ onEnterPortal }) => {
           className="flex items-center gap-3 cursor-default select-none group transition-all"
         >
           <img 
-            src="/inzozi_symbol.png" 
-            alt="INZOZI Group Symbol" 
+            src="/ubaka_symbol.png" 
+            alt="Ubaka Tech Symbol" 
             className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
           />
           <div>
-            <h1 className="text-base font-extrabold text-white leading-none tracking-tight">INZOZI Group</h1>
+            <h1 className="text-base font-extrabold text-white leading-none tracking-tight">Ubaka Tech</h1>
             <span className="text-[9px] font-bold text-slate-500 tracking-widest uppercase block mt-1">Ecosystem Showcase</span>
           </div>
         </div>
@@ -342,7 +342,7 @@ const Landing = ({ onEnterPortal }) => {
             <div className="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-3xl p-4 shadow-2xl relative transition-all duration-500 hover:border-purple-500/30 hover:shadow-purple-500/5">
               <img 
                 src="/workspace_hero.png" 
-                alt="INZOZI Group Connectivity Artwork" 
+                alt="Ubaka Tech Connectivity Artwork" 
                 className="w-full h-auto rounded-2xl object-cover mix-blend-lighten aspect-[4/3] select-none pointer-events-none"
               />
               
@@ -546,11 +546,11 @@ const Landing = ({ onEnterPortal }) => {
           <div className="col-span-2 md:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
               <img 
-              src="/inzozi_symbol.png" 
-              alt="INZOZI Group Symbol" 
+              src="/ubaka_symbol.png" 
+              alt="Ubaka Tech Symbol" 
               className="w-8 h-8 object-contain"
             />
-              <span className="text-sm font-extrabold text-white tracking-tight">INZOZI Group</span>
+              <span className="text-sm font-extrabold text-white tracking-tight">Ubaka Tech</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
               We design digital infrastructure that supports local merchants, maps transit, and breaks accessibility barriers in Rwanda. Built by people, for people.
@@ -598,7 +598,7 @@ const Landing = ({ onEnterPortal }) => {
         {/* Bottom Bar */}
         <div className="border-t border-slate-900/60 pt-8 flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-600 gap-4">
           <div className="flex items-center gap-1.5 font-medium">
-            <span>© {new Date().getFullYear()} INZOZI Group. Made with </span>
+            <span>© {new Date().getFullYear()} Ubaka Tech. Made with </span>
             <span className="text-rose-500 animate-pulse">♥</span>
             <span> for civic and vendor empowerment.</span>
           </div>

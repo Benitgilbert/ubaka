@@ -36,7 +36,7 @@ const logger = pino({
   // Base fields to include in every log
   base: {
     env: process.env.NODE_ENV || "development",
-    app: "impressa-backend",
+    app: "kurimacye-backend",
   },
 
   // Timestamp format
@@ -78,3 +78,4 @@ const logger = pino({
 });
 
 export default logger;
+

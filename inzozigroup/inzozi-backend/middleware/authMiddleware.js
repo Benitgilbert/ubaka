@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { resolveEffectiveUser } from '../controllers/authController.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'inzozi_group_super_secret_jwt_key_12345';
+const JWT_SECRET = process.env.JWT_SECRET || 'ubaka_tech_super_secret_jwt_key_12345';
 
 // Authenticate user token
 export const protect = async (req, res, next) => {

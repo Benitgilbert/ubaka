@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import pino from 'pino';
 
 // Mock Prisma
 vi.mock('../prisma.js', () => ({
@@ -19,13 +20,19 @@ vi.mock('../prisma.js', () => ({
       findFirst: vi.fn(),
       update: vi.fn(),
     },
+    orderItem: {
+      update: vi.fn(),
+    },
+    user: {
+      findUnique: vi.fn(),
+    },
     coupon: {
       findUnique: vi.fn(),
       update: vi.fn(),
     },
     account: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
+      findUnique: vi.fn().mockResolvedValue({ id: 'account-123', name: 'Mock Account', code: '1000' }),
+      create: vi.fn().mockResolvedValue({ id: 'account-123', name: 'Mock Account', code: '1000' }),
     },
     shippingZone: {
       findMany: vi.fn(),
@@ -54,20 +61,29 @@ vi.mock('../services/momoService.js', () => ({
   validateWebhook: vi.fn(() => true),
 }));
 
+// Mock RRA EBM Service
+vi.mock('../services/rraEbmService.js', () => ({
+  default: {
+    initializeDevice: vi.fn(),
+    saveItem: vi.fn(),
+    submitSaleInvoice: vi.fn(),
+    generateEbmReceiptsForOrder: vi.fn(async () => ({ success: true })),
+  }
+}));
+
 // Mock Finance Controller
 vi.mock('../controllers/financeController.js', () => ({
   recordTransaction: vi.fn(),
+  createTransaction: vi.fn(),
+  getAccounts: vi.fn(),
+  createAccount: vi.fn(),
+  getLedger: vi.fn(),
+  getFinancialSummary: vi.fn(),
 }));
 
 // Mock Logger to keep test output clean
 vi.mock('../config/logger.js', () => ({
-  default: {
-    info: vi.fn(),
-    error: vi.fn(),
-    warn: vi.fn(),
-    debug: vi.fn(),
-    fatal: vi.fn(),
-  },
+  default: pino({ level: 'silent' }),
 }));
 
 // Set environment variables for testing

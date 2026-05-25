@@ -581,7 +581,7 @@ const Kanban = () => {
                         <>
                           <option value="mock-dev-id">Benit Gilbert (Developer)</option>
                           <option value="mock-marketer-id">Growth Marketer (Marketing)</option>
-                          <option value="mock-admin-id">Inzozi Admin (Admin)</option>
+                          <option value="mock-admin-id">Ubaka Admin (Admin)</option>
                         </>
                       )
                   }

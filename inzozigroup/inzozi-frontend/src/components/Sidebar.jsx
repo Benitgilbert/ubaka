@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, 
@@ -40,9 +40,42 @@ const Sidebar = ({ activePage, setActivePage }) => {
     },
     { 
       id: 'impressa-admin', 
-      label: 'Impressa Control', 
+      label: 'Kuri Macye Control', 
       icon: ShoppingBag,
-      permissions: ['approve_products', 'moderate_content', 'manage_tickets'] 
+      permissions: [
+        'manage_impressa_users',
+        'manage_impressa_sellers',
+        'manage_impressa_violations',
+        'view_impressa_seller_reports',
+        'manage_impressa_orders',
+        'manage_impressa_inquiries',
+        'manage_impressa_products',
+        'approve_impressa_products',
+        'manage_impressa_shifts',
+        'manage_impressa_categories',
+        'manage_impressa_attributes',
+        'manage_impressa_reviews',
+        'manage_impressa_tickets',
+        'manage_impressa_customer_queries',
+        'manage_impressa_abonnes',
+        'manage_impressa_coupons',
+        'manage_impressa_gift_cards',
+        'manage_impressa_gift_card_products',
+        'manage_impressa_flash_sales',
+        'manage_impressa_banners',
+        'manage_impressa_testimonials',
+        'manage_impressa_blogs',
+        'manage_impressa_brand_partners',
+        'manage_impressa_finance',
+        'manage_impressa_commissions',
+        'manage_impressa_payouts',
+        'manage_impressa_site_settings',
+        'manage_impressa_subscribers',
+        'manage_impressa_delivery',
+        'manage_impressa_taxes',
+        'manage_impressa_reports',
+        'manage_impressa_settings'
+      ] 
     },
     {
       id: 'delegations',
@@ -87,12 +120,12 @@ const Sidebar = ({ activePage, setActivePage }) => {
       <div className="p-6">
         <div className="flex items-center gap-3">
           <img 
-            src="/inzozi_symbol.png" 
-            alt="INZOZI Group Symbol" 
+            src="/ubaka_symbol.png" 
+            alt="Ubaka Tech Symbol" 
             className="w-10 h-10 object-contain"
           />
           <div>
-            <h1 className="text-base font-extrabold text-white leading-none tracking-tight">INZOZI Group</h1>
+            <h1 className="text-base font-extrabold text-white leading-none tracking-tight">Ubaka Tech</h1>
             <span className="text-[10px] font-semibold text-slate-500 tracking-widest uppercase">Internal MIS</span>
           </div>
         </div>
@@ -134,7 +167,7 @@ const Sidebar = ({ activePage, setActivePage }) => {
           />
           <div className="flex-1 min-w-0">
             <h4 className="text-xs font-bold text-slate-200 truncate leading-none mb-1">{user.name}</h4>
-            <span className="text-[10px] text-slate-500 truncate block leading-none mb-1.5">{user.title || 'Inzozi Member'}</span>
+            <span className="text-[10px] text-slate-500 truncate block leading-none mb-1.5">{user.title || 'Ubaka Member'}</span>
             <span className={`inline-flex px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide leading-none ${roleColors[user.role] || 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
               {user.role.replace('_', ' ')}
             </span>
@@ -157,3 +190,4 @@ const Sidebar = ({ activePage, setActivePage }) => {
 };
 
 export default Sidebar;
+

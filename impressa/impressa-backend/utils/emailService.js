@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+﻿import nodemailer from "nodemailer";
 import { Resend } from 'resend';
 import { renderTemplate } from "./emailTemplate.js";
 
@@ -28,13 +28,13 @@ const createTransporter = () => {
 };
 
 export const sendEmail = async ({ to, subject, text, html, headers }) => {
-    const from = process.env.SMTP_FROM || "Impressa <noreply@impressa.rw>";
+    const from = process.env.SMTP_FROM || "Kuri Macye <noreply@kurimacye.rw>";
     
     // 1. Try Resend first if configured
     if (resend) {
         try {
             const { data, error } = await resend.emails.send({
-                from: from.includes('<') ? from : `Impressa <${from}>`,
+                from: from.includes('<') ? from : `Kuri Macye <${from}>`,
                 to,
                 subject,
                 text,
@@ -56,7 +56,7 @@ export const sendEmail = async ({ to, subject, text, html, headers }) => {
     try {
         const transporter = createTransporter();
         const mailOptions = {
-            from: from.includes('<') ? from : `"Impressa" <${process.env.SMTP_USER || from}>`,
+            from: from.includes('<') ? from : `"Kuri Macye" <${process.env.SMTP_USER || from}>`,
             to,
             subject,
             text,
@@ -82,7 +82,7 @@ export const sendOrderConfirmation = async (order) => {
     const html = `
     <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #f1f5f9;">
         <div style="background-color: #0f172a; padding: 40px 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">IMPRESSA</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">KURI MACYE</h1>
             <p style="color: #94a3b8; margin: 10px 0 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Order Confirmed</p>
         </div>
         <div style="padding: 40px 30px;">
@@ -110,13 +110,13 @@ export const sendOrderConfirmation = async (order) => {
             </div>
         </div>
         <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="color: #94a3b8; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Impressa. All rights reserved.</p>
+            <p style="color: #94a3b8; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Kuri Macye. All rights reserved.</p>
         </div>
     </div>`;
 
     return sendEmail({
         to: order.guestInfo?.email || order.customer?.email,
-        subject: `Order Confirmation #${order.publicId} — Impressa`,
+        subject: `Order Confirmation #${order.publicId} â€” Kuri Macye`,
         html
     });
 };
@@ -125,7 +125,7 @@ export const sendOrderConfirmation = async (order) => {
 export const sendStatusUpdate = async (order) => {
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #6366f1;">📦 Order Update</h2>
+        <h2 style="color: #6366f1;">ðŸ“¦ Order Update</h2>
         <p>Hi ${order.guestInfo?.name || order.customer?.name || 'Customer'},</p>
         <p>Your order <strong>#${order.publicId}</strong> status has been updated to: <strong>${order.status.toUpperCase()}</strong>.</p>
         <a href="${process.env.FRONTEND_URL}/orders/${order.publicId}" 
@@ -136,7 +136,7 @@ export const sendStatusUpdate = async (order) => {
 
     return sendEmail({
         to: order.guestInfo?.email || order.customer?.email,
-        subject: `Order Update #${order.publicId} — Impressa`,
+        subject: `Order Update #${order.publicId} â€” Kuri Macye`,
         html
     });
 };
@@ -145,8 +145,8 @@ export const sendStatusUpdate = async (order) => {
 export const sendGiftCardEmail = async (giftCard, senderName) => {
     const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; padding: 40px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white;">
-        <h1 style="font-size: 32px; margin-bottom: 10px;">Surprise! 🎁</h1>
-        <p style="font-size: 18px; margin-bottom: 30px;">${senderName} has sent you an Impressa Gift Card.</p>
+        <h1 style="font-size: 32px; margin-bottom: 10px;">Surprise! ðŸŽ</h1>
+        <p style="font-size: 18px; margin-bottom: 30px;">${senderName} has sent you an Kuri Macye Gift Card.</p>
         <div style="background: rgba(255, 255, 255, 0.1); border: 2px dashed rgba(255, 255, 255, 0.5); padding: 30px; border-radius: 20px; margin: 40px 0;">
             <p style="text-transform: uppercase; letter-spacing: 4px; font-size: 12px; margin: 0 0 10px 0; opacity: 0.8;">Your Gift Code</p>
             <h2 style="font-size: 36px; margin: 0; font-weight: 900; letter-spacing: 1px;">${giftCard.code}</h2>
@@ -169,7 +169,7 @@ export const sendGiftCardEmail = async (giftCard, senderName) => {
 export const sendSellerApprovedEmail = async (seller) => {
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #10b981;">🎉 Congratulations! Your Seller Account is Approved</h2>
+        <h2 style="color: #10b981;">ðŸŽ‰ Congratulations! Your Seller Account is Approved</h2>
         <p>Hi ${seller.name},</p>
         <p>Great news! Your seller application for <strong>${seller.storeName}</strong> has been approved.</p>
         <a href="${process.env.FRONTEND_URL}/seller/dashboard" 
@@ -180,7 +180,7 @@ export const sendSellerApprovedEmail = async (seller) => {
 
     return sendEmail({
         to: seller.email,
-        subject: "🎉 Your Seller Account is Approved - Impressa",
+        subject: "ðŸŽ‰ Your Seller Account is Approved - Kuri Macye",
         html
     });
 };
@@ -193,12 +193,12 @@ export const sendSellerRejectedEmail = async (seller, reason) => {
         <p>Hi ${seller.name},</p>
         <p>We've reviewed your seller application for <strong>${seller.storeName || 'your store'}</strong>.</p>
         ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
-        <p style="color: #6b7280; margin-top: 24px;">— The Impressa Team</p>
+        <p style="color: #6b7280; margin-top: 24px;">â€” The Kuri Macye Team</p>
     </div>`;
 
     return sendEmail({
         to: seller.email,
-        subject: "Seller Application Update - Impressa",
+        subject: "Seller Application Update - Kuri Macye",
         html
     });
 };
@@ -207,7 +207,7 @@ export const sendSellerRejectedEmail = async (seller, reason) => {
 export const sendProductApprovedEmail = async (seller, product) => {
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #10b981;">✅ Product Approved</h2>
+        <h2 style="color: #10b981;">âœ… Product Approved</h2>
         <p>Hi ${seller.name},</p>
         <p>Your product <strong>"${product.name}"</strong> has been approved and is now live.</p>
         <a href="${process.env.FRONTEND_URL}/product/${product.slug}" 
@@ -218,7 +218,7 @@ export const sendProductApprovedEmail = async (seller, product) => {
 
     return sendEmail({
         to: seller.email,
-        subject: `✅ Product Approved: ${product.name} - Impressa`,
+        subject: `âœ… Product Approved: ${product.name} - Kuri Macye`,
         html
     });
 };
@@ -232,7 +232,7 @@ export const sendNewOrderEmail = async (seller, order) => {
 
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #6366f1;">🛒 New Order Received!</h2>
+        <h2 style="color: #6366f1;">ðŸ›’ New Order Received!</h2>
         <p>Hi ${seller.name},</p>
         <p>You have a new order to fulfill!</p>
         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
@@ -248,7 +248,7 @@ export const sendNewOrderEmail = async (seller, order) => {
 
     return sendEmail({
         to: seller.email,
-        subject: `🛒 New Order: ${order.orderNumber || order.id} - Impressa`,
+        subject: `ðŸ›’ New Order: ${order.orderNumber || order.id} - Kuri Macye`,
         html
     });
 };
@@ -257,7 +257,7 @@ export const sendNewOrderEmail = async (seller, order) => {
 export const sendPayoutSentEmail = async (seller, payout) => {
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #10b981;">💰 Payout Processed</h2>
+        <h2 style="color: #10b981;">ðŸ’° Payout Processed</h2>
         <p>Hi ${seller.name},</p>
         <p>Your payout of <strong>${payout.amount.toLocaleString()} RWF</strong> has been processed.</p>
         <p>Payment Method: ${payout.paymentMethod}</p>
@@ -265,7 +265,7 @@ export const sendPayoutSentEmail = async (seller, payout) => {
 
     return sendEmail({
         to: seller.email,
-        subject: `💰 Payout Processed: ${payout.amount.toLocaleString()} RWF - Impressa`,
+        subject: `ðŸ’° Payout Processed: ${payout.amount.toLocaleString()} RWF - Kuri Macye`,
         html
     });
 };
@@ -274,7 +274,7 @@ export const sendPayoutSentEmail = async (seller, payout) => {
 export const sendWarningEmail = async (seller, violation) => {
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #f59e0b;">⚠️ Account Warning</h2>
+        <h2 style="color: #f59e0b;">âš ï¸ Account Warning</h2>
         <p>Hi ${seller.name},</p>
         <p><strong>Issue:</strong> ${violation.type.replace(/_/g, ' ')}</p>
         <p>${violation.description}</p>
@@ -282,7 +282,7 @@ export const sendWarningEmail = async (seller, violation) => {
 
     return sendEmail({
         to: seller.email,
-        subject: "⚠️ Seller Account Warning - Impressa",
+        subject: "âš ï¸ Seller Account Warning - Kuri Macye",
         html
     });
 };
@@ -295,7 +295,7 @@ export const sendLowStockEmail = async (seller, products) => {
 
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #6366f1;">📦 Low Stock Alert</h2>
+        <h2 style="color: #6366f1;">ðŸ“¦ Low Stock Alert</h2>
         <ul style="background: #f3f4f6; padding: 16px 32px; border-radius: 8px;">
             ${productList}
         </ul>
@@ -307,7 +307,7 @@ export const sendLowStockEmail = async (seller, products) => {
 
     return sendEmail({
         to: seller.email,
-        subject: "📦 Low Stock Alert - Impressa",
+        subject: "ðŸ“¦ Low Stock Alert - Kuri Macye",
         html
     });
 };
@@ -322,7 +322,7 @@ export const sendWelcomeEmail = async (email) => {
 
     const html = `
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>Welcome to Impressa! 🎉</h2>
+        <h2>Welcome to Kuri Macye! ðŸŽ‰</h2>
         <p>Thank you for subscribing to our newsletter.</p>
         <div style="text-align: center; margin-top: 32px;">
             <a href="${process.env.FRONTEND_URL}/shop" 
@@ -334,7 +334,7 @@ export const sendWelcomeEmail = async (email) => {
 
     return sendEmail({
         to: email,
-        subject: "Welcome to the Impressa Community! 💌",
+        subject: "Welcome to the Kuri Macye Community! ðŸ’Œ",
         html,
         headers
     });
@@ -354,3 +354,4 @@ export default {
     sendLowStockEmail,
     sendWelcomeEmail
 };
+

@@ -3,7 +3,7 @@ import fs from "fs";
 import axios from "axios";
 import prisma from "../prisma.js";
 import { buildReportData } from "../services/reportBuilders.js";
-import { createImpressaPDF } from "../utils/pdfLayout.js";
+import { createKuriMacyePDF } from "../utils/pdfLayout.js";
 import convertToCSV from "../utils/csvExporter.js";
 import generateAISummary from "../utils/aiSummary.js";
 import sendReportEmail from "../utils/sendReportEmail.js";
@@ -34,7 +34,7 @@ const getLogoBuffer = async (logoUrlOrPath) => {
 };
 
 /**
- * 📊 Generate and export business reports
+ * ðŸ“Š Generate and export business reports
  */
 export const generateReport = async (req, res) => {
     try {
@@ -86,7 +86,7 @@ export const generateReport = async (req, res) => {
         try {
             await sendReportEmail({
                 to: user.email,
-                subject: `📊 ${type.charAt(0).toUpperCase() + type.slice(1)} Report Ready`,
+                subject: `ðŸ“Š ${type.charAt(0).toUpperCase() + type.slice(1)} Report Ready`,
                 text: `Your report has been generated.\n\nSummary:\n${aiSummary}`,
             });
         } catch (e) {
@@ -114,9 +114,9 @@ export const generateReport = async (req, res) => {
         let reportDateTitle = "";
         try {
             if (type === "daily" && filters.date) {
-                reportDateTitle = ` – ${new Date(filters.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+                reportDateTitle = ` â€“ ${new Date(filters.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}`;
             } else if (type === "monthly" && filters.month && filters.year) {
-                reportDateTitle = ` – ${new Date(parseInt(filters.year), parseInt(filters.month) - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+                reportDateTitle = ` â€“ ${new Date(parseInt(filters.year), parseInt(filters.month) - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
             }
         } catch (e) {
             reportDateTitle = "";
@@ -145,7 +145,7 @@ export const generateReport = async (req, res) => {
         const hasStore = !!(user.storeName);
         const isSellerReport = hasStore; // Treat as seller report if they have a store name
         
-        const companyName = isSellerReport ? user.storeName : (settings?.siteName || "IMPRESSA");
+        const companyName = isSellerReport ? user.storeName : (settings?.siteName || "KURI MACYE");
         const companySubtitle = isSellerReport ? (user.storeDescription || "Store Performance Report") : "Platform Performance Report";
         
         // Address formatting
@@ -157,11 +157,11 @@ export const generateReport = async (req, res) => {
             }
         }
 
-        const doc = createImpressaPDF({
+        const doc = createKuriMacyePDF({
             title: performanceTitle,
             companyName: companyName,
             subtitle: companySubtitle,
-            companyEmail: isSellerReport ? user.email : (settings?.contactEmail || "support@impressa.com"),
+            companyEmail: isSellerReport ? user.email : (settings?.contactEmail || "support@kurimacye.com"),
             companyPhone: isSellerReport ? (user.storePhone || user.phone) : (settings?.contactPhone || "+250 788 819 878"),
             companyAddress: displayAddress,
             contentBuilder: (pdfDoc, helpers) => {
@@ -333,3 +333,4 @@ export const generateReport = async (req, res) => {
         }
     }
 };
+

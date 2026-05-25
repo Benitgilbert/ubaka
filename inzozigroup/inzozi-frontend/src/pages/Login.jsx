@@ -52,14 +52,14 @@ const Login = ({ onBackToLanding }) => {
           <div className="w-20 h-20 bg-slate-900/60 rounded-3xl p-3.5 flex items-center justify-center border border-slate-850 shadow-xl shadow-purple-500/5 backdrop-blur-sm relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
             <img 
-              src="/inzozi_symbol.png" 
-              alt="INZOZI Group Symbol" 
+              src="/ubaka_symbol.png" 
+              alt="Ubaka Tech Symbol" 
               className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(168,85,247,0.3)] animate-pulse" 
             />
           </div>
           <div className="flex items-center gap-2">
             <h1 className="text-sm font-extrabold tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-200 to-purple-400 uppercase">
-              INZOZI GROUP
+              UBAKA TECH
             </h1>
           </div>
         </div>
@@ -85,7 +85,7 @@ const Login = ({ onBackToLanding }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="username@inzozi.com"
+                placeholder="username@ubakatech.com"
                 className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-650 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/25 transition-all font-mono"
                 required
               />

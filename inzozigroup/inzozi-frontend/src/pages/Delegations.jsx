@@ -367,7 +367,7 @@ const Delegations = () => {
   // Resolve dynamic approver for live routing diagram
   const activeApprover = delegations.find(d => 
     d.isActive && 
-    (d.targetRoleCode === 'content_controller' || d.customPermissions?.includes('approve_products'))
+    (d.targetRoleCode === 'content_controller' || d.customPermissions?.includes('approve_impressa_products'))
   );
 
   return (
@@ -429,7 +429,7 @@ const Delegations = () => {
           <div className="lg:col-span-7 space-y-4">
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
               <FileText className="w-4 h-4 text-purple-400" />
-              INZOZI Group Staff Roster
+              Ubaka Tech Staff Roster
             </h3>
             
             <div className="bg-slate-900/15 backdrop-blur-md border border-slate-900 rounded-2xl p-5 shadow-2xl space-y-4">
@@ -830,7 +830,7 @@ const Delegations = () => {
                       type="email"
                       value={hireEmail}
                       onChange={(e) => setHireEmail(e.target.value)}
-                      placeholder="moderator@inzozi.com"
+                      placeholder="moderator@ubakatech.com"
                       className="w-full bg-slate-950 border border-slate-850 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-655 outline-none focus:border-purple-500/60 focus:bg-slate-950 transition-colors"
                       disabled={hireSubmitting}
                     />

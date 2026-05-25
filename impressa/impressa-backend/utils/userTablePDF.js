@@ -1,10 +1,10 @@
-﻿import { createImpressaPDF } from "./pdfLayout.js";
+import { createKuriMacyePDF } from "./pdfLayout.js";
 
 export const generateUserTablePDF = ({ userRows, signatory, logoPath }) => {
-  return createImpressaPDF({
+  return createKuriMacyePDF({
     title: "User Table Report",
     logoPath,
-    signatory: signatory || { name: "Impressa Admin", title: "System Generated" },
+    signatory: signatory || { name: "Kuri Macye Admin", title: "System Generated" },
     contentBuilder: (doc, helpers) => {
       helpers.table({
         columns: [
@@ -23,3 +23,4 @@ export const generateUserTablePDF = ({ userRows, signatory, logoPath }) => {
     }
   });
 };
+

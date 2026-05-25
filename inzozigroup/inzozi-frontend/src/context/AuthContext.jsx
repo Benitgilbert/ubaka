@@ -16,7 +16,7 @@ export const API_BASE_URL = `${BACKEND_URL}/api`;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('inzozi_token') || null);
+  const [token, setToken] = useState(localStorage.getItem('ubaka_token') || null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('inzozi_token', data.token);
+        localStorage.setItem('ubaka_token', data.token);
         setToken(data.token);
         setUser(data.user);
         return { success: true };
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('inzozi_token');
+    localStorage.removeItem('ubaka_token');
     setToken(null);
     setUser(null);
   };

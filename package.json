@@ -1,7 +1,7 @@
 {
-  "name": "inzozi-ecosystem-monorepo",
+  "name": "ubaka-tech-ecosystem-monorepo",
   "version": "1.0.0",
-  "description": "Unified monorepo workspace for INZOZI Group ecosystem applications",
+  "description": "Unified monorepo workspace for Ubaka Tech ecosystem applications",
   "private": true,
   "workspaces": [
     "impressa/impressa-backend",
@@ -12,9 +12,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install:all": "npm install",
-    "dev:inzozi": "concurrently \"npm run dev -w inzozigroup/inzozi-backend\" \"npm run dev -w inzozigroup/inzozi-frontend\"",
+    "dev:ubaka": "concurrently \"npm run dev -w inzozigroup/inzozi-backend\" \"npm run dev -w inzozigroup/inzozi-frontend\"",
     "dev:impressa": "concurrently \"npm run dev -w impressa/impressa-backend\" \"npm run dev -w impressa/impressa-frontend\"",
-    "build:inzozi": "npm run build -w inzozigroup/inzozi-frontend",
+    "build:ubaka": "npm run build -w inzozigroup/inzozi-frontend",
     "build:impressa": "npm run build -w impressa/impressa-frontend"
   },
   "keywords": [],

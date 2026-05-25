@@ -75,7 +75,7 @@ export default function Shop() {
     if (category !== selectedCategory) setSelectedCategory(category);
 
     // Update SEO Page Title
-    const title = category ? `${category} | Impressa Shop` : sortBy === 'featured' ? 'Featured Products | Impressa' : sortBy === 'trending' ? 'Trending Now | Impressa' : 'Shop Premium Custom Prints | Impressa';
+    const title = category ? `${category} | Kuri Macye Shop` : sortBy === 'featured' ? 'Featured Products | Kuri Macye' : sortBy === 'trending' ? 'Trending Now | Kuri Macye' : 'Shop Premium Custom Prints | Kuri Macye';
     document.title = title;
 
     // Only update local search if q matches URL (to allow typing without interference)

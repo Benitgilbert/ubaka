@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 
-export const createImpressaPDF = ({ 
+export const createKuriMacyePDF = ({ 
   title, 
   companyName, 
   subtitle, 
@@ -23,7 +23,7 @@ export const createImpressaPDF = ({
 
     // Fixed Branding - Match User's Request Exactly
     doc.fillColor("#1E3A8A").fontSize(20).font("Helvetica-Bold")
-      .text((companyName || "IMPRESSA").toUpperCase(), left, top);
+      .text((companyName || "KURI MACYE").toUpperCase(), left, top);
 
     doc.fillColor("#64748B").fontSize(9).font("Helvetica")
       .text(subtitle || "Custom Solutions ", left, top + 24);
@@ -56,9 +56,9 @@ export const createImpressaPDF = ({
       .strokeColor("#E5E7EB").lineWidth(0.5).stroke();
 
     const contactInfo = [
-      companyEmail || "support@impressa.com",
+      companyEmail || "support@kurimacye.rw",
       companyPhone || "+250 000 000 000",
-      companyAddress || "Impressa Platform"
+      companyAddress || "Kuri Macye Platform"
     ].filter(Boolean).join(" | ");
 
     doc.fillColor("#94A3B8").fontSize(7.5).font("Helvetica")
@@ -277,3 +277,4 @@ export const createImpressaPDF = ({
 
   return doc;
 };
+
