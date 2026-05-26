@@ -210,7 +210,7 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       <Header />
 
-      <main className="py-8 md:py-12">
+      <main className="py-4 md:py-12">
         <div className="container mx-auto px-4">
           <Breadcrumbs
             items={[
@@ -246,7 +246,7 @@ export default function ProductDetail() {
               </div>
 
               {/* Info Section */}
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4 md:gap-6">
                 <div>
                   <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">{product.name}</h1>
                   <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">{product.description || "No description available."}</p>
