@@ -237,7 +237,11 @@ export default function ProductDetail() {
               {/* Image Section */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-800 transition-all duration-300 hover:shadow-2xl w-full h-[280px] md:h-[350px] lg:h-[450px] max-w-[480px] mx-auto flex items-center justify-center p-4 md:p-6">
                 {product.image ? (
-                  <img src={assetUrl(product.image)} alt={product.name} className="max-h-full max-w-full object-contain rounded-2xl" />
+                  <img 
+                    src={assetUrl(product.image)} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain rounded-2xl transition-transform duration-500 hover:scale-105" 
+                  />
                 ) : (
                   <div className="aspect-square w-full flex items-center justify-center bg-gray-50 dark:bg-slate-850">
                     <FaTshirt className="text-8xl text-gray-300 dark:text-gray-600" />
