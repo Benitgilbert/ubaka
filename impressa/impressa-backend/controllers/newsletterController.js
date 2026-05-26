@@ -40,12 +40,10 @@ export const subscribe = async (req, res, next) => {
                     }
                 });
 
-                // Send welcome email
-                try {
-                    await sendWelcomeEmail(lowercaseEmail);
-                } catch (error) {
+                // Send welcome email in background
+                sendWelcomeEmail(lowercaseEmail).catch((error) => {
                     console.error("Failed to send welcome email:", error);
-                }
+                });
 
                 return res.json({
                     success: true,
@@ -67,12 +65,10 @@ export const subscribe = async (req, res, next) => {
             notifyNewSubscriber(email);
         } catch (e) { }
 
-        // Send welcome email
-        try {
-            await sendWelcomeEmail(lowercaseEmail);
-        } catch (error) {
+        // Send welcome email in background
+        sendWelcomeEmail(lowercaseEmail).catch((error) => {
             console.error("Failed to send welcome email:", error);
-        }
+        });
 
         res.status(201).json({
             success: true,
