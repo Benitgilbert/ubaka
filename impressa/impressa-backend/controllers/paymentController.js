@@ -104,14 +104,18 @@ export const processPayment = async (req, res, next) => {
 export const checkPaymentStatus = async (req, res, next) => {
   try {
     const { orderId } = req.params;
+    console.log(`🔍 [checkPaymentStatus] Received request for orderId: "${orderId}"`);
+    
     const order = await prisma.order.findUnique({ 
         where: { id: orderId },
         include: { items: true }
     });
 
     if (!order) {
+      console.log(`❌ [checkPaymentStatus] Order with id "${orderId}" NOT found in database!`);
       return res.status(404).json({ message: "Order not found" });
     }
+    console.log(`✅ [checkPaymentStatus] Order found in database: publicId=${order.publicId}, current paymentStatus=${order.paymentStatus}`);
 
     if (order.paymentMethod === "mtn_momo" && order.transactionId) {
       let statusData;
