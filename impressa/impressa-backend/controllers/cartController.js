@@ -346,7 +346,7 @@ export const applyCoupon = async (req, res, next) => {
   try {
     const { couponCode } = req.body;
     if (!couponCode) {
-      const error = new Error("Coupon code is required");
+      const error = new Error("Promo code is required");
       error.statusCode = 400;
       return next(error);
     }
@@ -364,7 +364,7 @@ export const applyCoupon = async (req, res, next) => {
 
     const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
     if (!coupon || !coupon.isActive || new Date() > new Date(coupon.expiresAt) || new Date() < new Date(coupon.validFrom)) {
-        const error = new Error("Invalid or expired coupon");
+        const error = new Error("Invalid or expired promo code");
         error.statusCode = 400;
         return next(error);
     }
@@ -378,7 +378,7 @@ export const applyCoupon = async (req, res, next) => {
     }
 
     if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
-        const error = new Error("Coupon usage limit reached");
+        const error = new Error("Promo code usage limit reached");
         error.statusCode = 400;
         return next(error);
     }
@@ -396,7 +396,7 @@ export const applyCoupon = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "Coupon applied successfully",
+      message: "Promo code applied successfully",
       data: formatCartResponse(populatedCart, coupon.code, discountAmount),
       sessionToken: userId ? sessionToken : cart.id,
     });
@@ -414,7 +414,7 @@ export const removeCoupon = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "Coupon removed",
+      message: "Promo code removed",
       data: formatCartResponse(populatedCart),
       sessionToken: userId ? sessionToken : cart.id,
     });

@@ -46,14 +46,33 @@ export default function CheckoutPage() {
   // Pre-fill user data if logged in
   useEffect(() => {
     if (user) {
+      const shipping = user.shippingAddress || {};
+      const billing = user.billingAddress || {};
+      const targetAddress = shipping.province ? shipping : (billing.province ? billing : null);
+
       setFormData(prev => ({
         ...prev,
         firstName: user.name ? user.name.split(' ')[0] : prev.firstName,
         lastName: user.name && user.name.split(' ').length > 1 ? user.name.split(' ').slice(1).join(' ') : prev.lastName,
         email: user.email || prev.email,
-        phone: user.phone || prev.phone,
-        address: user.address || prev.address,
+        phone: targetAddress?.phone || user.phone || prev.phone,
+        address: targetAddress?.street || prev.address || user.address || "",
+        province: targetAddress?.province || prev.province,
+        district: targetAddress?.district || prev.district,
+        sector: targetAddress?.sector || prev.sector,
+        cell: targetAddress?.cell || prev.cell,
+        city: targetAddress?.district || prev.city,
       }));
+
+      if (targetAddress?.province) {
+        setAvailableDistricts(getDistricts(targetAddress.province));
+      }
+      if (targetAddress?.district) {
+        setAvailableSectors(getSectors(targetAddress.district));
+      }
+      if (targetAddress?.sector) {
+        setAvailableCells(getCells(targetAddress.sector));
+      }
     }
   }, [user]);
 

@@ -3,15 +3,15 @@ import prisma from "../prisma.js";
 // Helper functions (formerly in Mongoose Model)
 const findValidCoupon = async (code) => {
   const coupon = await prisma.coupon.findUnique({ where: { code } });
-  if (!coupon) throw new Error("Coupon not found");
-  if (!coupon.isActive) throw new Error("Coupon is not active");
+  if (!coupon) throw new Error("Promo code not found");
+  if (!coupon.isActive) throw new Error("Promo code is not active");
   
   const now = new Date();
-  if (now < new Date(coupon.validFrom)) throw new Error("Coupon is not valid yet");
-  if (now > new Date(coupon.expiresAt)) throw new Error("Coupon has expired");
+  if (now < new Date(coupon.validFrom)) throw new Error("Promo code is not valid yet");
+  if (now > new Date(coupon.expiresAt)) throw new Error("Promo code has expired");
   
   if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
-    throw new Error("Coupon usage limit reached");
+    throw new Error("Promo code usage limit reached");
   }
   return coupon;
 };
@@ -27,7 +27,7 @@ const canUserUse = (coupon, userId, userEmail) => {
   }
   
   if (userUsageCount >= coupon.perUserLimit) {
-    return { canUse: false, reason: "You have reached the usage limit for this coupon" };
+    return { canUse: false, reason: "You have reached the usage limit for this promo code" };
   }
   
   return { canUse: true };
@@ -81,7 +81,7 @@ export const getCouponById = async (req, res, next) => {
     const coupon = await prisma.coupon.findUnique({ where: { id } });
 
     if (!coupon) {
-      const error = new Error("Coupon not found");
+      const error = new Error("Promo code not found");
       error.statusCode = 404;
       return next(error);
     }
@@ -165,7 +165,7 @@ export const createCoupon = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: "Coupon created successfully",
+      message: "Promo code created successfully",
       data: coupon,
     });
   } catch (error) {
@@ -198,12 +198,12 @@ export const updateCoupon = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "Coupon updated successfully",
+      message: "Promo code updated successfully",
       data: coupon,
     });
   } catch (error) {
     if (error.code === 'P2025') {
-      const err = new Error("Coupon not found");
+      const err = new Error("Promo code not found");
       err.statusCode = 404;
       return next(err);
     }
@@ -221,11 +221,11 @@ export const deleteCoupon = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: "Coupon deleted successfully",
+      message: "Promo code deleted successfully",
     });
   } catch (error) {
     if (error.code === 'P2025') {
-      const err = new Error("Coupon not found");
+      const err = new Error("Promo code not found");
       err.statusCode = 404;
       return next(err);
     }
@@ -242,7 +242,7 @@ export const getCouponStats = async (req, res, next) => {
     const coupon = await prisma.coupon.findUnique({ where: { id } });
 
     if (!coupon) {
-      const error = new Error("Coupon not found");
+      const error = new Error("Promo code not found");
       error.statusCode = 404;
       return next(error);
     }

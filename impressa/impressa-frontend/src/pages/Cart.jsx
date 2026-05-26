@@ -21,10 +21,10 @@ export default function CartPage() {
     if (!couponCode.trim()) return;
     try {
       await applyCoupon(couponCode);
-      setCouponMessage({ type: "success", text: "Coupon applied successfully!" });
+      setCouponMessage({ type: "success", text: "Promo code applied successfully!" });
       setCouponCode("");
     } catch (error) {
-      setCouponMessage({ type: "error", text: error.response?.data?.message || "Invalid coupon code" });
+      setCouponMessage({ type: "error", text: error.response?.data?.message || "Invalid promo code" });
     }
   };
 
