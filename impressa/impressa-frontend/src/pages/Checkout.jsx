@@ -9,6 +9,7 @@ import { useToast } from "../context/ToastContext";
 import { FaShoppingCart, FaCreditCard, FaMoneyBillWave, FaLock, FaTruck, FaMobileAlt, FaGift } from "react-icons/fa";
 import LandingFooter from "../components/LandingFooter";
 import Header from "../components/Header";
+import assetUrl from "../utils/assetUrl";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -326,329 +327,364 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
       <Header />
+      <style>{`
+        /* Webkit browser autofill overrides */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+          -webkit-box-shadow: 0 0 0 1000px #f9fafb inset !important;
+          -webkit-text-fill-color: #111827 !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+        .dark input:-webkit-autofill,
+        .dark input:-webkit-autofill:hover, 
+        .dark input:-webkit-autofill:focus, 
+        .dark input:-webkit-autofill:active {
+          -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+          -webkit-text-fill-color: #ffffff !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+      `}</style>
 
       <main>
-        <section className="relative py-16 md:py-24 overflow-hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
+        <section className="relative py-10 md:py-14 overflow-hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-10 left-10 w-72 h-72 bg-violet-200 dark:bg-violet-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
             <div className="absolute top-20 right-20 w-72 h-72 bg-fuchsia-200 dark:bg-fuchsia-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
             <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-200 dark:bg-blue-900/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
           </div>
           <div className="relative mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center gap-4">
-              <FaLock className="text-violet-600" /> Secure Checkout
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-3">
+              <FaLock className="text-violet-600 text-xl md:text-2xl animate-pulse" /> Secure Checkout
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Almost there! Please provide your details to complete the order.
             </p>
           </div>
         </section>
 
-        <section className="py-12 md:py-16">
-          <div className="mx-auto max-w-3xl px-4">
-            <form onSubmit={handlePlaceOrder} className="space-y-8">
+        <section className="py-8 md:py-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-              {/* 1. Billing & Shipping Card */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                <div className="flex items-center gap-4 mb-8 border-b border-gray-50 dark:border-slate-800 pb-6">
-                  <div className="p-3 bg-violet-50 dark:bg-violet-900/10 rounded-xl text-violet-600 dark:text-violet-400">
-                    <FaTruck className="text-2xl" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Billing & Delivery</h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Enter your delivery details</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">First Name</label>
-                    <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Last Name</label>
-                    <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
-                  </div>
-                  <div className="md:col-span-2 space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Email Address</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
-                  </div>
-                  <div className="md:col-span-2 space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Phone Number</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Province</label>
-                    <select name="province" value={formData.province} onChange={handleProvinceChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer">
-                      <option value="">Select Province</option>
-                      {provinces.map(prov => <option key={prov} value={prov}>{prov}</option>)}
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">District</label>
-                    <select name="district" value={formData.district} onChange={handleDistrictChange} required disabled={!formData.province} className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer disabled:opacity-50">
-                      <option value="">Select District</option>
-                      {availableDistricts.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Sector</label>
-                    <select name="sector" value={formData.sector} onChange={handleSectorChange} required disabled={!formData.district} className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer disabled:opacity-50">
-                      <option value="">Select Sector</option>
-                      {availableSectors.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Cell</label>
-                    <select name="cell" value={formData.cell} onChange={handleCellChange} required disabled={!formData.sector} className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer disabled:opacity-50">
-                      <option value="">Select Cell</option>
-                      {availableCells.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-
-                  <div className="md:col-span-2 space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Street Address</label>
-                    <input type="text" name="address" value={formData.address} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" placeholder="e.g. KG 123 St, Village name" />
-                  </div>
-                </div>
-
-                {/* Shipping Method Selector inside Billing Card */}
-                <div className="mt-10 pt-10 border-t border-gray-50 dark:border-slate-800">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                    <FaTruck className="text-violet-600" /> Delivery Method
-                  </h3>
-                  {loadingShipping ? (
-                    <div className="flex items-center gap-3 text-gray-500">
-                      <div className="w-4 h-4 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-sm">Calculating delivery options...</span>
+              {/* Left Column: Forms */}
+              <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+                
+                {/* 1. Billing & Shipping Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-all duration-300">
+                  <div className="flex items-center gap-4 mb-6 border-b border-gray-50 dark:border-slate-800 pb-4">
+                    <div className="p-2.5 bg-violet-50 dark:bg-violet-900/10 rounded-xl text-violet-600 dark:text-violet-400">
+                      <FaTruck className="text-xl" />
                     </div>
-                  ) : shippingMethods.length > 0 ? (
-                    <div className="space-y-4">
-                      {shippingMethods.map((method, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => handleMethodChange(method)}
-                          className={`group p-4 rounded-2xl border-2 cursor-pointer flex justify-between items-center transition-all ${selectedMethod?.id === method.id
-                            ? 'bg-violet-50 dark:bg-violet-900/10 border-violet-600 shadow-lg shadow-violet-500/10'
-                            : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 hover:border-violet-400'}`}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedMethod?.id === method.id ? 'border-violet-600' : 'border-gray-300 dark:border-slate-600 group-hover:border-violet-400'}`}>
-                              {selectedMethod?.id === method.id && <div className="w-2.5 h-2.5 bg-violet-600 rounded-full" />}
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Billing & Delivery</h2>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Enter your delivery details</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">First Name</label>
+                      <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Last Name</label>
+                      <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
+                    </div>
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Email Address</label>
+                      <input type="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
+                    </div>
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Phone Number</label>
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Province</label>
+                      <select name="province" value={formData.province} onChange={handleProvinceChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer">
+                        <option value="">Select Province</option>
+                        {provinces.map(prov => <option key={prov} value={prov}>{prov}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">District</label>
+                      <select name="district" value={formData.district} onChange={handleDistrictChange} required disabled={!formData.province} className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer disabled:opacity-50">
+                        <option value="">Select District</option>
+                        {availableDistricts.map(d => <option key={d} value={d}>{d}</option>)}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Sector</label>
+                      <select name="sector" value={formData.sector} onChange={handleSectorChange} required disabled={!formData.district} className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer disabled:opacity-50">
+                        <option value="">Select Sector</option>
+                        {availableSectors.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Cell</label>
+                      <select name="cell" value={formData.cell} onChange={handleCellChange} required disabled={!formData.sector} className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all cursor-pointer disabled:opacity-50">
+                        <option value="">Select Cell</option>
+                        {availableCells.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Street Address</label>
+                      <input type="text" name="address" value={formData.address} onChange={handleInputChange} required className="w-full bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-violet-500 transition-all placeholder:text-gray-400" placeholder="e.g. KG 123 St, Village name" />
+                    </div>
+                  </div>
+
+                  {/* Shipping Method Selector inside Billing Card */}
+                  <div className="mt-8 pt-8 border-t border-gray-50 dark:border-slate-800">
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FaTruck className="text-violet-600" /> Delivery Method
+                    </h3>
+                    {loadingShipping ? (
+                      <div className="flex items-center gap-3 text-gray-500 py-2">
+                        <div className="w-4 h-4 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs">Calculating delivery options...</span>
+                      </div>
+                    ) : shippingMethods.length > 0 ? (
+                      <div className="space-y-3">
+                        {shippingMethods.map((method, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleMethodChange(method)}
+                            className={`group p-3.5 rounded-xl border-2 cursor-pointer flex justify-between items-center transition-all duration-200 ${selectedMethod?.id === method.id
+                              ? 'bg-violet-50 dark:bg-violet-900/10 border-violet-600 shadow-md shadow-violet-500/5'
+                              : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-750 hover:border-violet-400'}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedMethod?.id === method.id ? 'border-violet-600' : 'border-gray-300 dark:border-slate-650 group-hover:border-violet-400'}`}>
+                                {selectedMethod?.id === method.id && <div className="w-2.5 h-2.5 bg-violet-600 rounded-full" />}
+                              </div>
+                              <span className={`text-sm font-bold transition-colors ${selectedMethod?.id === method.id ? 'text-violet-900 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-violet-600'}`}>{method.name}</span>
                             </div>
-                            <span className={`font-bold transition-colors ${selectedMethod?.id === method.id ? 'text-violet-900 dark:text-violet-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-violet-600'}`}>{method.name}</span>
+                            <span className="text-base font-extrabold text-violet-600 dark:text-violet-400">{method.cost === 0 ? "Free" : formatRwf(method.cost)}</span>
                           </div>
-                          <span className="text-lg font-black text-violet-600 dark:text-violet-400">{method.cost === 0 ? "Free" : formatRwf(method.cost)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 text-sm text-gray-500 text-center italic">
-                      Please complete your location details to see delivery options.
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-800 text-xs text-gray-500 text-center italic">
+                        Please complete your location details to see delivery options.
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* 2. Payment Method Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-all duration-300">
+                  <div className="flex items-center gap-4 mb-6 border-b border-gray-50 dark:border-slate-800 pb-4">
+                    <div className="p-2.5 bg-amber-50 dark:bg-amber-900/10 rounded-xl text-amber-600 dark:text-amber-400">
+                      <FaCreditCard className="text-xl" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Payment Method</h2>
+                      <p className="text-gray-500 dark:text-gray-400 text-xs">Choose how you want to pay</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {/* MoMo Option */}
+                    <div
+                      onClick={() => setPaymentMethod("mtn_momo")}
+                      className={`group rounded-xl border-2 transition-all duration-200 overflow-hidden ${paymentMethod === 'mtn_momo'
+                        ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-500 shadow-md shadow-amber-500/5'
+                        : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-750 hover:border-amber-400'}`}
+                    >
+                      <div className="p-4 flex items-center justify-between cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'mtn_momo' ? 'border-amber-500' : 'border-gray-300 dark:border-slate-650 group-hover:border-amber-400'}`}>
+                            {paymentMethod === 'mtn_momo' && <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" />}
+                          </div>
+                          <span className={`text-sm font-bold transition-colors ${paymentMethod === 'mtn_momo' ? 'text-amber-900 dark:text-amber-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-amber-600'}`}>MTN Mobile Money</span>
+                        </div>
+                        <FaMoneyBillWave className="text-amber-500 text-xl animate-pulse" />
+                      </div>
+
+                      {paymentMethod === "mtn_momo" && (
+                        <div className="px-4 pb-4 pt-0">
+                          <div className="bg-white dark:bg-slate-900/50 p-3 rounded-xl border border-amber-100 dark:border-amber-900/30">
+                            <label className="text-[9px] font-bold text-amber-605 dark:text-amber-400 uppercase tracking-widest mb-1.5 block">Phone Number for payment</label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500"><FaMobileAlt className="text-sm" /></span>
+                              <input
+                                type="tel"
+                                value={momoPhone}
+                                onChange={(e) => setMomoPhone(e.target.value)}
+                                placeholder="079xxxxxxx"
+                                className="w-full bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl py-2.5 pl-9 pr-4 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder:text-amber-600/40 dark:placeholder:text-amber-500/30"
+                              />
+                            </div>
+                            <p className="text-[9px] text-amber-600/60 mt-2 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                              You will receive a prompt to enter your PIN on your phone
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Credit Card (Disabled) */}
+                    <div className="group rounded-xl border-2 border-gray-100 dark:border-slate-850 p-4 flex items-center justify-between opacity-50 cursor-not-allowed">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4.5 h-4.5 rounded-full border-2 border-gray-300 dark:border-slate-650"></div>
+                        <span className="text-sm font-bold text-gray-400">Credit Card <span className="text-[9px] uppercase tracking-widest ml-2 bg-gray-100 dark:bg-slate-800 py-0.5 px-2 rounded">Soon</span></span>
+                      </div>
+                      <FaCreditCard className="text-gray-300 text-xl" />
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
-              {/* 2. Payment Method Card */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                <div className="flex items-center gap-4 mb-8 border-b border-gray-50 dark:border-slate-800 pb-6">
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl text-amber-600 dark:text-amber-400">
-                    <FaCreditCard className="text-2xl" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Payment Method</h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Choose how you want to pay</p>
-                  </div>
-                </div>
+              {/* Right Column: Order Summary (Sticky on Desktop) */}
+              <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 space-y-6">
+                
+                {/* 3. Order Summary Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-all duration-300">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                    <span className="p-2.5 bg-green-50 dark:bg-green-900/10 rounded-xl text-green-600 dark:text-green-400">
+                      <FaShoppingCart className="text-lg" />
+                    </span>
+                    Your Order
+                  </h2>
 
-                <div className="space-y-4">
-                  {/* MoMo Option */}
-                  <div
-                    onClick={() => setPaymentMethod("mtn_momo")}
-                    className={`group rounded-2xl border-2 transition-all overflow-hidden ${paymentMethod === 'mtn_momo'
-                      ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-500 shadow-lg shadow-amber-500/10'
-                      : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 hover:border-amber-400'}`}
-                  >
-                    <div className="p-5 flex items-center justify-between cursor-pointer">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'mtn_momo' ? 'border-amber-500' : 'border-gray-300 dark:border-slate-600 group-hover:border-amber-400'}`}>
-                          {paymentMethod === 'mtn_momo' && <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" />}
+                  <div className="space-y-3 mb-6 max-h-[320px] overflow-y-auto pr-1">
+                    {items.map((item, idx) => (
+                      <div key={idx} className="flex gap-4 items-center bg-gray-50/50 dark:bg-slate-800/30 p-3 rounded-xl border border-gray-100 dark:border-slate-800/50 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-sm hover:shadow-md group">
+                        <div className="w-16 h-16 bg-white dark:bg-slate-950 rounded-lg overflow-hidden shadow-inner flex-shrink-0 flex items-center justify-center">
+                          {item.image ? (
+                            <img src={assetUrl(item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-slate-700 bg-gray-100 dark:bg-slate-800 text-base font-bold">IMP</div>
+                          )}
                         </div>
-                        <span className={`font-bold transition-colors ${paymentMethod === 'mtn_momo' ? 'text-amber-900 dark:text-amber-300' : 'text-gray-700 dark:text-gray-300 group-hover:text-amber-600'}`}>MTN Mobile Money</span>
-                      </div>
-                      <FaMoneyBillWave className="text-amber-500 text-2xl" />
-                    </div>
-
-                    {paymentMethod === "mtn_momo" && (
-                      <div className="px-5 pb-5 pt-0 animate-fade-in">
-                        <div className="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-amber-100 dark:border-amber-900/30">
-                          <label className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2 block">Phone Number for payment</label>
-                          <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-500"><FaMobileAlt /></span>
-                            <input
-                              type="tel"
-                              value={momoPhone}
-                              onChange={(e) => setMomoPhone(e.target.value)}
-                              placeholder="079xxxxxxx"
-                              className="w-full bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl py-3 pl-10 pr-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder:text-amber-600/40 dark:placeholder:text-amber-500/30"
-                            />
+                        <div className="flex-grow min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors mb-0.5">{item.name}</p>
+                            <p className="text-xs font-bold text-gray-400 dark:text-gray-500">Qty: {item.quantity}</p>
                           </div>
-                          <p className="text-[10px] text-amber-600/60 mt-3 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                            You will receive a prompt to enter your PIN on your phone
+                          <p className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                            {formatRwf(item.quantity * (item.price || item.product?.price || 0))}
                           </p>
                         </div>
                       </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-3 pt-6 border-t border-gray-100 dark:border-slate-800 px-1">
+                    <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs font-medium">
+                      <span>Subtotal</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{formatRwf(totals.subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-500 dark:text-gray-400 text-xs font-medium">
+                      <span>Delivery</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{selectedMethod ? formatRwf(shippingCost) : "--"}</span>
+                    </div>
+                    {taxData.taxes.map((tax, idx) => (
+                      <div key={idx} className="flex justify-between text-gray-500 dark:text-gray-400 text-xs font-medium">
+                        <span>{tax.name} ({tax.rate}%)</span>
+                        <span className="font-bold text-gray-900 dark:text-white">{formatRwf(tax.amount)}</span>
+                      </div>
+                    ))}
+                    {totals.discount > 0 && (
+                      <div className="flex justify-between text-green-600 dark:text-green-400 text-xs font-bold bg-green-50/50 dark:bg-green-900/10 p-3 rounded-xl animate-fade-in">
+                        <span>Discount (PROMO)</span>
+                        <span>-{formatRwf(totals.discount)}</span>
+                      </div>
                     )}
-                  </div>
 
-                  {/* Credit Card (Disabled) */}
-                  <div className="group rounded-2xl border-2 border-gray-100 dark:border-slate-800 p-5 flex items-center justify-between opacity-50 cursor-not-allowed">
-                    <div className="flex items-center gap-4">
-                      <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-slate-600"></div>
-                      <span className="font-bold text-gray-400">Credit Card <span className="text-[10px] uppercase tracking-widest ml-2 bg-gray-100 dark:bg-slate-800 py-0.5 px-2 rounded">Soon</span></span>
-                    </div>
-                    <FaCreditCard className="text-gray-300 text-2xl" />
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Order Summary Card */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-4">
-                  <span className="p-3 bg-green-50 dark:bg-green-900/10 rounded-xl text-green-600 dark:text-green-400">
-                    <FaShoppingCart className="text-2xl" />
-                  </span>
-                  Your Order
-                </h2>
-
-                <div className="space-y-4 mb-8">
-                  {items.map((item, idx) => (
-                    <div key={idx} className="flex gap-6 items-center bg-gray-50/50 dark:bg-slate-800/30 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-sm hover:shadow-md">
-                      <div className="w-20 h-20 bg-white dark:bg-slate-950 rounded-xl overflow-hidden shadow-inner flex-shrink-0 group">
-                        {item.image ? (
-                          <img src={process.env.REACT_APP_API_URL + item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-200 dark:text-slate-800 bg-gray-100 dark:bg-slate-800 text-xl font-bold">IMP</div>
-                        )}
+                    {/* Gift Card Application UI */}
+                    <div className="py-4 border-y border-gray-100 dark:border-slate-800 my-2">
+                      <div className="flex items-center gap-2 mb-3">
+                        <FaGift className="text-violet-500 text-xs" />
+                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Have a Gift Card?</span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors mb-1">{item.name}</p>
-                        <p className="text-sm font-bold text-gray-400 dark:text-gray-500">Qty: {item.quantity}</p>
-                      </div>
-                      <p className="text-xl font-black text-gray-900 dark:text-white">{formatRwf(item.quantity * (item.price || item.product.price || 0))}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-4 pt-8 border-t border-gray-100 dark:border-slate-800 px-2">
-                  <div className="flex justify-between text-gray-500 dark:text-gray-400 font-medium">
-                    <span>Subtotal</span>
-                    <span className="font-bold text-gray-900 dark:text-white">{formatRwf(totals.subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-500 dark:text-gray-400 font-medium">
-                    <span>Delivery</span>
-                    <span className="font-bold text-gray-900 dark:text-white">{selectedMethod ? formatRwf(shippingCost) : "--"}</span>
-                  </div>
-                  {taxData.taxes.map((tax, idx) => (
-                    <div key={idx} className="flex justify-between text-gray-500 dark:text-gray-400 font-medium">
-                      <span>{tax.name} ({tax.rate}%)</span>
-                      <span className="font-bold text-gray-900 dark:text-white">{formatRwf(tax.amount)}</span>
-                    </div>
-                  ))}
-                  {totals.discount > 0 && (
-                    <div className="flex justify-between text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-green-900/10 p-4 rounded-2xl animate-fade-in">
-                      <span>Discount (PROMO)</span>
-                      <span>-{formatRwf(totals.discount)}</span>
-                    </div>
-                  )}
-
-                  {/* Gift Card Application UI */}
-                  <div className="py-6 border-y border-gray-100 dark:border-slate-800 my-2">
-                    <div className="flex items-center gap-2 mb-4">
-                      <FaGift className="text-terracotta-500" />
-                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Have a Gift Card?</span>
-                    </div>
-                    {appliedGiftCard ? (
-                      <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-900/10 p-4 rounded-2xl border border-violet-200 dark:border-violet-800 animate-fade-in-up">
-                        <div>
-                          <p className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest">{appliedGiftCard.code}</p>
-                          <p className="text-lg font-black text-gray-900 dark:text-white mt-1">-{formatRwf(giftCardDiscount)}</p>
+                      {appliedGiftCard ? (
+                        <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-900/10 p-3 rounded-xl border border-violet-200 dark:border-violet-805 animate-fade-in-up">
+                          <div>
+                            <p className="text-[10px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest">{appliedGiftCard.code}</p>
+                            <p className="text-base font-black text-gray-900 dark:text-white mt-0.5">-{formatRwf(giftCardDiscount)}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={removeGiftCard}
+                            className="text-xs font-bold text-red-500 hover:text-red-700 uppercase tracking-tighter"
+                          >
+                            Remove
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={removeGiftCard}
-                          className="text-xs font-bold text-red-500 hover:text-red-700 uppercase tracking-tighter"
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={giftCardCode}
+                            onChange={(e) => setGiftCardCode(e.target.value)}
+                            placeholder="IMPR-XXXX-XXXX"
+                            className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all uppercase placeholder:normal-case"
+                          />
+                          <button
+                            type="button"
+                            disabled={isApplyingGC || !giftCardCode}
+                            onClick={handleApplyGiftCard}
+                            className="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-4 rounded-xl font-bold text-xs hover:bg-violet-700 transition-all disabled:opacity-50"
+                          >
+                            {isApplyingGC ? "..." : "Apply"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between items-center py-4 pt-6 border-t border-gray-100 dark:border-slate-800 mt-2">
+                      <span className="text-lg font-bold text-gray-900 dark:text-white">To Pay</span>
+                      <span className="text-2xl md:text-3xl font-black text-violet-600 dark:text-violet-400 drop-shadow-sm">{formatRwf(grandTotal)}</span>
+                    </div>
+                  </div>
+
+                  {/* Place Order Button */}
+                  <button
+                    type="submit"
+                    disabled={!selectedMethod || isProcessing}
+                    className="mt-6 w-full bg-violet-600 hover:bg-violet-700 disabled:bg-gray-200 dark:disabled:bg-slate-800 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all shadow-md shadow-violet-500/20 hover:shadow-violet-500/35 active:scale-[0.98] group"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm">Processing Order...</span>
+                      </>
                     ) : (
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={giftCardCode}
-                          onChange={(e) => setGiftCardCode(e.target.value)}
-                          placeholder="IMPR-XXXX-XXXX"
-                          className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-violet-500 outline-none transition-all uppercase placeholder:normal-case"
-                        />
-                        <button
-                          type="button"
-                          disabled={isApplyingGC || !giftCardCode}
-                          onClick={handleApplyGiftCard}
-                          className="bg-charcoal-900 dark:bg-white dark:text-charcoal-900 text-white px-6 rounded-xl font-bold text-sm hover:bg-terracotta-500 transition-all disabled:opacity-50"
-                        >
-                          {isApplyingGC ? "..." : "Apply"}
-                        </button>
-                      </div>
+                      <>
+                        <span className="text-base font-extrabold">Place Secure Order</span>
+                        <FaLock className="text-sm group-hover:translate-y-[-1px] transition-transform" />
+                      </>
                     )}
-                  </div>
-                  <div className="flex justify-between items-center py-8 pt-10 border-t border-gray-100 dark:border-slate-800 mt-4">
-                    <span className="text-2xl font-bold text-gray-900 dark:text-white">To Pay</span>
-                    <span className="text-4xl font-black text-violet-600 dark:text-violet-400 drop-shadow-sm">{formatRwf(grandTotal)}</span>
-                  </div>
+                  </button>
+
+                  {paymentStatus === "awaiting_payment" && (
+                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-500/30 rounded-xl text-center animate-pulse shadow-sm shadow-amber-500/5">
+                      <p className="font-extrabold text-amber-600 dark:text-amber-400 text-sm uppercase tracking-wider">Check your phone!</p>
+                      <p className="text-xs font-bold text-amber-900/60 dark:text-amber-100/60 mt-1 italic">Please approve the payment on {momoPhone}</p>
+                    </div>
+                  )}
+
+                  {paymentStatus === "success" && (
+                    <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/10 border-2 border-green-500/30 rounded-xl text-center shadow-sm shadow-green-500/5">
+                      <p className="font-extrabold text-green-600 dark:text-green-400 text-sm uppercase tracking-wider">Payment Successful!</p>
+                      <p className="text-xs font-bold text-green-900/60 dark:text-green-100/60 mt-1 italic">Redirecting to order confirmation...</p>
+                    </div>
+                  )}
+
+                  <p className="text-center text-[9px] font-bold text-gray-400 dark:text-slate-600 mt-6 uppercase tracking-widest leading-relaxed">
+                    By placing your order, you agree to our <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline">Terms & Conditions</Link>.
+                  </p>
                 </div>
 
-                {/* Place Order Button */}
-                <button
-                  type="submit"
-                  disabled={!selectedMethod || isProcessing}
-                  className="mt-8 w-full bg-violet-600 hover:bg-violet-700 disabled:bg-gray-200 dark:disabled:bg-slate-800 text-white py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-4 transition-all shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 active:scale-[0.98] group"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Processing Order...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Place Secure Order</span>
-                      <FaLock className="group-hover:translate-y-[-2px] transition-transform" />
-                    </>
-                  )}
-                </button>
-
-                {paymentStatus === "awaiting_payment" && (
-                  <div className="mt-6 p-5 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-500/30 rounded-2xl text-center animate-pulse shadow-lg shadow-amber-500/10">
-                    <p className="font-black text-amber-600 dark:text-amber-400 text-lg uppercase tracking-wider">Check your phone!</p>
-                    <p className="text-sm font-bold text-amber-900/60 dark:text-amber-100/60 mt-1 italic">Please approve the payment on {momoPhone}</p>
-                  </div>
-                )}
-
-                {paymentStatus === "success" && (
-                  <div className="mt-6 p-5 bg-green-50 dark:bg-green-900/10 border-2 border-green-500/30 rounded-2xl text-center shadow-lg shadow-green-500/10">
-                    <p className="font-black text-green-600 dark:text-green-400 text-lg uppercase tracking-wider">Payment Successful!</p>
-                    <p className="text-sm font-bold text-green-900/60 dark:text-green-100/60 mt-1 italic">Redirecting to order confirmation...</p>
-                  </div>
-                )}
-
-                <p className="text-center text-[10px] font-bold text-gray-400 dark:text-slate-600 mt-8 uppercase tracking-widest leading-relaxed">
-                  By placing your order, you agree to our <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline">Terms & Conditions</Link>.
-                </p>
               </div>
+
             </form>
           </div>
         </section>
