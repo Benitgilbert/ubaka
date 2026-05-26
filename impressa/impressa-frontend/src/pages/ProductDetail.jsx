@@ -235,11 +235,11 @@ export default function ProductDetail() {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
               {/* Image Section */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-800 transition-all duration-300 hover:shadow-2xl">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-slate-800 transition-all duration-300 hover:shadow-2xl aspect-square w-full flex items-center justify-center p-4 md:p-6">
                 {product.image ? (
-                  <img src={assetUrl(product.image)} alt={product.name} className="w-full h-auto object-cover" />
+                  <img src={assetUrl(product.image)} alt={product.name} className="max-h-full max-w-full object-contain rounded-2xl" />
                 ) : (
-                  <div className="aspect-square w-full flex items-center justify-center bg-gray-50 dark:bg-slate-800">
+                  <div className="aspect-square w-full flex items-center justify-center bg-gray-50 dark:bg-slate-850">
                     <FaTshirt className="text-8xl text-gray-300 dark:text-gray-600" />
                   </div>
                 )}
@@ -443,7 +443,7 @@ export default function ProductDetail() {
           {relatedProducts.length > 0 && (
             <div className="mt-20">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">You may also like</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {relatedProducts.map(p => (
                   <Link key={p.id} to={`/product/${p.slug || p.id}`} className="group bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 dark:border-slate-800">
                     <div className="aspect-square overflow-hidden bg-gray-50 dark:bg-slate-950">
