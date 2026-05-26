@@ -185,8 +185,8 @@ const FORM_SCHEMAS = {
   ],
   delivery: [
     { name: 'name', label: 'Zone Name', type: 'text', required: true },
-    { name: 'regions', label: 'Regions (JSON Array)', type: 'textarea', required: true },
-    { name: 'methods', label: 'Shipping Methods (JSON Array)', type: 'textarea', required: true },
+    { name: 'regions', label: 'Regions Covered', type: 'textarea', required: true },
+    { name: 'methods', label: 'Shipping Methods', type: 'textarea', required: true },
     { name: 'isActive', label: 'Is Active', type: 'checkbox' }
   ],
   settings: [
@@ -196,6 +196,390 @@ const FORM_SCHEMAS = {
     { name: 'contactPhone', label: 'Support Phone', type: 'text' },
     { name: 'commissionRate', label: 'Platform Fee commissionRate (%)', type: 'number', required: true }
   ]
+};
+
+const DeliveryFormEditor = ({ formData, setFormData }) => {
+  const regions = Array.isArray(formData.regions) ? formData.regions : [];
+  const methods = Array.isArray(formData.methods) ? formData.methods : [];
+
+  const updateField = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleAddRegion = () => {
+    const updated = [...regions, { province: '', district: '', sector: '', cell: '' }];
+    updateField('regions', updated);
+  };
+
+  const handleRemoveRegion = (index) => {
+    const updated = regions.filter((_, idx) => idx !== index);
+    updateField('regions', updated);
+  };
+
+  const handleRegionChange = (index, field, value) => {
+    const updated = regions.map((reg, idx) => {
+      if (idx === index) {
+        return { ...reg, [field]: value };
+      }
+      return reg;
+    });
+    updateField('regions', updated);
+  };
+
+  const handleAddMethod = () => {
+    const updated = [
+      ...methods,
+      {
+        id: `method_${Date.now()}`,
+        name: '',
+        cost: 0,
+        type: 'flat_rate',
+        isActive: true,
+        minOrderAmount: 0
+      }
+    ];
+    updateField('methods', updated);
+  };
+
+  const handleRemoveMethod = (index) => {
+    const updated = methods.filter((_, idx) => idx !== index);
+    updateField('methods', updated);
+  };
+
+  const handleMethodChange = (index, field, value) => {
+    const updated = methods.map((met, idx) => {
+      if (idx === index) {
+        return { ...met, [field]: value };
+      }
+      return met;
+    });
+    updateField('methods', updated);
+  };
+
+  return (
+    <div className="space-y-6 text-slate-200">
+      {/* Zone Name */}
+      <div className="space-y-1.5">
+        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Zone Name <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={formData.name || ''}
+          onChange={(e) => updateField('name', e.target.value)}
+          required
+          placeholder="e.g. Kigali City, Default, etc."
+          className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 focus:bg-slate-950 transition-colors"
+        />
+      </div>
+
+      {/* Regions Section */}
+      <div className="space-y-3 border-t border-slate-855/60 pt-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h4 className="text-xs font-bold text-slate-350 uppercase tracking-wider">Regions Covered</h4>
+            <p className="text-[10px] text-slate-500">Define target locations. Leave empty for Default catch-all zone.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAddRegion}
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 text-purple-400 rounded-lg text-[10px] font-bold transition-all cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Region
+          </button>
+        </div>
+
+        {regions.length === 0 ? (
+          <div className="p-4 bg-slate-955/40 border border-dashed border-slate-850 rounded-xl text-center text-[10.5px] text-slate-500 italic">
+            No specific regions defined. This zone will act as a general fallback.
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-48 overflow-y-auto pr-1 scrollbar-thin">
+            {regions.map((region, idx) => (
+              <div key={idx} className="p-3 bg-slate-955/80 border border-slate-850 rounded-xl flex items-center gap-3 relative group">
+                <div className="grid grid-cols-2 gap-2 flex-1">
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Province</span>
+                    <select
+                      value={region.province || ''}
+                      onChange={(e) => handleRegionChange(idx, 'province', e.target.value)}
+                      className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-[11px] focus:outline-none focus:border-purple-550"
+                    >
+                      <option value="">Select Province</option>
+                      <option value="Kigali City">Kigali City</option>
+                      <option value="Eastern Province">Eastern Province</option>
+                      <option value="Western Province">Western Province</option>
+                      <option value="Northern Province">Northern Province</option>
+                      <option value="Southern Province">Southern Province</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">District</span>
+                    <input
+                      type="text"
+                      value={region.district || ''}
+                      onChange={(e) => handleRegionChange(idx, 'district', e.target.value)}
+                      placeholder="e.g. Nyarugenge"
+                      className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-[11px] focus:outline-none focus:border-purple-550"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Sector</span>
+                    <input
+                      type="text"
+                      value={region.sector || ''}
+                      onChange={(e) => handleRegionChange(idx, 'sector', e.target.value)}
+                      placeholder="e.g. Kimisagara"
+                      className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-[11px] focus:outline-none focus:border-purple-550"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Cell</span>
+                    <input
+                      type="text"
+                      value={region.cell || ''}
+                      onChange={(e) => handleRegionChange(idx, 'cell', e.target.value)}
+                      placeholder="e.g. Kamuhoza"
+                      className="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-[11px] focus:outline-none focus:border-purple-550"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveRegion(idx)}
+                  className="p-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 rounded-lg transition-colors cursor-pointer"
+                  title="Remove Region"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Methods Section */}
+      <div className="space-y-3 border-t border-slate-855/60 pt-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h4 className="text-xs font-bold text-slate-350 uppercase tracking-wider">Delivery Methods</h4>
+            <p className="text-[10px] text-slate-550">Configure shipping methods and costs for this zone.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAddMethod}
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/25 text-purple-400 rounded-lg text-[10px] font-bold transition-all cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Method
+          </button>
+        </div>
+
+        {methods.length === 0 ? (
+          <div className="p-4 bg-slate-955/40 border border-dashed border-slate-850 rounded-xl text-center text-[10.5px] text-slate-500 italic">
+            No shipping methods configured. Customers in this zone will have no shipping options.
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-1 scrollbar-thin">
+            {methods.map((method, idx) => (
+              <div key={idx} className="p-4 bg-slate-955/80 border border-slate-850 rounded-xl space-y-3 relative group">
+                <div className="flex justify-between items-center border-b border-slate-850/40 pb-2">
+                  <span className="text-[9px] font-black text-purple-400 uppercase tracking-wider">Method #{idx + 1}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveMethod(idx)}
+                    className="p-1 text-slate-550 hover:text-red-400 rounded transition-colors cursor-pointer"
+                    title="Delete Method"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-550 uppercase tracking-widest">Method Name</span>
+                    <input
+                      type="text"
+                      value={method.name || ''}
+                      onChange={(e) => handleMethodChange(idx, 'name', e.target.value)}
+                      placeholder="e.g. Moto Delivery"
+                      required
+                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-555 uppercase tracking-widest">Base Cost (RWF)</span>
+                    <input
+                      type="number"
+                      value={method.cost === undefined ? 0 : method.cost}
+                      onChange={(e) => handleMethodChange(idx, 'cost', Number(e.target.value))}
+                      placeholder="e.g. 1500"
+                      required
+                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-bold text-slate-555 uppercase tracking-widest">Shipping Rule Type</span>
+                    <select
+                      value={method.type || 'flat_rate'}
+                      onChange={(e) => handleMethodChange(idx, 'type', e.target.value)}
+                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550"
+                    >
+                      <option value="flat_rate">Flat Rate</option>
+                      <option value="free_shipping">Free Shipping</option>
+                      <option value="local_pickup">Local Pickup</option>
+                    </select>
+                  </div>
+
+                  {method.type === 'free_shipping' && (
+                    <div className="space-y-1">
+                      <span className="text-[8px] font-bold text-slate-555 uppercase tracking-widest">Min Spend for Free (RWF)</span>
+                      <input
+                        type="number"
+                        value={method.minOrderAmount === undefined ? 0 : method.minOrderAmount}
+                        onChange={(e) => handleMethodChange(idx, 'minOrderAmount', Number(e.target.value))}
+                        placeholder="e.g. 20000"
+                        className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={!!method.isActive}
+                      onChange={(e) => handleMethodChange(idx, 'isActive', e.target.checked)}
+                      className="w-4 h-4 rounded border-slate-800 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-slate-950 bg-slate-900 cursor-pointer"
+                    />
+                    <span className="text-[10px] text-slate-405 font-bold uppercase tracking-wider">Method Active</span>
+                  </label>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Zone Active Toggle */}
+      <div className="pt-4 border-t border-slate-855/60">
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={!!formData.isActive}
+            onChange={(e) => updateField('isActive', e.target.checked)}
+            className="w-4.5 h-4.5 rounded border-slate-850 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-slate-950 bg-slate-955 cursor-pointer"
+          />
+          <span className="text-xs text-slate-355 font-bold uppercase tracking-wider">Is Shipping Zone Active</span>
+        </label>
+      </div>
+    </div>
+  );
+};
+
+const renderCellContent = (key, val) => {
+  // 1. Handle regions column
+  if (key === 'regions') {
+    let regions = [];
+    if (typeof val === 'string') {
+      try { regions = JSON.parse(val); } catch (e) { regions = []; }
+    } else if (Array.isArray(val)) {
+      regions = val;
+    }
+    if (!regions || regions.length === 0) {
+      return <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-900/60 text-slate-400 border border-slate-800">Default (All Regions)</span>;
+    }
+    const summaries = regions.map(r => {
+      const parts = [r.province, r.district].filter(Boolean);
+      return parts.join(' - ');
+    }).filter(Boolean);
+    const uniqueSummaries = [...new Set(summaries)];
+    
+    return (
+      <div className="flex flex-wrap gap-1 max-w-xs">
+        {uniqueSummaries.slice(0, 3).map((summary, idx) => (
+          <span key={idx} className="px-2 py-0.5 rounded text-[10px] bg-purple-950/40 text-purple-300 border border-purple-900/40 whitespace-nowrap">
+            {summary}
+          </span>
+        ))}
+        {uniqueSummaries.length > 3 && (
+          <span className="px-2 py-0.5 rounded text-[10px] bg-slate-850 text-slate-400 border border-slate-800 whitespace-nowrap">
+            +{uniqueSummaries.length - 3} more
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // 2. Handle methods column
+  if (key === 'methods') {
+    let methods = [];
+    if (typeof val === 'string') {
+      try { methods = JSON.parse(val); } catch (e) { methods = []; }
+    } else if (Array.isArray(val)) {
+      methods = val;
+    }
+    if (!methods || methods.length === 0) {
+      return <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold bg-red-950/30 text-red-400 border border-red-900/30">No Methods</span>;
+    }
+    return (
+      <div className="flex flex-wrap gap-1 max-w-xs">
+        {methods.map((m, idx) => {
+          const costStr = m.type === 'free_shipping' ? 'Free' : `${m.cost?.toLocaleString() || 0} RWF`;
+          const activeClass = m.isActive 
+            ? 'bg-emerald-950/40 text-emerald-300 border-emerald-900/40' 
+            : 'bg-slate-900/40 text-slate-500 border-slate-850';
+          return (
+            <span key={idx} className={`px-2 py-0.5 rounded text-[10px] border whitespace-nowrap ${activeClass}`}>
+              {m.name || 'Unnamed'}: {costStr}
+            </span>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // 3. Handle Active / isActive status (boolean)
+  if (key === 'isActive' || key === 'isPublished') {
+    const active = val === true || val === 'true' || val === 1 || val === '1';
+    return active ? (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-450 border border-emerald-500/20">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        Active
+      </span>
+    ) : (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-450 border border-slate-500/20">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+        Inactive
+      </span>
+    );
+  }
+
+  // 4. Handle generic statuses and severity
+  if (key === 'sellerStatus' || key === 'status' || key === 'severity') {
+    const strVal = String(val).toLowerCase();
+    let colorClass = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+    if (['active', 'resolved', 'low', 'approved'].includes(strVal)) {
+      colorClass = 'bg-emerald-500/10 text-emerald-405 border-emerald-500/20';
+    } else if (['pending', 'medium'].includes(strVal)) {
+      colorClass = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+    } else if (['rejected', 'voided', 'expired', 'high'].includes(strVal)) {
+      colorClass = 'bg-red-500/10 text-red-405 border-red-500/20';
+    }
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border capitalize ${colorClass}`}>
+        {strVal}
+      </span>
+    );
+  }
+
+  // 5. Default fallback
+  if (val !== undefined && typeof val === 'object' && val !== null) {
+    return JSON.stringify(val);
+  }
+  return String(val);
 };
 
 const ImpressaAdmin = () => {
@@ -459,7 +843,11 @@ const ImpressaAdmin = () => {
     const fields = FORM_SCHEMAS[selectedFeature] || [];
     const initialForm = {};
     fields.forEach(f => {
-      initialForm[f.name] = f.type === 'checkbox' ? false : '';
+      if (selectedFeature === 'delivery' && (f.name === 'regions' || f.name === 'methods')) {
+        initialForm[f.name] = [];
+      } else {
+        initialForm[f.name] = f.type === 'checkbox' ? false : '';
+      }
     });
     setFormData(initialForm);
     setModalMode('create');
@@ -473,10 +861,21 @@ const ImpressaAdmin = () => {
     const formVals = {};
     fields.forEach(f => {
       let val = record[f.name];
-      if (val !== undefined && typeof val === 'object' && val !== null) {
-        val = JSON.stringify(val, null, 2);
+      if (selectedFeature === 'delivery' && (f.name === 'regions' || f.name === 'methods')) {
+        if (typeof val === 'string') {
+          try {
+            val = JSON.parse(val);
+          } catch (e) {
+            val = [];
+          }
+        }
+        formVals[f.name] = Array.isArray(val) ? val : [];
+      } else {
+        if (val !== undefined && typeof val === 'object' && val !== null) {
+          val = JSON.stringify(val, null, 2);
+        }
+        formVals[f.name] = val !== undefined ? val : '';
       }
-      formVals[f.name] = val !== undefined ? val : '';
     });
     setFormData(formVals);
     setModalMode('edit');
@@ -893,7 +1292,7 @@ const ImpressaAdmin = () => {
                           <tr key={record.id} className="hover:bg-slate-900/30 transition-colors">
                             {Object.entries(record).filter(([key]) => key !== 'id').map(([key, val]) => (
                               <td key={key} className="px-5 py-3 text-xs text-slate-300 font-medium whitespace-nowrap max-w-xs truncate">
-                                {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                                {renderCellContent(key, val)}
                               </td>
                             ))}
                             <td className="px-5 py-3 text-center">
@@ -945,57 +1344,60 @@ const ImpressaAdmin = () => {
                 <X className="w-4 h-4" />
               </button>
             </div>
-
             {/* Form */}
             <form onSubmit={handleGenericSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto scrollbar-thin">
-              {(FORM_SCHEMAS[selectedFeature] || []).map((field) => (
-                <div key={field.name} className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    {field.label} {field.required && <span className="text-red-500">*</span>}
-                  </label>
-                  
-                  {field.type === 'select' ? (
-                    <select
-                      value={formData[field.name] || ''}
-                      onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                      required={field.required}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 focus:bg-slate-950 transition-colors"
-                    >
-                      <option value="" className="text-slate-500">-- Select {field.label} --</option>
-                      {field.options.map(opt => (
-                        <option key={opt} value={opt} className="bg-slate-950 text-slate-200">{opt}</option>
-                      ))}
-                    </select>
-                  ) : field.type === 'textarea' ? (
-                    <textarea
-                      value={formData[field.name] || ''}
-                      onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
-                      required={field.required}
-                      placeholder={`Enter ${field.label}...`}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 focus:bg-slate-950 transition-colors resize-none h-24"
-                    />
-                  ) : field.type === 'checkbox' ? (
-                    <label className="flex items-center gap-3 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={!!formData[field.name]}
-                        onChange={(e) => setFormData({ ...formData, [field.name]: e.target.checked })}
-                        className="w-4.5 h-4.5 rounded border-slate-850 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-slate-950 bg-slate-950 cursor-pointer"
-                      />
-                      <span className="text-xs text-slate-350 font-bold">{field.label}</span>
+              {selectedFeature === 'delivery' ? (
+                <DeliveryFormEditor formData={formData} setFormData={setFormData} />
+              ) : (
+                (FORM_SCHEMAS[selectedFeature] || []).map((field) => (
+                  <div key={field.name} className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      {field.label} {field.required && <span className="text-red-500">*</span>}
                     </label>
-                  ) : (
-                    <input
-                      type={field.type}
-                      value={formData[field.name] || ''}
-                      onChange={(e) => setFormData({ ...formData, [field.name]: field.type === 'number' ? Number(e.target.value) : e.target.value })}
-                      required={field.required}
-                      placeholder={`Enter ${field.label}...`}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 focus:bg-slate-950 transition-colors"
-                    />
-                  )}
-                </div>
-              ))}
+                    
+                    {field.type === 'select' ? (
+                      <select
+                         value={formData[field.name] || ''}
+                         onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                         required={field.required}
+                         className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-550 focus:bg-slate-950 transition-colors"
+                      >
+                        <option value="" className="text-slate-500">-- Select {field.label} --</option>
+                        {field.options.map(opt => (
+                          <option key={opt} value={opt} className="bg-slate-955 text-slate-200">{opt}</option>
+                        ))}
+                      </select>
+                    ) : field.type === 'textarea' ? (
+                      <textarea
+                        value={formData[field.name] || ''}
+                        onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                        required={field.required}
+                        placeholder={`Enter ${field.label}...`}
+                        className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-550 focus:bg-slate-950 transition-colors resize-none h-24"
+                      />
+                    ) : field.type === 'checkbox' ? (
+                      <label className="flex items-center gap-3 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={!!formData[field.name]}
+                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.checked })}
+                          className="w-4.5 h-4.5 rounded border-slate-850 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-slate-950 bg-slate-950 cursor-pointer"
+                        />
+                        <span className="text-xs text-slate-350 font-bold">{field.label}</span>
+                      </label>
+                    ) : (
+                      <input
+                        type={field.type}
+                        value={formData[field.name] || ''}
+                        onChange={(e) => setFormData({ ...formData, [field.name]: field.type === 'number' ? Number(e.target.value) : e.target.value })}
+                        required={field.required}
+                        placeholder={`Enter ${field.label}...`}
+                        className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-550 focus:bg-slate-950 transition-colors"
+                      />
+                    )}
+                  </div>
+                ))
+              )}
 
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-850">
                 <button
