@@ -437,10 +437,16 @@ export default function Shop() {
                         <span className="inline-flex items-center gap-2 bg-sage-100 dark:bg-sage-900/30 text-sage-700 dark:text-sage-400 px-3 py-1.5 rounded-full text-sm font-medium">
                           "{q}"
                           <button 
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               setLocalSearch("");
                               setQ("");
                               setDebouncedQ("");
+                              const newParams = new URLSearchParams(searchParams);
+                              newParams.delete("q");
+                              newParams.delete("search");
+                              setSearchParams(newParams, { replace: true });
                             }} 
                             className="hover:text-sage-900 dark:hover:text-sage-200"
                           >
