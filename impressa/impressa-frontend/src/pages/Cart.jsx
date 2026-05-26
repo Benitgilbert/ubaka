@@ -7,6 +7,7 @@ import LandingFooter from "../components/LandingFooter";
 import Header from "../components/Header";
 import * as api from "../services/api";
 import FlashSaleBanner from "../components/FlashSaleBanner";
+import assetUrl from "../utils/assetUrl";
 
 export default function CartPage() {
   const { items, updateQty, removeItem, totals, setFile, applyCoupon, removeCoupon, coupon } = useCart();
@@ -55,17 +56,26 @@ export default function CartPage() {
       <FlashSaleBanner />
 
       <main>
-        <section className="relative py-10 md:py-12 overflow-hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
+        <style>{`
+          /* Custom styles for cart text input focus */
+          .focus-ring-violet:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+          }
+        `}</style>
+
+        <section className="relative py-8 md:py-10 overflow-hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-10 left-10 w-72 h-72 bg-violet-200 dark:bg-violet-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
             <div className="absolute top-20 right-20 w-72 h-72 bg-fuchsia-200 dark:bg-fuchsia-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
             <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-200 dark:bg-blue-900/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
           </div>
           <div className="relative mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center gap-4">
-              <FaShoppingCart className="text-violet-600" /> Your Shopping Cart
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-3">
+              <FaShoppingCart className="text-violet-600 animate-pulse text-xl md:text-2xl" /> Your Shopping Cart
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Review your items, make any changes, and proceed to checkout.
             </p>
           </div>
@@ -74,72 +84,85 @@ export default function CartPage() {
         <section className="py-8 md:py-12">
           <div className="mx-auto max-w-7xl px-4">
             {items.length === 0 ? (
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center shadow-sm border border-gray-100 dark:border-slate-800 animate-fade-in">
-                <div className="w-24 h-24 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FaShoppingCart className="text-4xl text-gray-300 dark:text-gray-600" />
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 md:p-14 text-center shadow-sm border border-gray-105 dark:border-slate-800 animate-fade-in max-w-lg mx-auto">
+                <div className="w-20 h-20 bg-gray-55 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+                  <FaShoppingCart className="text-3xl text-gray-300 dark:text-gray-600" />
                 </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Your cart is empty</div>
-                <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">Time to find some amazing products and fill it up!</p>
+                <div className="text-xl font-bold text-gray-900 dark:text-white mb-3">Your cart is empty</div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 max-w-xs mx-auto leading-relaxed">Time to find some amazing products and fill it up!</p>
                 <Link
                   to="/shop"
-                  className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/25 active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-violet-500/20 active:scale-[0.98]"
                 >
-                  Start Shopping <FaArrowRight className="text-sm" />
+                  Start Shopping <FaArrowRight className="text-xs" />
                 </Link>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+                  
+                  {/* Desktop/Tablet Table View */}
+                  <div className="hidden md:block bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="bg-gray-50/50 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800">
-                            <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
-                            <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Price</th>
-                            <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Qty</th>
-                            <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Subtotal</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Product</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider hidden sm:table-cell">Price</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">Qty</th>
+                            <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Subtotal</th>
                             <th className="px-6 py-4 text-right"></th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
                           {items.map((it, idx) => (
                             <tr key={idx} className="group hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                              <td className="px-6 py-6">
-                                <div className="font-bold text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors mb-1">{it.name}</div>
-                                {it.customText && <div className="text-xs text-gray-500 dark:text-gray-400">Text: <span className="text-violet-600 dark:text-violet-400">{it.customText}</span></div>}
-                                {it.cloudLink && <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">Cloud: <span className="text-violet-600 dark:text-violet-400">{it.cloudLink}</span></div>}
-                                <div className="mt-4">
-                                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Customization file</label>
-                                  <input
-                                    type="file"
-                                    accept="image/*,application/pdf"
-                                    onChange={(e) => setFile(idx, e.target.files?.[0] || null)}
-                                    className="block w-full text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 cursor-pointer"
-                                  />
+                              <td className="px-6 py-5">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-16 h-16 bg-gray-50 dark:bg-slate-950 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100 dark:border-slate-800 shadow-inner">
+                                    {(it.product?.image || it.image) ? (
+                                      <img src={assetUrl(it.product?.image || it.image)} alt={it.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <div className="text-gray-300 dark:text-slate-700 text-xs font-bold">IMP</div>
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-bold text-gray-950 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors mb-1 truncate max-w-[240px] sm:max-w-none">{it.name}</div>
+                                    {it.customText && <div className="text-xs text-gray-500 dark:text-gray-400">Text: <span className="text-violet-650 dark:text-violet-400 font-medium">{it.customText}</span></div>}
+                                    {it.cloudLink && <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">Cloud: <span className="text-violet-650 dark:text-violet-400 font-medium">{it.cloudLink}</span></div>}
+                                    <div className="mt-3">
+                                      <label className="block text-[9px] font-bold text-gray-400 uppercase mb-1">Customization file</label>
+                                      <input
+                                        type="file"
+                                        accept="image/*,application/pdf"
+                                        onChange={(e) => setFile(idx, e.target.files?.[0] || null)}
+                                        className="block w-full text-[10px] text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-violet-50 dark:file:bg-violet-950/30 file:text-violet-750 dark:file:text-violet-400 hover:file:bg-violet-100 cursor-pointer"
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
                               </td>
-                              <td className="px-6 py-6 text-sm font-medium text-gray-600 dark:text-gray-300 hidden sm:table-cell">
+                              <td className="px-6 py-5 text-sm font-semibold text-gray-700 dark:text-gray-300 hidden sm:table-cell">
                                 {formatRwf(it.price)}
                               </td>
-                              <td className="px-6 py-6 text-center">
+                              <td className="px-6 py-5 text-center">
                                 <input
                                   type="number"
                                   min={1}
                                   value={it.quantity}
                                   onChange={(e) => updateQty(idx, parseInt(e.target.value || "1"))}
-                                  className="w-16 px-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm text-center font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none"
+                                  className="w-14 px-2 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-xs text-center font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none"
                                 />
                               </td>
-                              <td className="px-6 py-6 text-right text-sm font-bold text-violet-600 dark:text-violet-400">
+                              <td className="px-6 py-5 text-right text-sm font-bold text-violet-600 dark:text-violet-400">
                                 {formatRwf(it.subtotal)}
                               </td>
-                              <td className="px-6 py-6 text-right">
+                              <td className="px-6 py-5 text-right">
                                 <button
                                   onClick={() => removeItem(idx)}
                                   className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-full transition-all"
                                 >
-                                  <FaTrashAlt />
+                                  <FaTrashAlt className="text-sm" />
                                 </button>
                               </td>
                             </tr>
@@ -148,21 +171,82 @@ export default function CartPage() {
                       </table>
                     </div>
                   </div>
+
+                  {/* Mobile View card layout */}
+                  <div className="block md:hidden space-y-4">
+                    {items.map((it, idx) => (
+                      <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-100 dark:border-slate-800/80 shadow-sm relative space-y-4">
+                        <button
+                          onClick={() => removeItem(idx)}
+                          className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-full transition-all"
+                        >
+                          <FaTrashAlt className="text-sm" />
+                        </button>
+
+                        <div className="flex gap-4">
+                          <div className="w-16 h-16 bg-gray-50 dark:bg-slate-950 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100 dark:border-slate-800">
+                            {(it.product?.image || it.image) ? (
+                              <img src={assetUrl(it.product?.image || it.image)} alt={it.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="text-gray-300 dark:text-slate-700 text-xs font-bold">IMP</div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1 pr-6">
+                            <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate">{it.name}</h3>
+                            <p className="text-xs font-bold text-violet-600 dark:text-violet-400 mt-1">{formatRwf(it.price)}</p>
+                            {it.customText && <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Text: <span className="text-violet-605 dark:text-violet-400 font-medium">{it.customText}</span></div>}
+                            {it.cloudLink && <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">Cloud: <span className="text-violet-605 dark:text-violet-400 font-medium">{it.cloudLink}</span></div>}
+                          </div>
+                        </div>
+
+                        <div className="pt-3 border-t border-gray-50 dark:border-slate-800/60 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400">Qty:</span>
+                            <input
+                              type="number"
+                              min={1}
+                              value={it.quantity}
+                              onChange={(e) => updateQty(idx, parseInt(e.target.value || "1"))}
+                              className="w-14 px-2 py-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-xs text-center font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none"
+                            />
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] text-gray-450 block font-medium">Subtotal</span>
+                            <span className="text-sm font-bold text-violet-600 dark:text-violet-400">{formatRwf(it.subtotal)}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2">
+                          <label className="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Customization file</label>
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            onChange={(e) => setFile(idx, e.target.files?.[0] || null)}
+                            className="block w-full text-[10px] text-gray-500 dark:text-gray-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-violet-50 dark:file:bg-violet-950/30 file:text-violet-750 dark:file:text-violet-400 hover:file:bg-violet-100 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                 </div>
+
+                {/* Sidebar Summary */}
                 <aside className="space-y-6 h-fit lg:sticky lg:top-24">
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-800">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 leading-none">Order Summary</h2>
-                    <div className="space-y-4 mb-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-500 dark:text-gray-400">Items Count</span>
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5 border-b border-gray-50 dark:border-slate-800 pb-3">Order Summary</h2>
+                    
+                    <div className="space-y-3.5 mb-5">
+                      <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 font-medium">
+                        <span>Items Count</span>
                         <span className="font-bold text-gray-900 dark:text-white">{totals.itemCount}</span>
                       </div>
-                      <div className="flex justify-between items-center py-4 border-t border-gray-50 dark:border-slate-800">
-                        <span className="text-lg font-bold text-gray-900 dark:text-white">Order Total</span>
-                        <span className="text-2xl font-black text-violet-600 dark:text-violet-400">{formatRwf(totals.grandTotal || totals.subtotal)}</span>
+                      <div className="flex justify-between items-center py-3.5 border-t border-gray-50 dark:border-slate-800">
+                        <span className="text-base font-bold text-gray-900 dark:text-white">Order Total</span>
+                        <span className="text-xl font-black text-violet-600 dark:text-violet-400">{formatRwf(totals.grandTotal || totals.subtotal)}</span>
                       </div>
                       {totals.discount > 0 && (
-                        <div className="flex justify-between items-center text-green-600 dark:text-green-400 text-sm font-bold bg-green-50 dark:bg-green-900/10 p-3 rounded-xl">
+                        <div className="flex justify-between items-center text-green-600 dark:text-green-400 text-xs font-bold bg-green-50 dark:bg-green-900/10 p-3 rounded-xl animate-fade-in">
                           <span>Discount Applied ({coupon})</span>
                           <span>-{formatRwf(totals.discount)}</span>
                         </div>
@@ -170,11 +254,11 @@ export default function CartPage() {
                     </div>
 
                     {/* Coupon Section */}
-                    <div className="pt-6 border-t border-gray-50 dark:border-slate-800 mb-8">
+                    <div className="pt-4 border-t border-gray-50 dark:border-slate-800 mb-6">
                       {coupon ? (
-                        <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3">
-                          <span className="text-violet-700 dark:text-violet-400 font-bold text-sm">PROMO: {coupon}</span>
-                          <button onClick={handleRemoveCoupon} className="p-1.5 text-violet-400 hover:text-red-500 transition-colors">
+                        <div className="flex items-center justify-between bg-violet-50 dark:bg-violet-900/10 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3 animate-fade-in">
+                          <span className="text-violet-750 dark:text-violet-400 font-bold text-xs">PROMO: {coupon}</span>
+                          <button onClick={handleRemoveCoupon} className="p-1 text-violet-450 hover:text-red-500 transition-colors">
                             <FaTimes />
                           </button>
                         </div>
@@ -185,31 +269,31 @@ export default function CartPage() {
                             placeholder="Promo code"
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value)}
-                            className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 transition-all dark:text-white"
+                            className="flex-1 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white uppercase"
                           />
                           <button
                             onClick={handleApplyCoupon}
-                            className="bg-gray-900 dark:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-violet-600 transition-colors"
+                            className="bg-slate-900 dark:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-violet-650 transition-all active:scale-[0.97]"
                           >
                             Apply
                           </button>
                         </div>
                       )}
                       {couponMessage && (
-                        <p className={`text-[10px] mt-2 font-bold uppercase tracking-wider ${couponMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                        <p className={`text-[9px] mt-2 font-bold uppercase tracking-wider ${couponMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
                           {couponMessage.text}
                         </p>
                       )}
                     </div>
 
-                    {/* Shipping Calculator */}
-                    <div className="space-y-4 mb-8">
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest">Est. Delivery</h3>
+                    {/* Shipping Estimator */}
+                    <div className="space-y-3 mb-6 pt-4 border-t border-gray-50 dark:border-slate-800">
+                      <h3 className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Est. Delivery</h3>
                       <div className="space-y-2">
                         <select
                           value={shippingAddress.country}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
-                          className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 transition-all dark:text-white cursor-pointer"
+                          className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white cursor-pointer"
                         >
                           <option value="Rwanda">Rwanda</option>
                           <option value="USA">United States</option>
@@ -221,30 +305,30 @@ export default function CartPage() {
                             placeholder="City"
                             value={shippingAddress.city}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                            className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 transition-all dark:text-white"
+                            className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white"
                           />
                           <input
                             type="text"
                             placeholder="Zip"
                             value={shippingAddress.zip}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, zip: e.target.value })}
-                            className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 transition-all dark:text-white"
+                            className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white"
                           />
                         </div>
                         <button
                           onClick={handleCalculateShipping}
                           disabled={calculating}
-                          className="w-full py-2.5 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-white rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                          className="w-full py-2 bg-gray-105 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-750 text-gray-900 dark:text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
                         >
                           {calculating ? "Calculating..." : "Calculate Delivery Fee"}
                         </button>
                         {shippingEstimate && (
-                          <div className="bg-violet-50 dark:bg-violet-900/10 rounded-xl p-4 border border-violet-100 dark:border-violet-900/30 animate-fade-in">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-sm text-violet-700 dark:text-violet-400">Delivery Fee:</span>
-                              <span className="font-bold text-violet-900 dark:text-violet-200">{formatRwf(shippingEstimate.cost)}</span>
+                          <div className="bg-violet-50 dark:bg-violet-900/10 rounded-xl p-3 border border-violet-100 dark:border-violet-900/30 animate-fade-in">
+                            <div className="flex justify-between items-center mb-0.5">
+                              <span className="text-xs text-violet-750 dark:text-violet-400">Delivery Fee:</span>
+                              <span className="font-bold text-xs text-violet-900 dark:text-violet-200">{formatRwf(shippingEstimate.cost)}</span>
                             </div>
-                            <div className="text-[10px] text-violet-500 uppercase font-bold">
+                            <div className="text-[9px] text-violet-500 uppercase font-bold">
                               Est. Delivery: {shippingEstimate.estimatedDays} days
                             </div>
                           </div>
@@ -254,11 +338,11 @@ export default function CartPage() {
 
                     <button
                       onClick={() => nav("/checkout")}
-                      className="w-full bg-violet-600 hover:bg-violet-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 active:scale-[0.98] mb-4"
+                      className="w-full bg-violet-600 hover:bg-violet-700 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-violet-500/20 hover:shadow-violet-500/30 active:scale-[0.98] mb-3"
                     >
-                      Proceed to Checkout <FaArrowRight className="text-sm" />
+                      Proceed to Checkout <FaArrowRight className="text-xs" />
                     </button>
-                    <Link to="/shop" className="block text-center text-sm font-bold text-gray-400 hover:text-violet-600 transition-colors">
+                    <Link to="/shop" className="block text-center text-xs font-bold text-gray-400 hover:text-violet-600 transition-colors">
                       Continue Shopping
                     </Link>
                   </div>
@@ -268,23 +352,23 @@ export default function CartPage() {
 
             {/* Cross Sells */}
             {items.some(item => item.product.crossSells?.length > 0) && (
-              <div className="mt-20">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 pr-4">Complete your order</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="mt-16">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 pr-4">Complete your order</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Array.from(new Map(items.flatMap(item => item.product.crossSells || []).map(p => [p.id, p])).values()).map(p => (
-                    <Link key={p.id} to={`/product/${p.slug || p.id}`} className="group bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 dark:border-slate-800">
-                      <div className="aspect-square overflow-hidden bg-gray-50 dark:bg-slate-950">
+                    <Link key={p.id} to={`/product/${p.slug || p.id}`} className="group bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100 dark:border-slate-800 flex flex-col h-full">
+                      <div className="aspect-square overflow-hidden bg-gray-55 dark:bg-slate-950 flex items-center justify-center">
                         {p.image ? (
-                          <img src={process.env.REACT_APP_API_URL + p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          <img src={assetUrl(p.image)} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-300">
-                            <FaShoppingCart className="text-4xl" />
+                          <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-slate-700 bg-gray-100 dark:bg-slate-850">
+                            <FaShoppingCart className="text-2xl" />
                           </div>
                         )}
                       </div>
-                      <div className="p-4">
-                        <h3 className="font-bold text-gray-900 dark:text-white mb-1 truncate">{p.name}</h3>
-                        <div className="text-violet-600 dark:text-violet-400 font-bold">{formatRwf(p.price)}</div>
+                      <div className="p-3 flex-grow flex flex-col justify-between">
+                        <h3 className="font-bold text-xs text-gray-900 dark:text-white mb-1.5 truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">{p.name}</h3>
+                        <div className="text-violet-600 dark:text-violet-400 font-bold text-sm">{formatRwf(p.price)}</div>
                       </div>
                     </Link>
                   ))}
