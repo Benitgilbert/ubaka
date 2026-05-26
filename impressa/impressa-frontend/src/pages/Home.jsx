@@ -602,7 +602,8 @@ export default function Home() {
                     setNewsletterStatus({ loading: false, message: data.message, type: 'error' });
                   }
                 } catch (err) {
-                  setNewsletterStatus({ loading: false, message: 'Something went wrong. Please try again.', type: 'error' });
+                  const errorMsg = err.response?.data?.message || 'Something went wrong. Please try again.';
+                  setNewsletterStatus({ loading: false, message: errorMsg, type: 'error' });
                 }
               }}
             >
