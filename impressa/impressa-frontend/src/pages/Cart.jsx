@@ -5,7 +5,7 @@ import { formatRwf } from "../utils/currency";
 import { FaShoppingCart, FaTrashAlt, FaArrowRight, FaTimes } from "react-icons/fa";
 import LandingFooter from "../components/LandingFooter";
 import Header from "../components/Header";
-import * as api from "../services/api";
+
 import FlashSaleBanner from "../components/FlashSaleBanner";
 import assetUrl from "../utils/assetUrl";
 
@@ -15,21 +15,7 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState("");
   const [couponMessage, setCouponMessage] = useState(null);
 
-  // Shipping Calculator State
-  const [shippingAddress, setShippingAddress] = useState({ country: "Rwanda", city: "", zip: "" });
-  const [shippingEstimate, setShippingEstimate] = useState(null);
-  const [calculating, setCalculating] = useState(false);
 
-  const handleCalculateShipping = async () => {
-    try {
-      setCalculating(true);
-      const res = await api.calculateDelivery(shippingAddress);
-      setShippingEstimate(res.data);
-    } catch (error) {
-    } finally {
-      setCalculating(false);
-    }
-  };
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -284,56 +270,6 @@ export default function CartPage() {
                           {couponMessage.text}
                         </p>
                       )}
-                    </div>
-
-                    {/* Shipping Estimator */}
-                    <div className="space-y-3 mb-6 pt-4 border-t border-gray-50 dark:border-slate-800">
-                      <h3 className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Est. Delivery</h3>
-                      <div className="space-y-2">
-                        <select
-                          value={shippingAddress.country}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
-                          className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white cursor-pointer"
-                        >
-                          <option value="Rwanda">Rwanda</option>
-                          <option value="USA">United States</option>
-                          <option value="Other">International</option>
-                        </select>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            type="text"
-                            placeholder="City"
-                            value={shippingAddress.city}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                            className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white"
-                          />
-                          <input
-                            type="text"
-                            placeholder="Zip"
-                            value={shippingAddress.zip}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, zip: e.target.value })}
-                            className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-violet-500 outline-none transition-all dark:text-white"
-                          />
-                        </div>
-                        <button
-                          onClick={handleCalculateShipping}
-                          disabled={calculating}
-                          className="w-full py-2 bg-gray-105 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-750 text-gray-900 dark:text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-                        >
-                          {calculating ? "Calculating..." : "Calculate Delivery Fee"}
-                        </button>
-                        {shippingEstimate && (
-                          <div className="bg-violet-50 dark:bg-violet-900/10 rounded-xl p-3 border border-violet-100 dark:border-violet-900/30 animate-fade-in">
-                            <div className="flex justify-between items-center mb-0.5">
-                              <span className="text-xs text-violet-750 dark:text-violet-400">Delivery Fee:</span>
-                              <span className="font-bold text-xs text-violet-900 dark:text-violet-200">{formatRwf(shippingEstimate.cost)}</span>
-                            </div>
-                            <div className="text-[9px] text-violet-500 uppercase font-bold">
-                              Est. Delivery: {shippingEstimate.estimatedDays} days
-                            </div>
-                          </div>
-                        )}
-                      </div>
                     </div>
 
                     <button
