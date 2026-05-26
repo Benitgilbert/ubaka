@@ -94,9 +94,15 @@ export default function Shop() {
   const [debouncedQ, setDebouncedQ] = useState(q);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQ(q), 500);
+    const timer = setTimeout(() => {
+      setDebouncedQ(localSearch);
+    }, 400);
     return () => clearTimeout(timer);
-  }, [q]);
+  }, [localSearch]);
+
+  useEffect(() => {
+    setQ(debouncedQ);
+  }, [debouncedQ]);
 
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams);

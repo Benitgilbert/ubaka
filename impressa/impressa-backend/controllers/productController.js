@@ -354,33 +354,50 @@ export const getAllProducts = async (req, res) => {
     if (req.query.tags) where.tags = { hasSome: req.query.tags.split(',') };
     if (req.query.seller) where.sellerId = req.query.seller;
 
+    const andConditions = [];
+
     if (req.query.category) {
-      where.OR = [
-        { categories: { some: { id: req.query.category } } },
-        { categories: { some: { name: req.query.category } } }
-      ];
+      andConditions.push({
+        OR: [
+          { categories: { some: { id: req.query.category } } },
+          { categories: { some: { name: req.query.category } } }
+        ]
+      });
     }
 
     if (req.query.minPrice || req.query.maxPrice) {
-      where.price = {};
+      const priceFilter = {};
       const min = Number(req.query.minPrice);
       const max = Number(req.query.maxPrice);
       
-      if (!isNaN(min) && req.query.minPrice !== "" && req.query.minPrice !== undefined) where.price.gte = min;
-      if (!isNaN(max) && req.query.maxPrice !== "" && req.query.maxPrice !== undefined) where.price.lte = max;
+      if (!isNaN(min) && req.query.minPrice !== "" && req.query.minPrice !== undefined) priceFilter.gte = min;
+      if (!isNaN(max) && req.query.maxPrice !== "" && req.query.maxPrice !== undefined) priceFilter.lte = max;
       
-      // If no valid numbers were provided, remove the price filter to avoid Prisma errors
-      if (Object.keys(where.price).length === 0) delete where.price;
+      if (Object.keys(priceFilter).length > 0) {
+        where.price = priceFilter;
+      }
     }
 
     if (req.query.search) {
-      where.OR = [
-        { name: { contains: req.query.search, mode: 'insensitive' } },
-        { description: { contains: req.query.search, mode: 'insensitive' } }
-      ];
+      const searchTerms = req.query.search.trim().split(/\s+/).filter(Boolean);
+      if (searchTerms.length > 0) {
+        searchTerms.forEach(term => {
+          andConditions.push({
+            OR: [
+              { name: { contains: term, mode: 'insensitive' } },
+              { description: { contains: term, mode: 'insensitive' } },
+              { tags: { has: term } }
+            ]
+          });
+        });
+      }
     }
 
-    const limit = Math.min(parseInt(req.query.limit) || 0, 100) || undefined;
+    if (andConditions.length > 0) {
+      where.AND = andConditions;
+    }
+
+    const limit = Math.min(parseInt(req.query.limit) || 0, 200) || undefined;
     const sort = req.query.sort || undefined;
     let orderBy = { createdAt: 'desc' };
 
@@ -389,7 +406,7 @@ export const getAllProducts = async (req, res) => {
       else if (sort === "price-desc") orderBy = { price: 'desc' };
     }
 
-    const limitValue = limit || 50;
+    const limitValue = limit || 100;
     const cursor = (req.query.cursor && req.query.cursor !== 'undefined') ? req.query.cursor : undefined;
 
     let products = await prisma.product.findMany({
