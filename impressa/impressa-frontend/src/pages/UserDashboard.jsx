@@ -172,7 +172,27 @@ function UserDashboard() {
     setAddress(newAddress);
   };
 
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-charcoal-900 flex flex-col items-center justify-center transition-colors duration-300 font-sans">
+        <div className="flex flex-col items-center gap-5">
+          <div className="relative flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full border-4 border-violet-500/20 dark:border-violet-450/10"></div>
+            <div className="absolute w-14 h-14 rounded-full border-4 border-t-violet-600 dark:border-t-violet-400 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+            <div className="absolute w-5 h-5 rounded-full bg-violet-600/20 dark:bg-violet-400/20 animate-pulse"></div>
+          </div>
+          <div className="text-center space-y-1">
+            <h3 className="text-xs font-black text-gray-900 dark:text-white tracking-widest uppercase">
+              Kuri Macye
+            </h3>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest animate-pulse">
+              Loading Profile...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-charcoal-900 transition-colors duration-300 font-sans">
