@@ -223,6 +223,7 @@ export default function Shop() {
   const clearAllFilters = () => {
     setQ("");
     setLocalSearch("");
+    setDebouncedQ("");
     setSelectedCategory("");
     setMinPrice("");
     setMaxPrice("");
@@ -435,7 +436,14 @@ export default function Shop() {
                       {q && (
                         <span className="inline-flex items-center gap-2 bg-sage-100 dark:bg-sage-900/30 text-sage-700 dark:text-sage-400 px-3 py-1.5 rounded-full text-sm font-medium">
                           "{q}"
-                          <button onClick={() => setQ("")} className="hover:text-sage-900 dark:hover:text-sage-200">
+                          <button 
+                            onClick={() => {
+                              setLocalSearch("");
+                              setQ("");
+                              setDebouncedQ("");
+                            }} 
+                            className="hover:text-sage-900 dark:hover:text-sage-200"
+                          >
                             <FaTimes className="text-xs" />
                           </button>
                         </span>
