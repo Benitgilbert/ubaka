@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../context/AuthContext';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
@@ -182,6 +182,12 @@ const FORM_SCHEMAS = {
     { name: 'contactEmail', label: 'Support Email', type: 'email', required: true },
     { name: 'contactPhone', label: 'Support Phone', type: 'text' },
     { name: 'commissionRate', label: 'Platform Fee commissionRate (%)', type: 'number', required: true }
+  ],
+  delivery: [
+    { name: 'name', label: 'Zone Name', type: 'text', required: true },
+    { name: 'regions', label: 'Regions (JSON Array)', type: 'textarea', required: true },
+    { name: 'methods', label: 'Shipping Methods (JSON Array)', type: 'textarea', required: true },
+    { name: 'isActive', label: 'Is Active', type: 'checkbox' }
   ],
   settings: [
     { name: 'siteName', label: 'Website Name', type: 'text', required: true },
@@ -410,6 +416,21 @@ const ImpressaAdmin = () => {
       ? `${API_BASE_URL}/projects/impressa/data/${selectedFeature}`
       : `${API_BASE_URL}/projects/impressa/data/${selectedFeature}/${editRecordId}`;
 
+    let submitData = { ...formData };
+    try {
+      if (selectedFeature === 'delivery') {
+        if (typeof submitData.regions === 'string') {
+          submitData.regions = JSON.parse(submitData.regions || '[]');
+        }
+        if (typeof submitData.methods === 'string') {
+          submitData.methods = JSON.parse(submitData.methods || '[]');
+        }
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Invalid JSON format in Regions or Methods. Please enter a valid JSON array.' });
+      return;
+    }
+
     try {
       const response = await fetch(url, {
         method,
@@ -417,7 +438,7 @@ const ImpressaAdmin = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
       if (response.ok) {
         setMsg({ type: 'success', text: `Record successfully ${modalMode === 'create' ? 'created' : 'updated'}!` });
@@ -451,7 +472,11 @@ const ImpressaAdmin = () => {
     const fields = FORM_SCHEMAS[selectedFeature] || [];
     const formVals = {};
     fields.forEach(f => {
-      formVals[f.name] = record[f.name] !== undefined ? record[f.name] : '';
+      let val = record[f.name];
+      if (val !== undefined && typeof val === 'object' && val !== null) {
+        val = JSON.stringify(val, null, 2);
+      }
+      formVals[f.name] = val !== undefined ? val : '';
     });
     setFormData(formVals);
     setModalMode('edit');
