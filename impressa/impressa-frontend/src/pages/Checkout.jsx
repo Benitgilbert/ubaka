@@ -492,8 +492,8 @@ export default function CheckoutPage() {
                               type="tel"
                               value={momoPhone}
                               onChange={(e) => setMomoPhone(e.target.value)}
-                              placeholder="0781234567"
-                              className="w-full bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl py-3 pl-10 pr-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder:text-amber-200"
+                              placeholder="079xxxxxxx"
+                              className="w-full bg-gray-50 dark:bg-slate-800 border border-amber-200 dark:border-amber-800 rounded-xl py-3 pl-10 pr-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all placeholder:text-amber-600/40 dark:placeholder:text-amber-500/30"
                             />
                           </div>
                           <p className="text-[10px] text-amber-600/60 mt-3 flex items-center gap-2">
