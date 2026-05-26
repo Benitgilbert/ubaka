@@ -75,6 +75,8 @@ export const getMe = async (req, res) => {
         storePhone: true,
         sellerStatus: true,
         storeLogo: true,
+        billingAddress: true,
+        shippingAddress: true,
         createdAt: true
       }
     });
@@ -96,7 +98,7 @@ export const getMe = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, email, storeName, storeDescription, storePhone } = req.body;
+    const { name, email, storeName, storeDescription, storePhone, billingAddress, shippingAddress } = req.body;
 
     const updateData = {};
     if (name) updateData.name = name;
@@ -104,6 +106,26 @@ export const updateProfile = async (req, res) => {
     if (storeName) updateData.storeName = storeName;
     if (storeDescription) updateData.storeDescription = storeDescription;
     if (storePhone) updateData.storePhone = storePhone;
+
+    if (billingAddress) {
+      try {
+        updateData.billingAddress = typeof billingAddress === 'string'
+          ? JSON.parse(billingAddress)
+          : billingAddress;
+      } catch (e) {
+        console.error("Failed to parse billingAddress:", e);
+      }
+    }
+
+    if (shippingAddress) {
+      try {
+        updateData.shippingAddress = typeof shippingAddress === 'string'
+          ? JSON.parse(shippingAddress)
+          : shippingAddress;
+      } catch (e) {
+        console.error("Failed to parse shippingAddress:", e);
+      }
+    }
 
     if (req.files) {
       if (req.files.profileImage) updateData.profileImage = req.files.profileImage[0].path;
