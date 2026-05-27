@@ -10,7 +10,9 @@ import {
   handleImpressaDataGet,
   handleImpressaDataCreate,
   handleImpressaDataUpdate,
-  handleImpressaDataDelete
+  handleImpressaDataDelete,
+  sendImpressaTestEmail,
+  verifyImpressaSeller
 } from '../controllers/projectController.js';
 import { protect, authorizePermission } from '../middleware/authMiddleware.js';
 
@@ -36,5 +38,11 @@ router.get('/impressa/data/:feature', protect, handleImpressaDataGet);
 router.post('/impressa/data/:feature', protect, handleImpressaDataCreate);
 router.put('/impressa/data/:feature/:id', protect, handleImpressaDataUpdate);
 router.delete('/impressa/data/:feature/:id', protect, handleImpressaDataDelete);
+
+// Proxy route for email template test triggers
+router.post('/impressa/email-templates/test', protect, authorizePermission('manage_impressa_email_templates'), sendImpressaTestEmail);
+
+// Proxy route for seller verification
+router.put('/impressa/sellers/:id/verify', protect, authorizePermission('manage_impressa_sellers'), verifyImpressaSeller);
 
 export default router;

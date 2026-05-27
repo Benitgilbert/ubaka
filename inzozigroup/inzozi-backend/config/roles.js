@@ -38,6 +38,7 @@ export const ALL_PERMISSIONS = [
   { code: 'manage_impressa_delivery', name: 'Delivery', description: 'Configure shipping zones and delivery rates', system: 'Impressa' },
   { code: 'manage_impressa_taxes', name: 'Taxes', description: 'Configure value added tax rates', system: 'Impressa' },
   { code: 'manage_impressa_reports', name: 'Reports', description: 'Download PDF tax and sale statements', system: 'Impressa' },
+  { code: 'manage_impressa_email_templates', name: 'Email Templates', description: 'Manage and preview email notification templates', system: 'Impressa' },
   { code: 'manage_impressa_settings', name: 'Settings', description: 'Configure system backend integrations', system: 'Impressa' },
 
   { code: 'view_analytics', name: 'View Business Analytics', description: 'View system usage, e-commerce revenues, and performance charts', system: 'Ubaka Tech MIS' },
@@ -103,7 +104,8 @@ export const ALL_ROLES = [
       'manage_impressa_delivery',
       'manage_impressa_taxes',
       'manage_impressa_reports',
-      'manage_impressa_settings'
+      'manage_impressa_settings',
+      'manage_impressa_email_templates'
     ]
   },
   {

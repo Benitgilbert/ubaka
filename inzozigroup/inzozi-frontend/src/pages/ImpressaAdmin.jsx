@@ -42,7 +42,9 @@ import {
   Mail,
   Truck,
   FileSpreadsheet,
-  ArrowLeft
+  ArrowLeft,
+  Laptop,
+  Smartphone
 } from 'lucide-react';
 
 const ALL_TABS = [
@@ -78,6 +80,7 @@ const ALL_TABS = [
   
   { id: 'site_settings', label: 'Site Settings', permission: 'manage_impressa_site_settings', category: 'Configuration', icon: Globe, desc: 'Configure company tagline, emails, and global rates.' },
   { id: 'subscribers', label: 'Subscribers', permission: 'manage_impressa_subscribers', category: 'Configuration', icon: Mail, desc: 'View newsletter email subscribers.' },
+  { id: 'email_templates', label: 'Email Templates', permission: 'manage_impressa_email_templates', category: 'Configuration', icon: Mail, desc: 'Manage and preview dynamic transactional email templates.' },
   { id: 'delivery', label: 'Delivery Config', permission: 'manage_impressa_delivery', category: 'Configuration', icon: Truck, desc: 'Manage shipping zones and delivery methods.' },
   { id: 'taxes', label: 'Tax Rates', permission: 'manage_impressa_taxes', category: 'Configuration', icon: Percent, desc: 'Set up value added tax rates.' },
   { id: 'settings', label: 'Settings', permission: 'manage_impressa_settings', category: 'Configuration', icon: SettingsIcon, desc: 'Configure technical backend settings.' }
@@ -582,8 +585,793 @@ const renderCellContent = (key, val) => {
   return String(val);
 };
 
+const EmailTemplatesWorkspace = ({ token, API_BASE_URL, setMsg }) => {
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTemplate, setActiveTemplate] = useState(null);
+  const [subject, setSubject] = useState('');
+  const [html, setHtml] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
+  const [sendingTest, setSendingTest] = useState(false);
+  const [previewMode, setPreviewMode] = useState('desktop');
+
+  const mockVariables = {
+    customerName: "Jane Doe",
+    orderNumber: "IMP-2026-9999",
+    grandTotal: "45,000",
+    paymentMethod: "MTN Mobile Money",
+    date: new Date().toLocaleDateString(),
+    trackUrl: "#",
+    status: "DELIVERED",
+    senderName: "John Smith",
+    code: "GIFT-7788-CC11",
+    amount: "25,000",
+    message: "Hope you love this special gift!",
+    expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+    shopUrl: "#",
+    sellerName: "Bertrand Keza",
+    storeName: "Kigali Tech Store",
+    dashboardUrl: "#",
+    reason: "Incomplete tax details supplied in registration forms.",
+    productName: "Smart Solar Lantern",
+    productUrl: "#",
+    itemCount: 2,
+    total: "30,000",
+    violationType: "Late Order Fulfillment",
+    description: "Vendor failed to process order within designated SLA times.",
+    productList: "<li><strong>Smart Solar Lantern</strong> - 1 remaining</li><li><strong>Clean Cooking Stove</strong> - 0 remaining</li>",
+    inventoryUrl: "#",
+    email: "customer@domain.rw",
+    unsubscribeUrl: "#"
+  };
+
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
+
+  const fetchTemplates = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/impressa/data/email_templates`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTemplates(data);
+        if (data.length > 0) {
+          selectTemplate(data[0]);
+        }
+      } else {
+        setMsg({ type: 'error', text: 'Failed to retrieve email templates.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Network failure loading email templates.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectTemplate = (template) => {
+    setActiveTemplate(template);
+    setSubject(template.subject);
+    setHtml(template.html);
+  };
+
+  const handleSave = async () => {
+    if (!activeTemplate) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/impressa/data/email_templates/${activeTemplate.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...activeTemplate,
+          subject,
+          html
+        })
+      });
+      if (res.ok) {
+        setMsg({ type: 'success', text: 'Email template successfully updated!' });
+        setTemplates(prev => prev.map(t => t.id === activeTemplate.id ? { ...t, subject, html } : t));
+        setTimeout(() => setMsg(null), 3000);
+      } else {
+        const err = await res.json();
+        setMsg({ type: 'error', text: err.error || 'Failed to save template.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Network error saving template changes.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSendTest = async () => {
+    if (!testEmail || !activeTemplate) return;
+    setSendingTest(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/impressa/email-templates/test`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          templateName: activeTemplate.name,
+          recipientEmail: testEmail
+        })
+      });
+      if (res.ok) {
+        setMsg({ type: 'success', text: `Test email successfully sent to ${testEmail}!` });
+        setTestEmail('');
+        setTimeout(() => setMsg(null), 3500);
+      } else {
+        const err = await res.json();
+        setMsg({ type: 'error', text: err.error || 'Failed to dispatch test email.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Network failure dispatching test email.' });
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
+  const insertPlaceholder = (ph) => {
+    const textInput = document.getElementById("template-html-editor");
+    if (!textInput) return;
+    const startPos = textInput.selectionStart;
+    const endPos = textInput.selectionEnd;
+    const before = html.substring(0, startPos);
+    const after = html.substring(endPos, html.length);
+    const newHtml = before + `{{${ph}}}` + after;
+    setHtml(newHtml);
+    setTimeout(() => {
+      textInput.focus();
+      textInput.setSelectionRange(startPos + ph.length + 4, startPos + ph.length + 4);
+    }, 0);
+  };
+
+  const getRenderedPreview = () => {
+    let renderedHtml = html || '';
+    Object.entries(mockVariables).forEach(([key, val]) => {
+      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      renderedHtml = renderedHtml.replace(regex, val);
+      const tripleRegex = new RegExp(`{{{\\s*${key}\\s*}}}`, 'g');
+      renderedHtml = renderedHtml.replace(tripleRegex, val);
+    });
+    return renderedHtml;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-grow flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-10 h-10 text-purple-550 animate-spin" />
+          <span className="text-slate-400 text-xs font-semibold tracking-wider uppercase animate-pulse">Syncing templates...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (templates.length === 0) {
+    return (
+      <div className="border border-dashed border-slate-850 rounded-2xl flex flex-col items-center justify-center text-center p-12 space-y-3">
+        <Mail className="w-12 h-12 text-slate-500" />
+        <h4 className="text-sm font-bold text-slate-350">No Email Templates Found</h4>
+        <p className="text-xs text-slate-500 max-w-sm leading-relaxed">No email templates were found in the database. Ensure database seeds have run correctly.</p>
+      </div>
+    );
+  }
+
+  const placeholders = Object.keys(mockVariables);
+  const previewHtml = getRenderedPreview();
+
+  return (
+    <div className="flex-grow flex flex-col lg:flex-row min-h-0 bg-slate-900/10 border border-slate-850 rounded-2xl overflow-hidden h-[calc(100vh-270px)]">
+      {/* Left Templates List */}
+      <div className="w-full lg:w-64 border-r border-slate-850 bg-slate-950/60 flex flex-col min-h-0 shrink-0">
+        <div className="p-4 border-b border-slate-850 bg-slate-950/90 shrink-0">
+          <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest">Email Templates</h3>
+          <p className="text-[10px] text-slate-555 mt-1 font-semibold">Select a template to customize.</p>
+        </div>
+        <div className="flex-grow overflow-y-auto p-2 space-y-1.5 scrollbar-thin">
+          {templates.map(t => {
+            const isActive = activeTemplate?.id === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => selectTemplate(t)}
+                className={`w-full text-left px-3 py-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 font-bold'
+                    : 'bg-transparent border-transparent hover:border-slate-800 hover:bg-slate-900/40 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Mail className={`w-4.5 h-4.5 ${isActive ? 'text-purple-400' : 'text-slate-500'}`} />
+                <span className="truncate capitalize">{t.name.replace(/_/g, ' ')}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Center Workspace & Right Preview */}
+      <div className="flex-1 flex flex-col md:flex-row min-h-0">
+        {/* Center Editor */}
+        <div className="flex-1 border-r border-slate-850 bg-slate-900/10 p-5 flex flex-col min-h-0 overflow-y-auto scrollbar-thin space-y-4">
+          <div className="flex items-center justify-between shrink-0">
+            <div>
+              <h4 className="text-xs font-bold text-slate-250 uppercase tracking-wider">Template Editor</h4>
+              <p className="text-[10px] text-slate-550 mt-0.5 font-medium">Use Handlebars templates. Placeholders are swapped dynamically.</p>
+            </div>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-black transition-all shadow-lg active:scale-95 cursor-pointer"
+            >
+              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+              Save Changes
+            </button>
+          </div>
+
+          {/* Subject line input */}
+          <div className="space-y-1.5 shrink-0">
+            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest">Email Subject</label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 focus:bg-slate-955"
+              placeholder="Enter subject line..."
+            />
+          </div>
+
+          {/* HTML editor field */}
+          <div className="space-y-1.5 flex-grow flex flex-col min-h-[250px]">
+            <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-widest shrink-0">HTML Body</label>
+            <textarea
+              id="template-html-editor"
+              value={html}
+              onChange={(e) => setHtml(e.target.value)}
+              className="w-full flex-grow p-3 bg-slate-955 border border-slate-850 rounded-xl text-slate-200 text-xs font-mono focus:outline-none focus:border-purple-500 focus:bg-slate-955 resize-none overflow-y-auto"
+              placeholder="Write HTML code here..."
+            />
+          </div>
+
+          {/* Placeholder Insertion Box */}
+          <div className="space-y-1.5 shrink-0 bg-slate-950/40 p-3.5 rounded-xl border border-slate-850/60">
+            <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest">Click to Insert Variable Placeholder</span>
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1 scrollbar-thin">
+              {placeholders.map(ph => (
+                <button
+                  key={ph}
+                  type="button"
+                  onClick={() => insertPlaceholder(ph)}
+                  className="px-2 py-1 bg-slate-900 hover:bg-purple-950/30 border border-slate-800 hover:border-purple-500/40 text-[9px] font-mono font-bold text-purple-400 rounded-md transition-all cursor-pointer"
+                >
+                  {`{{${ph}}}`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Send Test Email Section */}
+          <div className="pt-4 border-t border-slate-850 shrink-0 space-y-2">
+            <h5 className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Send Test Email</h5>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={testEmail}
+                onChange={(e) => setTestEmail(e.target.value)}
+                placeholder="Enter tester email address..."
+                className="flex-1 px-3 py-2 bg-slate-955 border border-slate-850 rounded-lg text-slate-250 text-xs focus:outline-none focus:border-purple-500 focus:bg-slate-955"
+              />
+              <button
+                type="button"
+                onClick={handleSendTest}
+                disabled={sendingTest || !testEmail.trim()}
+                className="px-4 py-2 bg-slate-850 hover:bg-slate-800 text-slate-200 border border-slate-750 rounded-lg text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+              >
+                {sendingTest ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                Send Test
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Preview Panel */}
+        <div className="w-full md:w-[360px] bg-slate-955/40 p-5 flex flex-col min-h-0 shrink-0 overflow-y-auto scrollbar-thin space-y-4">
+          <div className="flex items-center justify-between shrink-0">
+            <div>
+              <h4 className="text-xs font-bold text-slate-250 uppercase tracking-wider">Live Preview</h4>
+              <p className="text-[10px] text-slate-555 mt-0.5 font-medium">Real-time rendered mockup viewport.</p>
+            </div>
+            <div className="flex items-center border border-slate-850 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setPreviewMode('desktop')}
+                className={`p-1.5 transition-colors cursor-pointer ${previewMode === 'desktop' ? 'bg-purple-500/20 text-purple-400' : 'bg-transparent text-slate-500'}`}
+                title="Desktop viewport"
+              >
+                <Laptop className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewMode('mobile')}
+                className={`p-1.5 transition-colors cursor-pointer ${previewMode === 'mobile' ? 'bg-purple-500/20 text-purple-400' : 'bg-transparent text-slate-500'}`}
+                title="Mobile viewport"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 flex justify-center items-start min-h-[300px] overflow-hidden">
+            <div
+              className={`transition-all duration-300 ${
+                previewMode === 'mobile'
+                  ? 'w-[280px] h-[450px] border-[8px] border-slate-850 rounded-[32px] overflow-hidden shadow-2xl relative bg-white'
+                  : 'w-full h-full border border-slate-850 rounded-xl overflow-hidden shadow-xl bg-white min-h-[400px]'
+              }`}
+            >
+              <iframe
+                srcDoc={previewHtml}
+                title="Preview Frame"
+                className="w-full h-full border-0 bg-white"
+                sandbox="allow-same-origin"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SellersVerificationWorkspace = ({ token, API_BASE_URL, setMsg }) => {
+  const [sellers, setSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeSeller, setActiveSeller] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    fetchSellers();
+  }, []);
+
+  const fetchSellers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/impressa/data/sellers`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSellers(data);
+        if (data.length > 0) {
+          setActiveSeller(data[0]);
+        }
+      } else {
+        setMsg({ type: 'error', text: 'Failed to retrieve registered sellers.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Network connection failure loading sellers.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifySeller = async (sellerId, action, reason) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/impressa/sellers/${sellerId}/verify`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action, rejectionReason: reason })
+      });
+      if (res.ok) {
+        setMsg({ type: 'success', text: `Seller application successfully ${action === 'approve' ? 'approved' : 'rejected'}!` });
+        
+        // Update state in list
+        const updated = sellers.map(s => {
+          if (s.id === sellerId) {
+            const updatedRdb = s.rdbVerification ? {
+              ...s.rdbVerification,
+              documentStatus: action === 'approve' ? 'approved' : 'rejected',
+              rejectionReason: action === 'reject' ? reason : undefined
+            } : null;
+            return {
+              ...s,
+              sellerStatus: action === 'approve' ? 'active' : 'rejected',
+              rdbVerification: updatedRdb
+            };
+          }
+          return s;
+        });
+        setSellers(updated);
+        
+        // Update active selection
+        const match = updated.find(s => s.id === sellerId);
+        setActiveSeller(match || null);
+        
+        setShowRejectForm(false);
+        setRejectionReason('');
+        setTimeout(() => setMsg(null), 3000);
+      } else {
+        const err = await res.json();
+        setMsg({ type: 'error', text: err.error || 'Failed to update seller verification status.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Failed to process request due to network instability.' });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-grow flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-10 h-10 text-purple-500 animate-spin" />
+          <span className="text-slate-450 text-xs font-semibold tracking-wider uppercase animate-pulse">Syncing sellers...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Filter sellers list
+  const filteredSellers = sellers.filter(s => {
+    const query = searchQuery.toLowerCase();
+    return (
+      s.name?.toLowerCase().includes(query) ||
+      s.email?.toLowerCase().includes(query) ||
+      s.storeName?.toLowerCase().includes(query)
+    );
+  });
+
+  return (
+    <div className="flex-grow flex flex-col lg:flex-row min-h-0 bg-slate-900/10 border border-slate-850 rounded-2xl overflow-hidden h-[calc(100vh-270px)]">
+      {/* Left Sellers List */}
+      <div className="w-full lg:w-80 border-r border-slate-850 bg-slate-950/60 flex flex-col min-h-0 shrink-0">
+        <div className="p-4 border-b border-slate-850 bg-slate-950/90 shrink-0 space-y-3">
+          <div>
+            <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest">Seller Verifications</h3>
+            <p className="text-[10px] text-slate-500 mt-1 font-semibold">Review and verify RDB business credentials.</p>
+          </div>
+          {/* Search bar */}
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-3.5 w-3.5 text-slate-500" />
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by store or owner..."
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-[11px] text-slate-200 outline-none focus:border-purple-500/50 transition-colors"
+            />
+          </div>
+        </div>
+
+        <div className="flex-grow overflow-y-auto p-2 space-y-1.5 scrollbar-thin">
+          {filteredSellers.length === 0 ? (
+            <div className="text-center py-8 text-[11px] text-slate-500 italic">No matching sellers found.</div>
+          ) : (
+            filteredSellers.map(s => {
+              const isActive = activeSeller?.id === s.id;
+              const status = s.sellerStatus?.toLowerCase();
+              let badgeColor = 'bg-slate-900 text-slate-400 border-slate-800';
+              if (status === 'active') badgeColor = 'bg-emerald-950/40 text-emerald-400 border-emerald-900/30';
+              if (status === 'pending') badgeColor = 'bg-amber-950/40 text-amber-400 border-amber-900/30';
+              if (status === 'rejected') badgeColor = 'bg-red-950/40 text-red-400 border-red-900/30';
+
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => { setActiveSeller(s); setShowRejectForm(false); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl border flex flex-col gap-1.5 transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 font-bold'
+                      : 'bg-transparent border-transparent hover:border-slate-800 hover:bg-slate-900/40 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <div className="flex justify-between items-start w-full">
+                    <span className="font-bold text-xs truncate max-w-[150px]">{s.storeName || 'Unnamed Store'}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${badgeColor}`}>
+                      {status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center w-full text-[10px] text-slate-500">
+                    <span className="truncate">{s.name}</span>
+                    <span>{s.createdAt ? new Date(s.createdAt).toLocaleDateString() : ''}</span>
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Right Details Panel */}
+      <div className="flex-grow flex flex-col min-h-0 bg-slate-950/20">
+        {!activeSeller ? (
+          <div className="flex-grow flex flex-col items-center justify-center p-12 text-center space-y-3">
+            <Building className="w-12 h-12 text-slate-650" />
+            <h4 className="text-sm font-bold text-slate-350">No Seller Selected</h4>
+            <p className="text-xs text-slate-500 max-w-xs leading-relaxed">Select a merchant profile from the left sidebar to audit their TIN registration and RDB business documents.</p>
+          </div>
+        ) : (
+          <div className="flex-grow flex flex-col min-h-0 overflow-y-auto p-8 space-y-8 scrollbar-thin">
+            
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-900 shrink-0">
+              <div>
+                <h2 className="text-lg font-black text-white flex items-center gap-2">
+                  <Building className="w-5 h-5 text-purple-400" />
+                  {activeSeller.storeName || 'Unnamed Store'}
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Registered by <strong className="text-slate-300">{activeSeller.name}</strong> ({activeSeller.email})
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-slate-500">Ecosystem Status:</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border capitalize ${
+                  activeSeller.sellerStatus === 'active' ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20' :
+                  activeSeller.sellerStatus === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                  'bg-red-500/10 text-red-450 border-red-500/20'
+                }`}>
+                  {activeSeller.sellerStatus}
+                </span>
+              </div>
+            </div>
+
+            {/* Document Review Body */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              
+              {/* Left Column: Business details & terms */}
+              <div className="space-y-6">
+                
+                {/* RDB Info Card */}
+                <div className="bg-slate-900/40 border border-slate-850 p-6 rounded-2xl space-y-4">
+                  <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest border-b border-slate-850/60 pb-2">RDB Registration Details</h3>
+                  
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-xs">
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">TIN Number</span>
+                      <strong className="text-slate-200 text-sm font-mono tracking-wider">{activeSeller.rdbVerification?.tinNumber || 'N/A'}</strong>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Business Type</span>
+                      <span className="text-slate-300 font-semibold capitalize">{activeSeller.rdbVerification?.businessType?.replace('_', ' ') || 'N/A'}</span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Registered Business Name</span>
+                      <strong className="text-slate-200 font-bold">{activeSeller.rdbVerification?.businessName || 'N/A'}</strong>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audit Status</span>
+                      <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-black border uppercase tracking-wider ${
+                        activeSeller.rdbVerification?.documentStatus === 'approved' ? 'bg-emerald-950/40 text-emerald-400 border-emerald-900/30' :
+                        activeSeller.rdbVerification?.documentStatus === 'rejected' ? 'bg-red-950/40 text-red-400 border-red-900/30' :
+                        'bg-amber-950/40 text-amber-400 border-amber-900/30'
+                      }`}>
+                        {activeSeller.rdbVerification?.documentStatus || 'pending_review'}
+                      </span>
+                    </div>
+                    {activeSeller.rdbVerification?.rejectionReason && (
+                      <div className="col-span-2 p-3 bg-red-950/20 border border-red-900/30 rounded-xl">
+                        <span className="block text-[9px] font-black text-red-400 uppercase tracking-wider mb-1">Rejection Reason</span>
+                        <p className="text-[11px] text-red-300 font-semibold">{activeSeller.rdbVerification.rejectionReason}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Terms Acceptance Card */}
+                <div className="bg-slate-900/40 border border-slate-850 p-6 rounded-2xl space-y-4">
+                  <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest border-b border-slate-850/60 pb-2">Agreement Signature</h3>
+                  
+                  <div className="space-y-4 text-xs">
+                    {activeSeller.termsAcceptance ? (
+                      <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+                        <div className="col-span-2">
+                          <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Digital Signature</span>
+                          <div className="px-4 py-3 bg-slate-950 border border-slate-850 rounded-xl text-purple-400 italic font-serif text-lg tracking-wider">
+                            {activeSeller.termsAcceptance.digitalSignature}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Signed Timestamp</span>
+                          <span className="text-slate-300 font-medium">
+                            {new Date(activeSeller.termsAcceptance.acceptedAt).toLocaleString()}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">IP Address</span>
+                          <span className="text-slate-300 font-mono text-[11px]">{activeSeller.termsAcceptance.ipAddress || 'Unknown'}</span>
+                        </div>
+                        <div>
+                          <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Contract Version</span>
+                          <span className="text-slate-300 font-mono font-semibold">v{activeSeller.termsAcceptance.version}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-slate-500 italic text-[11.5px]">No terms acceptance details available for this record.</div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Documents Previews */}
+              <div className="space-y-6">
+                
+                {/* RDB Certificate File Preview */}
+                <div className="bg-slate-900/40 border border-slate-850 p-6 rounded-2xl space-y-4 flex flex-col">
+                  <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest border-b border-slate-850/60 pb-2">RDB Registration Certificate</h3>
+                  
+                  {activeSeller.rdbVerification?.rdbCertificate ? (
+                    <div className="space-y-3 flex-grow flex flex-col">
+                      <div className="border border-slate-800 rounded-xl bg-slate-950 p-2 overflow-hidden flex items-center justify-center min-h-[160px] max-h-[220px]">
+                        {activeSeller.rdbVerification.rdbCertificate.endsWith('.pdf') ? (
+                          <div className="text-center p-4 space-y-2">
+                            <span className="text-2xl">📄</span>
+                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">RDB Registration PDF File</span>
+                          </div>
+                        ) : (
+                          <img 
+                            src={activeSeller.rdbVerification.rdbCertificate} 
+                            alt="RDB Certificate" 
+                            className="max-w-full max-h-[200px] object-contain rounded-lg"
+                          />
+                        )}
+                      </div>
+                      <a
+                        href={activeSeller.rdbVerification.rdbCertificate}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full py-2.5 bg-slate-900 border border-slate-800 hover:border-purple-500 text-slate-300 hover:text-white rounded-xl text-[11px] font-bold text-center transition-all inline-block hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer"
+                      >
+                        Open RDB Document in New Tab ↗
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="py-8 bg-slate-955/40 border border-dashed border-slate-850 rounded-xl text-center text-xs text-slate-500 italic">
+                      No RDB Certificate uploaded.
+                    </div>
+                  )}
+                </div>
+
+                {/* National ID Preview */}
+                <div className="bg-slate-900/40 border border-slate-850 p-6 rounded-2xl space-y-4 flex flex-col">
+                  <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest border-b border-slate-850/60 pb-2">National ID / Passport</h3>
+                  
+                  {activeSeller.rdbVerification?.nationalId ? (
+                    <div className="space-y-3 flex-grow flex flex-col">
+                      <div className="border border-slate-800 rounded-xl bg-slate-950 p-2 overflow-hidden flex items-center justify-center min-h-[160px] max-h-[220px]">
+                        {activeSeller.rdbVerification.nationalId.endsWith('.pdf') ? (
+                          <div className="text-center p-4 space-y-2">
+                            <span className="text-2xl">📄</span>
+                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">National ID PDF Document</span>
+                          </div>
+                        ) : (
+                          <img 
+                            src={activeSeller.rdbVerification.nationalId} 
+                            alt="National ID" 
+                            className="max-w-full max-h-[200px] object-contain rounded-lg"
+                          />
+                        )}
+                      </div>
+                      <a
+                        href={activeSeller.rdbVerification.nationalId}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full py-2.5 bg-slate-900 border border-slate-800 hover:border-purple-500 text-slate-300 hover:text-white rounded-xl text-[11px] font-bold text-center transition-all inline-block hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer"
+                      >
+                        Open ID Document in New Tab ↗
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="py-8 bg-slate-955/40 border border-dashed border-slate-850 rounded-xl text-center text-xs text-slate-500 italic">
+                      No National ID or Passport document uploaded.
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Verification Processing Actions */}
+            {activeSeller.sellerStatus === 'pending' ? (
+              <div className="border-t border-slate-900 pt-8 space-y-4 shrink-0">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="text-xs font-black text-slate-300 uppercase tracking-wider">KYC Auditing Checklist</h4>
+                    <p className="text-[10px] text-slate-500">Approve the merchant store or reject their application with a feedback explanation.</p>
+                  </div>
+                  
+                  {!showRejectForm && (
+                    <div className="flex items-center gap-3">
+                      <button
+                        disabled={processing}
+                        onClick={() => setShowRejectForm(true)}
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Reject Application
+                      </button>
+                      <button
+                        disabled={processing}
+                        onClick={() => handleVerifySeller(activeSeller.id, 'approve')}
+                        className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all hover:shadow-lg hover:shadow-emerald-500/5 cursor-pointer"
+                      >
+                        {processing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                        Approve Seller
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {showRejectForm && (
+                  <div className="bg-slate-900/60 border border-red-500/20 rounded-2xl p-5 space-y-4 animate-fade-in">
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-black text-red-400 uppercase tracking-widest">Rejection Reason *</label>
+                      <textarea
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        placeholder="Provide details about why the registration was rejected (e.g. Incomplete RDB details, unclear ID photo). This will be emailed directly to the seller."
+                        className="w-full p-3 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-red-500 resize-none h-20"
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => { setShowRejectForm(false); setRejectionReason(''); }}
+                        className="px-3.5 py-2 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        disabled={processing || !rejectionReason.trim()}
+                        onClick={() => handleVerifySeller(activeSeller.id, 'reject', rejectionReason)}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg cursor-pointer"
+                      >
+                        {processing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Confirm Rejection'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="border-t border-slate-900 pt-8 shrink-0 flex justify-between items-center text-xs text-slate-500">
+                <span>Application processed. Status is locked.</span>
+                <span className="font-semibold uppercase tracking-wider text-[10px]">Ubaka Ecosystem verification registry</span>
+              </div>
+            )}
+
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const ImpressaAdmin = () => {
   const { token, user } = useAuth();
+
   const socket = useSocket();
   
   // Navigation State (null represents the Main Grid Hub Dashboard)
@@ -1238,6 +2026,12 @@ const ImpressaAdmin = () => {
                 })
               )}
             </div>
+          ) : selectedFeature === 'email_templates' ? (
+            /* Custom View: Email Templates Workspace */
+            <EmailTemplatesWorkspace token={token} API_BASE_URL={API_BASE_URL} setMsg={setMsg} />
+          ) : selectedFeature === 'sellers' ? (
+            /* Custom View: Seller Verification Review Workspace */
+            <SellersVerificationWorkspace token={token} API_BASE_URL={API_BASE_URL} setMsg={setMsg} />
           ) : (
             /* Generic CRUD View: Grid / Table for other 30 tables */
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-4">

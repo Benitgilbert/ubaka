@@ -1,4 +1,4 @@
-﻿import prisma, { isDbConnected } from '../config/db.js';
+import prisma, { isDbConnected } from '../config/db.js';
 import pg from 'pg';
 const { Pool } = pg;
 
@@ -404,7 +404,7 @@ const FEATURE_CONFIGS = {
   },
   sellers: {
     table: 'User',
-    select: 'id, name, email, "storeName", "sellerStatus", "createdAt"',
+    select: 'id, name, email, "storeName", "sellerStatus", "rdbVerification", "termsAcceptance", "createdAt"',
     where: "role = 'seller'",
     permission: 'manage_impressa_sellers'
   },
@@ -540,6 +540,11 @@ const FEATURE_CONFIGS = {
     select: '*',
     permission: 'manage_impressa_subscribers'
   },
+  email_templates: {
+    table: 'EmailTemplate',
+    select: '*',
+    permission: 'manage_impressa_email_templates'
+  },
   delivery: {
     table: 'ShippingZone',
     select: '*',
@@ -655,6 +660,10 @@ const mockDataStore = {
   subscribers: [
     { id: 'sub-1', email: 'newsletter@ubakatech.com', isActive: true, createdAt: '2026-02-01T08:00:00Z' }
   ],
+  email_templates: [
+    { id: 'mock-temp-1', name: 'welcome', subject: 'Welcome to Kuri Macye! 💌', html: '<h1>Welcome!</h1><p>Thank you for subscribing, {{email}}</p>', createdAt: '2026-02-01T08:00:00Z' },
+    { id: 'mock-temp-2', name: 'order_confirmation', subject: 'Order Confirmed #{{orderNumber}}', html: '<h1>Order Confirmed</h1><p>Thank you, {{customerName}}</p>', createdAt: '2026-02-01T08:00:00Z' }
+  ],
   delivery: [
     { id: 'dl-1', name: 'Kigali Express Delivery', regions: JSON.stringify([{ district: 'Nyarugenge' }]), methods: JSON.stringify([{ name: 'Moto Delivery', cost: 1500 }]), isActive: true, createdAt: '2026-01-10T00:00:00Z' }
   ],
@@ -689,7 +698,7 @@ export const handleImpressaDataGet = async (req, res) => {
         queryText += ` WHERE ${config.where}`;
       }
       
-      const tablesWithCreatedAt = ['User', 'Violation', 'SellerReport', 'Order', 'Product', 'Shift', 'Category', 'Attribute', 'Review', 'Ticket', 'ChatLog', 'ClientAbonne', 'Coupon', 'GiftCard', 'GiftCardProduct', 'FlashSale', 'Banner', 'Testimonial', 'Blog', 'BrandPartner', 'Transaction', 'Payout', 'Subscriber', 'ShippingZone', 'TaxRate', 'ReportLog'];
+      const tablesWithCreatedAt = ['User', 'Violation', 'SellerReport', 'Order', 'Product', 'Shift', 'Category', 'Attribute', 'Review', 'Ticket', 'ChatLog', 'ClientAbonne', 'Coupon', 'GiftCard', 'GiftCardProduct', 'FlashSale', 'Banner', 'Testimonial', 'Blog', 'BrandPartner', 'Transaction', 'Payout', 'Subscriber', 'ShippingZone', 'TaxRate', 'ReportLog', 'EmailTemplate'];
       if (tablesWithCreatedAt.includes(config.table)) {
         queryText += ` ORDER BY "createdAt" DESC`;
       }
@@ -835,4 +844,68 @@ export const handleImpressaDataDelete = async (req, res) => {
     return res.status(404).json({ error: `Record with id ${id} not found.` });
   }
 };
+
+// Proxy Test Email sending to impressa-backend
+export const sendImpressaTestEmail = async (req, res) => {
+  const { templateName, recipientEmail } = req.body;
+  const impressaUrl = process.env.IMPRESSA_API_URL || 'https://abelus-backend.onrender.com';
+  
+  if (!req.user.permissions.includes('manage_impressa_email_templates')) {
+    return res.status(403).json({ error: 'Access denied. Insufficient privileges to test templates.' });
+  }
+
+  try {
+    const response = await fetch(`${impressaUrl}/api/admin/email-templates/test`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ubaka-secret': process.env.JWT_SECRET || 'impressa123'
+      },
+      body: JSON.stringify({ templateName, recipientEmail })
+    });
+    
+    const data = await response.json();
+    if (response.ok) {
+      return res.json(data);
+    } else {
+      return res.status(response.status).json(data);
+    }
+  } catch (err) {
+    console.error('[ProjectController] Error proxying test email:', err.message);
+    return res.status(500).json({ error: `Failed to dispatch test email to e-commerce server: ${err.message}` });
+  }
+};
+
+// Proxy Seller Verification to impressa-backend
+export const verifyImpressaSeller = async (req, res) => {
+  const { id } = req.params;
+  const { action, rejectionReason } = req.body;
+  const impressaUrl = process.env.IMPRESSA_API_URL || 'https://abelus-backend.onrender.com';
+  
+  if (!req.user.permissions.includes('manage_impressa_sellers')) {
+    return res.status(403).json({ error: 'Access denied. Insufficient privileges to verify sellers.' });
+  }
+
+  try {
+    const response = await fetch(`${impressaUrl}/api/seller-verification/${id}/verify`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ubaka-secret': process.env.JWT_SECRET || 'impressa123'
+      },
+      body: JSON.stringify({ action, rejectionReason })
+    });
+    
+    const data = await response.json();
+    if (response.ok) {
+      return res.json(data);
+    } else {
+      return res.status(response.status).json(data);
+    }
+  } catch (err) {
+    console.error('[ProjectController] Error proxying seller verification:', err.message);
+    return res.status(500).json({ error: `Failed to verify seller on e-commerce server: ${err.message}` });
+  }
+};
+
 

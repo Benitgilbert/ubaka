@@ -55,6 +55,7 @@ import chatbotRoutes from "./routes/chatbotRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import { seedEmailTemplates } from "./utils/emailService.js";
 
 dotenv.config();
 
@@ -207,6 +208,7 @@ if (!isVercel && !isTest) {
       logger.info("Starting server initialization... URL: " + (process.env.DATABASE_URL || "NOT SET").replace(/:[^@]+@/, ":****@"));
       await prisma.$connect();
       logger.info("✅ Prisma connected to Supabase");
+      await seedEmailTemplates();
 
       const PORT = process.env.PORT || 5000;
       const server = app.listen(PORT, () => {
