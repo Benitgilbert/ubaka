@@ -961,3 +961,36 @@ model EmailTemplate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model JobListing {
+  id           String           @id @default(uuid())
+  title        String
+  department   String
+  location     String
+  type         String
+  icon         String
+  description  String
+  requirements String[]
+  benefits     String[]
+  isActive     Boolean          @default(true)
+  applications JobApplication[]
+
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model JobApplication {
+  id            String      @id @default(uuid())
+  fullName      String
+  email         String
+  phone         String
+  portfolioLink String?
+  coverLetter   String?
+  status        String      @default("pending")
+  
+  jobListingId  String
+  jobListing    JobListing  @relation(fields: [jobListingId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}

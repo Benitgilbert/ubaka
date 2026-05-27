@@ -392,6 +392,16 @@ export const formatCurrency = (amount) => {
   return `${n.toLocaleString()} RWF`;
 };
 
+export const getActiveJobListings = async () => {
+  const response = await axios.get("/careers");
+  return response.data;
+};
+
+export const submitJobApplication = async (jobId, data) => {
+  const response = await axios.post(`/careers/${jobId}/apply`, data);
+  return response.data;
+};
+
 const apiService = {
   // Cart
   getCart,
@@ -438,6 +448,9 @@ const apiService = {
   updateGiftCardStatus,
   createAdminGiftCard,
   deleteGiftCard,
+  // Careers
+  getActiveJobListings,
+  submitJobApplication,
 
   // Helpers
   formatPhoneNumber,

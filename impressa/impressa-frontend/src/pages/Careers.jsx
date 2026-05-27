@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     FaBriefcase, FaMapMarkerAlt, FaClock, FaCheckCircle, 
     FaSpinner, FaArrowRight, FaArrowLeft, FaGlobe, 
@@ -6,8 +6,19 @@ import {
 } from 'react-icons/fa';
 import Header from '../components/Header';
 import LandingFooter from '../components/LandingFooter';
+import { getActiveJobListings, submitJobApplication } from '../services/api';
+
+const iconMap = {
+    FaLaptopCode,
+    FaPrint,
+    FaGlobe,
+    FaLeaf,
+    FaBriefcase
+};
 
 export default function Careers() {
+    const [openRoles, setOpenRoles] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [activeJobId, setActiveJobId] = useState(null);
     const [applyingJobId, setApplyingJobId] = useState(null);
     const [submitting, setSubmitting] = useState(false);
@@ -22,89 +33,25 @@ export default function Careers() {
         coverLetter: ''
     });
 
-    const openRoles = [
-        {
-            id: 'role-1',
-            title: 'Fullstack React/Node Engineer',
-            department: 'Engineering',
-            location: 'Kigali, Rwanda (Hybrid)',
-            type: 'Full-Time',
-            icon: FaLaptopCode,
-            description: 'We are looking for a Senior Fullstack Developer to lead the development of our MIS Admin Dashboard and expand our storefront core APIs. You will work on real-time inventory systems, POS integrations, and automated seller tools.',
-            requirements: [
-                '3+ years experience with React.js, Node.js, and PostgreSQL/Prisma.',
-                'Proven experience building SaaS control planes or e-commerce admin panels.',
-                'Familiarity with Cloudinary asset storage and WebSockets integrations.',
-                'Passion for creating highly responsive, accessible, and premium user experiences.'
-            ],
-            benefits: [
-                'Competitive compensation package & health insurance.',
-                'Flexible hybrid working model (2 days remote).',
-                'Modern developer workspace in central Kigali.',
-                'Annual learning & development allowance.'
-            ]
-        },
-        {
-            id: 'role-2',
-            title: 'Graphic & Print Specialist',
-            department: 'Production',
-            location: 'Kigali HQ',
-            type: 'Full-Time',
-            icon: FaPrint,
-            description: 'Help our users turn their ideas into custom physical products. You will oversee print custom queries, quality audits of submitted vector templates (ID cards, banners, frames), and coordinate with the local print manufacturing team.',
-            requirements: [
-                'Expert knowledge of Adobe Illustrator, Photoshop, and vector graphics file formats.',
-                'Experience with industrial printing machinery and paper/material sourcing.',
-                'Meticulous eye for detail and print alignment specifications.',
-                'Strong communication skills to assist clients with file tweaks.'
-            ],
-            benefits: [
-                'Hands-on experience with state-of-the-art print equipment.',
-                'Health and wellness benefits.',
-                'Career progression opportunities into Operations Management.'
-            ]
-        },
-        {
-            id: 'role-3',
-            title: 'Merchant Onboarding & Growth Lead',
-            department: 'Operations',
-            location: 'Kigali, Rwanda (Field/Office)',
-            type: 'Full-Time',
-            icon: FaGlobe,
-            description: 'Lead our vendor expansion program. You will be responsible for sourcing local merchants, guiding them through the RDB/TIN onboarding checklist, and reviewing submitted KYC files to activate new storefronts.',
-            requirements: [
-                'Experience in merchant relations, partnership management, or sales operations.',
-                'Deep understanding of Rwandan business registration (RDB) and tax systems (RRA).',
-                'Empathetic communicator with strong troubleshooting skills.',
-                'Self-starter capable of managing partner pipelines.'
-            ],
-            benefits: [
-                'Attractive commission bonus per active store onboarded.',
-                'Travel/fuel allowance.',
-                'Company smartphone and computing setup.'
-            ]
-        },
-        {
-            id: 'role-4',
-            title: 'Sustainability & Solar Program Officer',
-            department: 'Impact Projects',
-            location: 'Kigali / Remote',
-            type: 'Full-Time',
-            icon: FaLeaf,
-            description: 'Direct our environmental impact products portfolio (solar lanterns, clean cookstoves). You will manage relationships with product suppliers, coordinate clean cooking stove logistics, and compile impact statistics for partner reports.',
-            requirements: [
-                'Degree in Environmental Sciences, Development Studies, or related fields.',
-                '1-2 years experience in project logistics or green energy distribution.',
-                'Data compilation skills (Excel/CSV dashboarding).',
-                'Commitment to promoting eco-friendly alternatives in Rwanda.'
-            ],
-            benefits: [
-                'Opportunity to work on high-impact climate initiatives.',
-                'Flexible working hours.',
-                'Comprehensive medical insurance coverage.'
-            ]
-        }
-    ];
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                setLoading(true);
+                const res = await getActiveJobListings();
+                if (res.success) {
+                    setOpenRoles(res.data);
+                } else {
+                    setErrorMsg("Failed to load positions.");
+                }
+            } catch (err) {
+                console.error("Error fetching jobs:", err);
+                setErrorMsg("Failed to load positions from server.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchJobs();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -130,29 +77,37 @@ export default function Careers() {
         setErrorMsg('');
         setSuccessMsg('');
 
-        // Client-side mock submission delay
-        setTimeout(() => {
-            if (!formData.fullName || !formData.email || !formData.phone) {
-                setErrorMsg('Please fill in all required fields.');
-                setSubmitting(false);
-                return;
-            }
-
-            setSuccessMsg('Your application has been received successfully! Our HR team will reach out to you within 3 business days.');
+        if (!formData.fullName || !formData.email || !formData.phone) {
+            setErrorMsg('Please fill in all required fields.');
             setSubmitting(false);
-            // Reset form
-            setFormData({
-                fullName: '',
-                email: '',
-                phone: '',
-                portfolioLink: '',
-                coverLetter: ''
-            });
-            // Clear applying state after a few seconds
-            setTimeout(() => {
-                setApplyingJobId(null);
-            }, 6000);
-        }, 1500);
+            return;
+        }
+
+        try {
+            const res = await submitJobApplication(applyingJobId, formData);
+            if (res.success) {
+                setSuccessMsg(res.message || 'Your application has been received successfully! Our HR team will reach out to you within 3 business days.');
+                // Reset form
+                setFormData({
+                    fullName: '',
+                    email: '',
+                    phone: '',
+                    portfolioLink: '',
+                    coverLetter: ''
+                });
+                // Clear applying state after a few seconds
+                setTimeout(() => {
+                    setApplyingJobId(null);
+                }, 6000);
+            } else {
+                setErrorMsg(res.message || 'Failed to submit application. Please try again.');
+            }
+        } catch (err) {
+            console.error("Error submitting application:", err);
+            setErrorMsg(err.response?.data?.message || 'Failed to submit application. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const toggleRoleAccordion = (jobId) => {
@@ -229,14 +184,26 @@ export default function Careers() {
                     <p className="text-sm text-gray-500 mt-2 font-medium">Join us in driving commerce innovation from Kigali</p>
                 </div>
 
-                <div className="space-y-6">
-                    {openRoles.map(role => {
-                        const isExpanded = activeJobId === role.id;
-                        const isApplying = applyingJobId === role.id;
-                        const RoleIcon = role.icon;
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                        <FaSpinner className="animate-spin text-4xl text-terracotta-500" />
+                        <p className="text-sm font-bold text-gray-500">Loading open positions...</p>
+                    </div>
+                ) : openRoles.length === 0 ? (
+                    <div className="text-center py-16 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-8 shadow-sm">
+                        <FaBriefcase className="text-4xl text-gray-300 dark:text-slate-700 mx-auto mb-3" />
+                        <h3 className="text-base font-black text-gray-900 dark:text-white">No Open Roles Right Now</h3>
+                        <p className="text-xs text-gray-500 mt-1 font-medium">Please check back later or subscribe to our newsletter for updates.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {openRoles.map(role => {
+                            const isExpanded = activeJobId === role.id;
+                            const isApplying = applyingJobId === role.id;
+                            const RoleIcon = iconMap[role.icon] || FaBriefcase;
 
-                        return (
-                            <div 
+                            return (
+                                <div 
                                 key={role.id} 
                                 className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
                             >
@@ -247,7 +214,7 @@ export default function Careers() {
                                     className="w-full flex items-center justify-between px-8 py-6 text-left focus:outline-none"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg transition-colors ${isExpanded ? 'bg-terracotta-500 text-white' : 'bg-gray-55 dark:bg-slate-800 text-gray-500'}`}>
+                                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg transition-colors ${isExpanded ? 'bg-terracotta-500 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-500'}`}>
                                             <RoleIcon />
                                         </div>
                                         <div>
@@ -261,7 +228,7 @@ export default function Careers() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-base font-bold transition-all ${isExpanded ? 'border-terracotta-500 text-terracotta-500' : 'border-gray-300 dark:border-slate-700 text-gray-550'}`}>
+                                    <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-base font-bold transition-all ${isExpanded ? 'border-terracotta-500 text-terracotta-500' : 'border-gray-300 dark:border-slate-700 text-gray-400'}`}>
                                         {isExpanded ? '−' : '+'}
                                     </div>
                                 </button>
@@ -274,15 +241,15 @@ export default function Careers() {
                                             /* Description & Requirement Details */
                                             <div className="space-y-6">
                                                 <div className="space-y-2">
-                                                    <h4 className="text-xs font-black text-gray-400 dark:text-gray-550 uppercase tracking-widest">Role Description</h4>
-                                                    <p className="text-xs text-gray-650 dark:text-gray-450 leading-relaxed font-medium">{role.description}</p>
+                                                    <h4 className="text-xs font-black text-gray-405 dark:text-slate-500 uppercase tracking-widest">Role Description</h4>
+                                                    <p className="text-xs text-slate-650 dark:text-slate-300 leading-relaxed font-medium">{role.description}</p>
                                                 </div>
 
                                                 <div className="space-y-2.5">
-                                                    <h4 className="text-xs font-black text-gray-400 dark:text-gray-555 uppercase tracking-widest">Job Requirements</h4>
+                                                    <h4 className="text-xs font-black text-gray-405 dark:text-slate-500 uppercase tracking-widest">Job Requirements</h4>
                                                     <ul className="space-y-2">
                                                         {role.requirements.map((reqText, i) => (
-                                                            <li key={i} className="flex items-start gap-2.5 text-xs text-gray-650 dark:text-gray-450 font-medium">
+                                                            <li key={i} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium">
                                                                 <span className="w-1.5 h-1.5 rounded-full bg-terracotta-500 shrink-0 mt-1.5" />
                                                                 {reqText}
                                                             </li>
@@ -291,10 +258,10 @@ export default function Careers() {
                                                 </div>
 
                                                 <div className="space-y-2.5">
-                                                    <h4 className="text-xs font-black text-gray-400 dark:text-gray-555 uppercase tracking-widest">Compensations & Benefits</h4>
+                                                    <h4 className="text-xs font-black text-gray-450 dark:text-slate-500 uppercase tracking-widest">Compensations & Benefits</h4>
                                                     <ul className="space-y-2">
                                                         {role.benefits.map((benText, i) => (
-                                                            <li key={i} className="flex items-start gap-2.5 text-xs text-gray-650 dark:text-gray-455 font-medium">
+                                                            <li key={i} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium">
                                                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
                                                                 {benText}
                                                             </li>
@@ -436,7 +403,8 @@ export default function Careers() {
                             </div>
                         );
                     })}
-                </div>
+                    </div>
+                )}
             </div>
 
             <LandingFooter />
