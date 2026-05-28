@@ -152,7 +152,7 @@ export default function Header() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 shrink-0">
-          <img src="/logo.svg" alt="Kuri Macye" className="h-10 w-auto object-contain" />
+          <img src="/logo.svg" alt="Kuri Macye" className="h-8 sm:h-10 w-auto object-contain" />
         </Link>
 
 
@@ -267,7 +267,7 @@ export default function Header() {
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2.5 text-charcoal-300 hover:text-white transition-colors"
+            className="p-1.5 sm:p-2.5 text-charcoal-300 hover:text-white transition-colors"
             title={theme === 'light' ? 'Dark Mode' : 'Light Mode'}
             aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
@@ -277,7 +277,7 @@ export default function Header() {
           {!isSellerOrAdminView && (
             <>
               {/* Wishlist */}
-              <Link to="/wishlist" className="p-2.5 text-charcoal-300 hover:text-white transition-colors relative group">
+              <Link to="/wishlist" className="p-1.5 sm:p-2.5 text-charcoal-300 hover:text-white transition-colors relative group">
                 <LuHeart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 {wishlist?.length > 0 && (
                   <span className="absolute top-1 right-1 w-4 h-4 bg-terracotta-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-charcoal-800">
@@ -287,7 +287,7 @@ export default function Header() {
               </Link>
 
               {/* Cart */}
-              <Link to="/cart" className="relative p-2.5 text-charcoal-300 hover:text-white transition-colors group">
+              <Link to="/cart" className="relative p-1.5 sm:p-2.5 text-charcoal-300 hover:text-white transition-colors group">
                 <LuShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
                 {items.length > 0 && (
                   <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white border-2 border-charcoal-800">
@@ -302,7 +302,7 @@ export default function Header() {
           <div className="relative">
             <button
               onClick={() => setSettingsDropdownOpen(!settingsDropdownOpen)}
-              className={`flex items-center gap-2 p-1.5 rounded-full transition-all border ${settingsDropdownOpen ? 'bg-charcoal-700 border-terracotta-500/50' : 'hover:bg-charcoal-700 border-charcoal-700'}`}
+              className={`flex items-center gap-1 md:gap-2 p-0.5 sm:p-1.5 rounded-full transition-all border ${settingsDropdownOpen ? 'bg-charcoal-700 border-terracotta-500/50' : 'hover:bg-charcoal-700 border-transparent sm:border-charcoal-700'}`}
             >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isAuthenticated ? 'bg-gradient-to-tr from-terracotta-500 to-terracotta-600 shadow-lg' : 'bg-charcoal-700 text-charcoal-400'}`}>
                 {isAuthenticated ? (
@@ -311,7 +311,7 @@ export default function Header() {
                   <LuUser className="w-5 h-5" />
                 )}
               </div>
-              <LuChevronDown className={`w-4 h-4 text-charcoal-400 transition-transform ${settingsDropdownOpen ? 'rotate-180' : ''}`} />
+              <LuChevronDown className={`w-4 h-4 text-charcoal-400 transition-transform ${settingsDropdownOpen ? 'rotate-180' : ''} hidden sm:block`} />
             </button>
 
             {settingsDropdownOpen && (
