@@ -65,6 +65,10 @@ module.exports = {
           900: '#28293D',
         },
       },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        outfit: ['Outfit', 'sans-serif'],
+      },
       keyframes: {
         slideUp: {
           '0%': { transform: 'translateY(100%)', opacity: '0' },
