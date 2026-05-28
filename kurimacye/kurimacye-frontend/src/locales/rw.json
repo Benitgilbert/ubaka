@@ -355,5 +355,32 @@
     "cross_sells_title": "Uzuza ikomande yawe",
     "toast_coupon_success": "Kode y'igabanyirizwa yakoreshejwe neza!",
     "toast_coupon_invalid": "Kode y'igabanyirizwa ntabwo ari yo"
+  },
+  "about": {
+    "hero_title": "Ibyerekeye ",
+    "hero_highlight": "Kuri Macye",
+    "hero_desc": "Turi urubuga rwo gucapa ruyoborwa na Ubaka Tech, twiyemeje guhindura ibishushanyo n'ibyifuzo byanyu impamo ku giciro cyiza na serivisi yizewe.",
+    "story_badge": "Urugendo Rwacu",
+    "story_title": "Amateka Yacu",
+    "story_desc1": "Kuri Macye yavutse ku gitekerezo cyoroshye: gucapa ibintu byiza ku buryo bworohereye buri wese. Yatangijwe nk'igicuruzwa cy'indashyikirwa cya Ubaka Tech, ibyatangiye ari urusenge ruto byakuze biba urubuga rukomeye rwa interineti rukorera abakiriya babarirwa mu bihumbi mu Rwanda.",
+    "story_desc2": "Twemera ko igishushanyo cyiza gikwiriye gucapwa neza cyane. Niyo mpamvu twashoye mu buryo bugezweho bwo gucapa no mu itsinda ry'inzobere zikunda ibyiza nk'uko namwe mukunda imishinga yanyu.",
+    "values_badge": "Indangagaciro",
+    "values_title": "Intego n'Indangagaciro Zacu",
+    "values_list": {
+      "innovation_title": "Guhanga Ibishya",
+      "innovation_desc": "Tuguma gushakisha uburyo n'ibikoresho bishya kugira ngo tuguhe ibyiza mu gucapa.",
+      "quality_title": "Ubuziranenge",
+      "quality_desc": "Kuva ku gakarita koroshye kugeza ku kimenyetso kinini cyane, twemeza ibyiza mu gucapwa kose.",
+      "partnership_title": "Ubufatanye",
+      "partnership_desc": "Dukorana nawe nk'umufatanyabikorwa kugira ngo ibyo wifuza bigerweho neza."
+    },
+    "team_badge": "Abahanga Bacu",
+    "team_title": "Itsinda Ryacu",
+    "team_desc": "Abantu bategura kandi bakora ibyo gucapa.",
+    "team_loading": "Turi gushaka abakozi...",
+    "team_empty": "Nta mukozi twabonye.",
+    "cta_title": "Witeguye gukora?",
+    "cta_desc": "Fatanya n'ibigo n'abantu babarirwa mu bihumbi bizera Kuri Macye mu byo gucapa byabo. Turi hano ngo duhindure ibyifuzo byanyu impamo.",
+    "cta_btn": "Reba Ibicuruzwa"
   }
 }
