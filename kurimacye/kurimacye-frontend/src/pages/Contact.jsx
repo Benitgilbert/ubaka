@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import LandingFooter from "../components/LandingFooter";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function Contact() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
@@ -13,8 +15,7 @@ export default function Contact() {
         const res = await fetch(`${API_URL}/site-settings/public`);
         const data = await res.json();
         if (data.success) setSettings(data.data);
-      } catch (err) {
-      }
+      } catch (err) {}
     };
     fetchSettings();
   }, []);
@@ -24,130 +25,164 @@ export default function Contact() {
     : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31901.07604313465!2d30.0467549!3d-1.6166549!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dc63979435b699%3A0x7d0a64e1c72f9e4b!2sGicumbi%2C%20Rwanda!5e0!3m2!1sen!2sus!4v1714900000000!5m2!1sen!2sus";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="min-h-screen bg-cream-100 dark:bg-charcoal-900 transition-colors duration-300">
       <Header />
 
       <main>
-        {/* Hero Section */}
-        <section className="relative py-20 md:py-32 overflow-hidden bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
+        {/* Hero Section — compact */}
+        <section className="relative py-10 md:py-14 overflow-hidden bg-white dark:bg-charcoal-800 border-b border-cream-200 dark:border-charcoal-700">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-10 left-10 w-72 h-72 bg-violet-200 dark:bg-violet-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-            <div className="absolute top-20 right-20 w-72 h-72 bg-indigo-200 dark:bg-indigo-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-200 dark:bg-blue-900/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-6 left-8 w-52 h-52 bg-terracotta-200 dark:bg-terracotta-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute top-10 right-10 w-52 h-52 bg-sand-200 dark:bg-sand-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
           </div>
           <div className="relative mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-5xl md:text-7xl font-black text-gray-900 dark:text-white mb-8 tracking-tight">
-              Get in <span className="text-violet-600 dark:text-violet-400">Touch</span>
+            <h1 className="text-3xl md:text-4xl font-black text-charcoal-800 dark:text-white mb-3 tracking-tight">
+              {t("contact.hero_title")}
+              <span className="text-terracotta-500 dark:text-terracotta-400">{t("contact.hero_highlight")}</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              {settings?.tagline || "We are here to help. Send us a message and we will get back to you as soon as possible."}
+            <p className="text-base text-charcoal-600 dark:text-charcoal-400 max-w-2xl mx-auto leading-relaxed">
+              {settings?.tagline || t("contact.hero_desc")}
             </p>
           </div>
         </section>
 
-        <section className="py-20 md:py-32">
+        {/* Form + Info Section — tighter padding */}
+        <section className="py-10 md:py-14">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
               {/* Form Card */}
-              <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
-                <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-8">Send us a Message</h2>
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest pl-1">Name</label>
+              <div className="lg:col-span-2 bg-white dark:bg-charcoal-800 rounded-2xl p-6 md:p-8 shadow-sm border border-cream-200 dark:border-charcoal-700">
+                <h2 className="text-2xl font-black text-charcoal-800 dark:text-white mb-6">
+                  {t("contact.form_title")}
+                </h2>
+                <form className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label htmlFor="name" className="text-xs font-bold text-charcoal-600 dark:text-charcoal-300 uppercase tracking-widest pl-1">
+                        {t("contact.label_name")}
+                      </label>
                       <input
                         type="text"
                         name="name"
                         id="name"
-                        className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl py-4 px-6 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none transition-all placeholder:text-gray-400"
-                        placeholder="John Doe"
+                        className="w-full bg-cream-50 dark:bg-charcoal-900 border border-cream-200 dark:border-charcoal-700 rounded-xl py-2.5 px-4 text-charcoal-800 dark:text-white focus:ring-2 focus:ring-terracotta-400 outline-none transition-all placeholder:text-charcoal-400 text-sm"
+                        placeholder={t("contact.placeholder_name")}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest pl-1">Email</label>
+                    <div className="space-y-1">
+                      <label htmlFor="email" className="text-xs font-bold text-charcoal-600 dark:text-charcoal-300 uppercase tracking-widest pl-1">
+                        {t("contact.label_email")}
+                      </label>
                       <input
                         type="email"
                         name="email"
                         id="email"
-                        className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl py-4 px-6 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none transition-all placeholder:text-gray-400"
-                        placeholder="john@example.com"
+                        className="w-full bg-cream-50 dark:bg-charcoal-900 border border-cream-200 dark:border-charcoal-700 rounded-xl py-2.5 px-4 text-charcoal-800 dark:text-white focus:ring-2 focus:ring-terracotta-400 outline-none transition-all placeholder:text-charcoal-400 text-sm"
+                        placeholder={t("contact.placeholder_email")}
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest pl-1">Subject</label>
+                  <div className="space-y-1">
+                    <label htmlFor="subject" className="text-xs font-bold text-charcoal-600 dark:text-charcoal-300 uppercase tracking-widest pl-1">
+                      {t("contact.label_subject")}
+                    </label>
                     <input
                       type="text"
                       name="subject"
                       id="subject"
-                      className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl py-4 px-6 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none transition-all placeholder:text-gray-400"
-                      placeholder="How can we help?"
+                      className="w-full bg-cream-50 dark:bg-charcoal-900 border border-cream-200 dark:border-charcoal-700 rounded-xl py-2.5 px-4 text-charcoal-800 dark:text-white focus:ring-2 focus:ring-terracotta-400 outline-none transition-all placeholder:text-charcoal-400 text-sm"
+                      placeholder={t("contact.placeholder_subject")}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest pl-1">Message</label>
+                  <div className="space-y-1">
+                    <label htmlFor="message" className="text-xs font-bold text-charcoal-600 dark:text-charcoal-300 uppercase tracking-widest pl-1">
+                      {t("contact.label_message")}
+                    </label>
                     <textarea
                       name="message"
                       id="message"
                       rows="5"
-                      className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl py-4 px-6 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none transition-all placeholder:text-gray-400 resize-none"
-                      placeholder="Your message here..."
+                      className="w-full bg-cream-50 dark:bg-charcoal-900 border border-cream-200 dark:border-charcoal-700 rounded-xl py-2.5 px-4 text-charcoal-800 dark:text-white focus:ring-2 focus:ring-terracotta-400 outline-none transition-all placeholder:text-charcoal-400 resize-none text-sm"
+                      placeholder={t("contact.placeholder_message")}
                     ></textarea>
                   </div>
-                  <div className="pt-4">
+                  <div className="pt-2">
                     <button
                       type="submit"
-                      className="w-full md:w-auto px-12 py-5 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black text-lg transition-all hover:scale-[1.02] shadow-xl shadow-violet-500/25 active:scale-95"
+                      className="inline-flex items-center gap-2 px-8 py-3 bg-terracotta-500 hover:bg-terracotta-600 text-white rounded-xl font-bold text-sm transition-all hover:scale-[1.02] shadow-md shadow-terracotta-500/20 active:scale-95"
                     >
-                      Send Message
+                      {t("contact.btn_send")}
                     </button>
                   </div>
                 </form>
               </div>
 
               {/* Info Card */}
-              <div className="space-y-8">
-                <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800 h-full">
-                  <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-10">Contact Info</h2>
-                  <div className="space-y-12">
-                    <div className="flex gap-6 group">
-                      <div className="w-14 h-14 bg-violet-50 dark:bg-violet-900/10 rounded-2xl flex items-center justify-center text-violet-600 dark:text-violet-400 transform group-hover:scale-110 transition-transform">
-                        <FaMapMarkerAlt className="text-2xl" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 uppercase tracking-widest text-sm opacity-50">Address</h3>
-                        <p className="text-gray-600 dark:text-gray-400 font-medium leading-relaxed">Building near Gicumbi distict office (Eudiose Building)</p>
-                      </div>
+              <div className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 md:p-8 shadow-sm border border-cream-200 dark:border-charcoal-700 h-fit">
+                <h2 className="text-2xl font-black text-charcoal-800 dark:text-white mb-6">
+                  {t("contact.info_title")}
+                </h2>
+                <div className="space-y-6">
+
+                  {/* Address */}
+                  <div className="flex gap-4 group">
+                    <div className="w-10 h-10 bg-terracotta-50 dark:bg-terracotta-900/10 rounded-xl flex items-center justify-center text-terracotta-500 dark:text-terracotta-400 shrink-0 group-hover:scale-110 transition-transform">
+                      <FaMapMarkerAlt className="text-base" />
                     </div>
-                    <div className="flex gap-6 group">
-                      <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 transform group-hover:scale-110 transition-transform">
-                        <FaPhoneAlt className="text-2xl" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 uppercase tracking-widest text-sm opacity-50">Phone</h3>
-                        <p className="text-gray-600 dark:text-gray-400 font-medium leading-relaxed">+250 789 079 978</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-6 group">
-                      <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/10 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 transform group-hover:scale-110 transition-transform">
-                        <FaEnvelope className="text-2xl" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 uppercase tracking-widest text-sm opacity-50">Email</h3>
-                        <p className="text-gray-600 dark:text-gray-400 font-medium leading-relaxed">
-                          <a href="mailto:ishfabzele2@gmail.com" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">ishfabzele2@gmail.com</a>
-                        </p>
-                      </div>
+                    <div>
+                      <h3 className="text-[10px] font-bold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-widest mb-1">
+                        {t("contact.label_address")}
+                      </h3>
+                      <p className="text-sm text-charcoal-700 dark:text-charcoal-300 font-medium leading-relaxed">
+                        {settings?.address || "Building near Gicumbi district office (Eudiose Building)"}
+                      </p>
                     </div>
                   </div>
+
+                  {/* Phone */}
+                  <div className="flex gap-4 group">
+                    <div className="w-10 h-10 bg-sage-50 dark:bg-sage-900/10 rounded-xl flex items-center justify-center text-sage-600 dark:text-sage-400 shrink-0 group-hover:scale-110 transition-transform">
+                      <FaPhoneAlt className="text-base" />
+                    </div>
+                    <div>
+                      <h3 className="text-[10px] font-bold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-widest mb-1">
+                        {t("contact.label_phone")}
+                      </h3>
+                      <p className="text-sm text-charcoal-700 dark:text-charcoal-300 font-medium">
+                        {settings?.contactPhone || "+250 789 079 978"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex gap-4 group">
+                    <div className="w-10 h-10 bg-sand-50 dark:bg-sand-900/10 rounded-xl flex items-center justify-center text-sand-600 dark:text-sand-400 shrink-0 group-hover:scale-110 transition-transform">
+                      <FaEnvelope className="text-base" />
+                    </div>
+                    <div>
+                      <h3 className="text-[10px] font-bold text-charcoal-500 dark:text-charcoal-400 uppercase tracking-widest mb-1">
+                        {t("contact.label_email_info")}
+                      </h3>
+                      <p className="text-sm text-charcoal-700 dark:text-charcoal-300 font-medium">
+                        <a
+                          href={`mailto:${settings?.contactEmail || "ishfabzele2@gmail.com"}`}
+                          className="hover:text-terracotta-500 dark:hover:text-terracotta-400 transition-colors"
+                        >
+                          {settings?.contactEmail || "ishfabzele2@gmail.com"}
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Map Section */}
-        <section className="h-[500px] w-full bg-gray-100 dark:bg-slate-800 grayscale dark:grayscale-0 hover:grayscale-0 transition-all duration-700">
+        {/* Map Section — shorter */}
+        <section className="h-72 w-full bg-cream-100 dark:bg-charcoal-800 grayscale dark:grayscale-0 hover:grayscale-0 transition-all duration-700">
           <iframe
             src={mapSource}
             width="100%"

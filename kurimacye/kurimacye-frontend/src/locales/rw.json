@@ -382,5 +382,24 @@
     "cta_title": "Witeguye Gutangira?",
     "cta_desc": "Fatanya n'abaguzi n'abagurisha babarirwa mu bihumbi bizera Kuri Macye mu bucuruzi bwabo. Vumbura ibicuruzwa byiza cyangwa utangire kugurisha uyu munsi.",
     "cta_btn": "Reba Ibicuruzwa"
+  },
+  "contact": {
+    "hero_title": "Watwandikiye ",
+    "hero_highlight": "Twebwe",
+    "hero_desc": "Turi hano kugufasha. Twoherereze ubutumwa kandi tugusubize bidatinze.",
+    "form_title": "Twoherereze Ubutumwa",
+    "label_name": "Amazina",
+    "label_email": "Imeli",
+    "label_subject": "Inshingano",
+    "label_message": "Ubutumwa",
+    "placeholder_name": "Nzeyimana Jean",
+    "placeholder_email": "jean@urugero.com",
+    "placeholder_subject": "Twasaidia gute?",
+    "placeholder_message": "Andika ubutumwa bwawe hano...",
+    "btn_send": "Ohereza Ubutumwa",
+    "info_title": "Amakuru yo Gutwandikira",
+    "label_address": "Aderesi",
+    "label_phone": "Telefoni",
+    "label_email_info": "Imeli"
   }
 }
