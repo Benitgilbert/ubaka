@@ -848,7 +848,7 @@ export const handleImpressaDataDelete = async (req, res) => {
 // Proxy Test Email sending to impressa-backend
 export const sendImpressaTestEmail = async (req, res) => {
   const { templateName, recipientEmail } = req.body;
-  const impressaUrl = process.env.IMPRESSA_API_URL || 'https://abelus-backend.onrender.com';
+  const impressaUrl = process.env.IMPRESSA_API_URL || 'https://kurimacye-backend.onrender.com';
   
   if (!req.user.permissions.includes('manage_impressa_email_templates')) {
     return res.status(403).json({ error: 'Access denied. Insufficient privileges to test templates.' });
@@ -880,7 +880,7 @@ export const sendImpressaTestEmail = async (req, res) => {
 export const verifyImpressaSeller = async (req, res) => {
   const { id } = req.params;
   const { action, rejectionReason } = req.body;
-  const impressaUrl = process.env.IMPRESSA_API_URL || 'https://abelus-backend.onrender.com';
+  const impressaUrl = process.env.IMPRESSA_API_URL || 'https://kurimacye-backend.onrender.com';
   
   if (!req.user.permissions.includes('manage_impressa_sellers')) {
     return res.status(403).json({ error: 'Access denied. Insufficient privileges to verify sellers.' });
