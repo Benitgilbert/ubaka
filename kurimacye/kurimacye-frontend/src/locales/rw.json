@@ -334,9 +334,9 @@
     "btn_add": "Shyira mu Gatebo"
   },
   "cart": {
-    "title": "Agatebo kawe k'Ibihashywa",
-    "description": "Suzuma ibyo watumije, ugire ibyo uhindura, maze ukomeze kwishura.",
-    "empty_title": "Agatebo karimo ubusa",
+    "title": "ahari ibyo wahisemo guhaha",
+    "description": "Suzuma ibyo wahisemo, ugire ibyo uhindura, maze ukomeze kwishyura.",
+    "empty_title": "Ntacyintu mwahashye ",
     "empty_desc": "Igihe ni iki ngo ushake ibicuruzwa bitangaje ubyuzuze agatebo kawe!",
     "start_shopping": "Tangira guhaha",
     "th_product": "Igicuruzwa",
