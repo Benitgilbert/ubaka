@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaUser, FaCalendarAlt, FaSearch } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import Header from "../components/Header";
 import LandingFooter from "../components/LandingFooter";
 import api from "../utils/axiosInstance";
@@ -8,6 +9,7 @@ import assetUrl from "../utils/assetUrl";
 import toast from "react-hot-toast";
 
 export default function Blog() {
+  const { t } = useTranslation();
   const [blogPosts, setBlogPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,13 +21,26 @@ export default function Blog() {
 
   const categories = ["All", "Seller Guides", "E-commerce Trends", "Platform Updates", "Success Stories", "Marketing 101", "Customer Tips"];
 
+  const getCategoryLabel = (cat) => {
+    switch (cat?.toLowerCase().trim()) {
+      case 'all': return t('blog.categories_list.all');
+      case 'seller guides': return t('blog.categories_list.seller_guides');
+      case 'e-commerce trends': return t('blog.categories_list.trends');
+      case 'platform updates': return t('blog.categories_list.updates');
+      case 'success stories': return t('blog.categories_list.stories');
+      case 'marketing 101': return t('blog.categories_list.marketing');
+      case 'customer tips': return t('blog.categories_list.tips');
+      default: return cat;
+    }
+  };
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const { data } = await api.get("/blogs");
         setBlogPosts(data);
       } catch (err) {
-        setError("Failed to load blogs. Please try again later.");
+        setError(t("blog.error_load"));
       } finally {
         setLoading(false);
       }
@@ -36,23 +51,23 @@ export default function Blog() {
 
   const handleSubscribe = async () => {
     if (!email) {
-      toast.error("Please enter your email address.");
+      toast.error(t("blog.toast_enter_email"));
       return;
     }
 
     // Basic email validation
     if (!/\S+@\S+\.\S+/.test(email)) {
-      toast.error("Please enter a valid email address.");
+      toast.error(t("blog.toast_invalid_email"));
       return;
     }
 
     setSubscribing(true);
     try {
       await api.post("/newsletter/subscribe", { email });
-      toast.success("Successfully subscribed to our newsletter!");
+      toast.success(t("blog.toast_subscribe_success"));
       setEmail("");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to subscribe. Please try again.");
+      toast.error(err.response?.data?.message || t("blog.toast_subscribe_fail"));
     } finally {
       setSubscribing(false);
     }
@@ -82,9 +97,9 @@ export default function Blog() {
             <div className="absolute top-20 right-20 w-72 h-72 bg-sand-200 dark:bg-sand-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
           </div>
           <div className="relative mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-black text-charcoal-800 dark:text-white mb-3">Kuri Macye <span className="text-terracotta-500 dark:text-terracotta-400">Blog</span></h1>
+            <h1 className="text-3xl md:text-4xl font-black text-charcoal-800 dark:text-white mb-3">{t("blog.hero_title")}<span className="text-terracotta-500 dark:text-terracotta-400">{t("blog.hero_highlight")}</span></h1>
             <p className="text-sm text-charcoal-600 dark:text-charcoal-400 max-w-xl mx-auto leading-relaxed">
-              Insights, tips, and inspiration for your printing projects and creative vision.
+              {t("blog.hero_desc")}
             </p>
           </div>
         </section>
@@ -111,7 +126,7 @@ export default function Blog() {
                 </div>
               ) : filteredPosts.length === 0 ? (
                 <div className="p-12 bg-white dark:bg-charcoal-800 rounded-2xl border-2 border-dashed border-cream-300 dark:border-charcoal-700 text-center text-charcoal-400 font-bold text-sm">
-                  No blog posts found matching your criteria.
+                  {t("blog.no_posts")}
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -140,7 +155,7 @@ export default function Blog() {
                             onClick={() => setSelectedCategory(post.category)}
                             className="px-3 py-1 bg-terracotta-50 dark:bg-terracotta-900/10 text-terracotta-500 dark:text-terracotta-400 rounded-full hover:bg-terracotta-500 hover:text-white transition-all text-[10px]"
                           >
-                            {post.category}
+                            {getCategoryLabel(post.category)}
                           </button>
                         </div>
                         <h2 className="text-lg md:text-xl font-black text-charcoal-800 dark:text-white mb-3 leading-tight group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400 transition-colors">
@@ -151,7 +166,7 @@ export default function Blog() {
                           to={`/blog/${post.id}`}
                           className="inline-flex items-center gap-1.5 text-terracotta-500 dark:text-terracotta-400 font-black text-sm group/link"
                         >
-                          Read More <span className="group-hover:translate-x-1 transition-transform duration-300">&rarr;</span>
+                          {t("blog.read_more")} <span className="group-hover:translate-x-1 transition-transform duration-300">&rarr;</span>
                         </Link>
                       </div>
                     </article>
@@ -164,13 +179,13 @@ export default function Blog() {
             <aside className="lg:col-span-4 space-y-6">
               {/* Search */}
               <div className="bg-white dark:bg-charcoal-800 p-5 rounded-2xl shadow-sm border border-cream-200 dark:border-charcoal-700">
-                <h3 className="text-base font-black text-charcoal-800 dark:text-white mb-4">Search</h3>
+                <h3 className="text-base font-black text-charcoal-800 dark:text-white mb-4">{t("blog.search")}</h3>
                 <div className="relative">
                   <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search blogs..."
+                    placeholder={t("blog.search_placeholder")}
                     className="w-full bg-cream-100 dark:bg-charcoal-700 border border-transparent focus:border-terracotta-500 rounded-xl py-2.5 pl-4 pr-10 text-sm text-charcoal-800 dark:text-white outline-none transition-all shadow-inner"
                   />
                   <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-charcoal-400 text-sm" />
@@ -179,7 +194,7 @@ export default function Blog() {
 
               {/* Categories */}
               <div className="bg-white dark:bg-charcoal-800 p-5 rounded-2xl shadow-sm border border-cream-200 dark:border-charcoal-700">
-                <h3 className="text-base font-black text-charcoal-800 dark:text-white mb-3">Categories</h3>
+                <h3 className="text-base font-black text-charcoal-800 dark:text-white mb-3">{t("blog.categories")}</h3>
                 <ul className="space-y-1.5">
                   {categories.map((category) => (
                     <li key={category}>
@@ -193,7 +208,7 @@ export default function Blog() {
                         <span className={`font-bold ${selectedCategory === category
                           ? "text-white"
                           : "text-charcoal-600 dark:text-charcoal-400 group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400"
-                          }`}>{category}</span>
+                          }`}>{getCategoryLabel(category)}</span>
                         {selectedCategory === category && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
                       </button>
                     </li>
@@ -204,14 +219,14 @@ export default function Blog() {
               {/* Newsletter */}
               <div className="bg-terracotta-500 p-6 rounded-2xl text-white overflow-hidden relative group">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full translate-x-1/2 -translate-y-1/2 transform group-hover:scale-150 transition-transform duration-1000"></div>
-                <h3 className="text-base font-black mb-2">Never Miss a Post</h3>
-                <p className="text-terracotta-100 mb-4 font-medium text-sm">Get the latest printing tips and design inspiration delivered to your inbox.</p>
+                <h3 className="text-base font-black mb-2">{t("blog.newsletter_title")}</h3>
+                <p className="text-terracotta-100 mb-4 font-medium text-sm">{t("blog.newsletter_desc")}</p>
                 <div className="space-y-2.5">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
+                    placeholder={t("blog.email_placeholder")}
                     className="w-full bg-white/20 border border-white/30 rounded-xl py-2.5 px-4 text-sm text-white placeholder:text-terracotta-200 outline-none focus:bg-white/30 transition-all font-bold"
                   />
                   <button
@@ -219,7 +234,7 @@ export default function Blog() {
                     disabled={subscribing}
                     className="w-full bg-white text-terracotta-500 py-2.5 rounded-xl font-black text-sm hover:bg-cream-100 transition-all active:scale-95 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    {subscribing ? "Subscribing..." : "Subscribe"}
+                    {subscribing ? t("blog.subscribing") : t("blog.subscribe")}
                   </button>
                 </div>
               </div>

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { FaSearch, FaBoxOpen, FaTruck, FaCheckCircle, FaClipboardList, FaSpinner } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import Header from "../components/Header";
 import LandingFooter from "../components/LandingFooter";
 import api from "../utils/axiosInstance";
 
 export default function TrackOrder() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -21,7 +23,7 @@ export default function TrackOrder() {
       const res = await api.get(`/orders/track/${encodeURIComponent(query)}`);
       setResult(res.data);
     } catch (e) {
-      setError(e?.response?.data?.message || "We couldn't find an order with that ID. Please check and try again.");
+      setError(e?.response?.data?.message || t("track_order.error_not_found"));
     } finally {
       setLoading(false);
     }
@@ -51,9 +53,9 @@ export default function TrackOrder() {
             <div className="absolute top-20 right-20 w-72 h-72 bg-sand-200 dark:bg-sand-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
           </div>
           <div className="relative mx-auto max-w-7xl px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-black text-charcoal-800 dark:text-white mb-3">Track Your <span className="text-terracotta-500 dark:text-terracotta-400">Order</span></h1>
+            <h1 className="text-3xl md:text-4xl font-black text-charcoal-800 dark:text-white mb-3">{t("track_order.hero_title")}<span className="text-terracotta-500 dark:text-terracotta-400">{t("track_order.hero_highlight")}</span></h1>
             <p className="text-sm text-charcoal-600 dark:text-charcoal-400 max-w-xl mx-auto leading-relaxed">
-              Enter your Order ID below to check the real-time status of your shipment.
+              {t("track_order.hero_desc")}
             </p>
           </div>
         </section>
@@ -68,7 +70,7 @@ export default function TrackOrder() {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Order ID (e.g., ORD-12345)"
+                    placeholder={t("track_order.placeholder")}
                     className="w-full bg-cream-100 dark:bg-charcoal-700 border border-transparent focus:border-terracotta-500 rounded-xl py-2.5 pl-10 pr-4 text-charcoal-800 dark:text-white outline-none transition-all shadow-inner text-sm"
                   />
                 </div>
@@ -77,7 +79,7 @@ export default function TrackOrder() {
                   disabled={loading || !query.trim()}
                   className="bg-terracotta-500 text-white px-6 py-2.5 rounded-xl font-black text-sm hover:bg-terracotta-600 transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[130px]"
                 >
-                  {loading ? <FaSpinner className="animate-spin" /> : "Track Order"}
+                  {loading ? <FaSpinner className="animate-spin" /> : t("track_order.btn_submit")}
                 </button>
               </div>
             </form>
@@ -94,9 +96,9 @@ export default function TrackOrder() {
             <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl border border-cream-200 dark:border-charcoal-700 overflow-hidden animate-fade-in-up">
               <div className="p-5 md:p-7 border-b border-cream-200 dark:border-charcoal-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h2 className="text-xl font-black text-charcoal-800 dark:text-white mb-1">Order Tracking Results</h2>
+                  <h2 className="text-xl font-black text-charcoal-800 dark:text-white mb-1">{t("track_order.results_title")}</h2>
                   <p className="text-charcoal-500 dark:text-charcoal-400 font-bold text-sm">
-                    Order ID: <span className="font-mono text-terracotta-500 dark:text-terracotta-400">{result.publicId}</span>
+                    {t("track_order.order_id")} <span className="font-mono text-terracotta-500 dark:text-terracotta-400">{result.publicId}</span>
                   </p>
                 </div>
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest border ${result.status?.toLowerCase() === 'delivered' ? 'bg-sage-50 text-sage-600 border-sage-500/20 dark:bg-sage-900/10 dark:text-sage-400' :
@@ -113,14 +115,14 @@ export default function TrackOrder() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-[10px] font-black text-charcoal-400 dark:text-charcoal-500 uppercase tracking-widest mb-3">Product Details</h3>
+                      <h3 className="text-[10px] font-black text-charcoal-400 dark:text-charcoal-500 uppercase tracking-widest mb-3">{t("track_order.product_details")}</h3>
                       <div className="bg-white dark:bg-charcoal-800 p-4 rounded-xl shadow-sm border border-cream-200 dark:border-charcoal-700">
                         <div className="text-sm font-black text-charcoal-800 dark:text-white mb-1">
                           {result.product || result.items?.[0]?.productName || `Order #${result.publicId}`}
                         </div>
                         {result.items && result.items.length > 0 && (
                           <div className="text-charcoal-500 dark:text-charcoal-400 font-bold text-xs uppercase tracking-wide">
-                            {result.items.length} item(s) included in this delivery
+                            {t("track_order.items_count", { count: result.items.length })}
                           </div>
                         )}
                       </div>
@@ -128,15 +130,15 @@ export default function TrackOrder() {
                   </div>
 
                   <div>
-                    <h3 className="text-[10px] font-black text-charcoal-400 dark:text-charcoal-500 uppercase tracking-widest mb-3">Order Timeline</h3>
+                    <h3 className="text-[10px] font-black text-charcoal-400 dark:text-charcoal-500 uppercase tracking-widest mb-3">{t("track_order.timeline")}</h3>
                     <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-terracotta-500/20 before:to-transparent">
 
                       {/* Dynamic Status Stages */}
                       {[
-                        { status: 'pending', label: 'Order Placed', desc: 'Your order has been received and is waiting for processing.' },
-                        { status: 'processing', label: 'Processing', desc: 'We are preparing your items for delivery.' },
-                        { status: 'shipped', label: 'Delivering', desc: 'Your order is on its way to you!' },
-                        { status: 'delivered', label: 'Delivered', desc: 'Order has been successfully delivered.' }
+                        { status: 'pending', label: t("track_order.stages.placed"), desc: t("track_order.stages.placed_desc") },
+                        { status: 'processing', label: t("track_order.stages.processing"), desc: t("track_order.stages.processing_desc") },
+                        { status: 'shipped', label: t("track_order.stages.delivering"), desc: t("track_order.stages.delivering_desc") },
+                        { status: 'delivered', label: t("track_order.stages.delivered"), desc: t("track_order.stages.delivered_desc") }
                       ].map((stage, idx) => {
                         const statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
                         const currentStatusIdx = statusOrder.indexOf(result.status?.toLowerCase()) ?? 0;
@@ -171,7 +173,7 @@ export default function TrackOrder() {
                           </div>
                           <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] p-3.5 rounded-xl bg-sand-50 dark:bg-charcoal-800 border border-sand-200 dark:border-charcoal-700 shadow-sm border-l-4 border-l-sand-500">
                             <div className="flex items-center justify-between space-x-2 mb-0.5">
-                              <div className="text-sm font-black text-charcoal-800 dark:text-white">Delivery Update</div>
+                              <div className="text-sm font-black text-charcoal-800 dark:text-white">{t("track_order.delivery_update")}</div>
                               <time className="font-mono text-[10px] font-bold text-sand-600 dark:text-sand-400">{new Date(note.createdAt).toLocaleDateString()}</time>
                             </div>
                             <p className="text-xs text-charcoal-600 dark:text-gray-300 font-medium italic">"{note.text}"</p>
