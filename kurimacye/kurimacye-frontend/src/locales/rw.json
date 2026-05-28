@@ -359,28 +359,28 @@
   "about": {
     "hero_title": "Ibyerekeye ",
     "hero_highlight": "Kuri Macye",
-    "hero_desc": "Turi urubuga rwo gucapa ruyoborwa na Ubaka Tech, twiyemeje guhindura ibishushanyo n'ibyifuzo byanyu impamo ku giciro cyiza na serivisi yizewe.",
+    "hero_desc": "Turi urubuga rwiza rw'ubucuruzi bwa interineti rurimo abacuruzi benshi ruyoborwa na Ubaka Tech, ruhuza abacuruzi bigenga n'abakiriya bashaka ibicuruzwa na serivisi byiza mu Rwanda.",
     "story_badge": "Urugendo Rwacu",
     "story_title": "Amateka Yacu",
-    "story_desc1": "Kuri Macye yavutse ku gitekerezo cyoroshye: gucapa ibintu byiza ku buryo bworohereye buri wese. Yatangijwe nk'igicuruzwa cy'indashyikirwa cya Ubaka Tech, ibyatangiye ari urusenge ruto byakuze biba urubuga rukomeye rwa interineti rukorera abakiriya babarirwa mu bihumbi mu Rwanda.",
-    "story_desc2": "Twemera ko igishushanyo cyiza gikwiriye gucapwa neza cyane. Niyo mpamvu twashoye mu buryo bugezweho bwo gucapa no mu itsinda ry'inzobere zikunda ibyiza nk'uko namwe mukunda imishinga yanyu.",
+    "story_desc1": "Kuri Macye yavutse ku ntego yoroshye: guha ubushobozi abacuruzi bo hafi no koroheza guhaha kuri interineti kuri buri wese. Yatangijwe nk'igicuruzwa cya mbere cy'indashyikirwa cya Ubaka Tech, ubu imaze gukura iba ihuriro ryagutse rihuza abacuruzi batandukanye n'abakiriya babarirwa mu bihumbi mu Rwanda.",
+    "story_desc2": "Twemera ko gushyigikira abacuruzi bigenga biganisha ku mikurire myiza mu gihe duhaye abaguzi serivisi zihuse, zizewe kandi zinoze. Binyuze mu guhuza amaduka ya kijyambere n'izindi serivisi zihariye, duhuza umuyoboro hagati y'abacuruzi n'ababagana.",
     "values_badge": "Indangagaciro",
     "values_title": "Intego n'Indangagaciro Zacu",
     "values_list": {
       "innovation_title": "Guhanga Ibishya",
-      "innovation_desc": "Tuguma gushakisha uburyo n'ibikoresho bishya kugira ngo tuguhe ibyiza mu gucapa.",
+      "innovation_desc": "Turangwa no guhora tunoza ibikoresho by'ubucuruzi, uburyo bwo kwishura, no kugeza ibicuruzwa ku bakiriya.",
       "quality_title": "Ubuziranenge",
-      "quality_desc": "Kuva ku gakarita koroshye kugeza ku kimenyetso kinini cyane, twemeza ibyiza mu gucapwa kose.",
+      "quality_desc": "Tugumana ibipimo byo hejuru ku rubuga rwacu, haba ku bacuruzi twemera no kuri serivisi duha abakiriya.",
       "partnership_title": "Ubufatanye",
-      "partnership_desc": "Dukorana nawe nk'umufatanyabikorwa kugira ngo ibyo wifuza bigerweho neza."
+      "partnership_desc": "Dukorana bya hafi n'abacuruzi nk'abafatanyabikorwa mu kubashyigikira ngo bakure kandi wagure ubucuruzi bwabo."
     },
     "team_badge": "Abahanga Bacu",
     "team_title": "Itsinda Ryacu",
-    "team_desc": "Abantu bategura kandi bakora ibyo gucapa.",
+    "team_desc": "Abahanga bategura kandi bakora iby'iri ihuriro ry'ubucuruzi.",
     "team_loading": "Turi gushaka abakozi...",
     "team_empty": "Nta mukozi twabonye.",
-    "cta_title": "Witeguye gukora?",
-    "cta_desc": "Fatanya n'ibigo n'abantu babarirwa mu bihumbi bizera Kuri Macye mu byo gucapa byabo. Turi hano ngo duhindure ibyifuzo byanyu impamo.",
+    "cta_title": "Witeguye Gutangira?",
+    "cta_desc": "Fatanya n'abaguzi n'abagurisha babarirwa mu bihumbi bizera Kuri Macye mu bucuruzi bwabo. Vumbura ibicuruzwa byiza cyangwa utangire kugurisha uyu munsi.",
     "cta_btn": "Reba Ibicuruzwa"
   }
 }

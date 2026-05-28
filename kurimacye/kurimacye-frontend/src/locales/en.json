@@ -359,28 +359,28 @@
   "about": {
     "hero_title": "About ",
     "hero_highlight": "Kuri Macye",
-    "hero_desc": "We are a premium custom-printing platform powered by Ubaka Tech, dedicated to bringing your designs and vision to life with exceptional quality and reliable service.",
+    "hero_desc": "We are a premium multivendor e-commerce platform powered by Ubaka Tech, connecting independent local sellers with customers looking for exceptional products and services across Rwanda.",
     "story_badge": "Our Journey",
     "story_title": "Our Story",
-    "story_desc1": "Kuri Macye was born from a simple idea: to make high-quality custom printing accessible and easy for everyone. Launched as a flagship product of Ubaka Tech, what started in a small workshop has grown into a leading online platform, serving thousands of happy customers across Rwanda.",
-    "story_desc2": "We believe that a great design deserves a great print. That's why we've invested in the latest printing technology and a team of experts who are as passionate about quality as you are about your projects.",
+    "story_desc1": "Kuri Macye was born from a simple mission: to empower local merchants and make online shopping convenient, reliable, and accessible to everyone. Launched as a flagship marketplace product of Ubaka Tech, it has grown into a vibrant ecosystem supporting diverse vendors and thousands of happy shoppers.",
+    "story_desc2": "We believe in building a platform that fosters growth for independent sellers while delivering a seamless, secure, and delightful experience to buyers. By integrating modern digital storefronts and specialized service offerings, we bridge the gap between merchants and their audience.",
     "values_badge": "Core Principles",
     "values_title": "Our Mission & Values",
     "values_list": {
       "innovation_title": "Innovation",
-      "innovation_desc": "We constantly explore new techniques and materials to offer the best printing solutions.",
+      "innovation_desc": "We continually refine our marketplace tools, payment systems, and delivery integrations to provide a seamless vendor and buyer experience.",
       "quality_title": "Quality",
-      "quality_desc": "From the simplest card to the largest banner, we guarantee excellence in every print.",
+      "quality_desc": "We ensure high standards across our platform, from vetted merchant listings to reliable customer service.",
       "partnership_title": "Partnership",
-      "partnership_desc": "We work with you as a partner to ensure your vision is perfectly realized."
+      "partnership_desc": "We work closely with vendors as partners to support their business growth and help them scale online."
     },
     "team_badge": "Creative Minds",
     "team_title": "Meet Our Team",
-    "team_desc": "The people behind the prints.",
+    "team_desc": "The minds behind the marketplace.",
     "team_loading": "Loading team members...",
     "team_empty": "No team members found.",
-    "cta_title": "Ready to Create?",
-    "cta_desc": "Join thousands of businesses and individuals who trust Kuri Macye for their printing needs. We're here to make your vision a reality.",
+    "cta_title": "Ready to Start?",
+    "cta_desc": "Join thousands of buyers and sellers who trust Kuri Macye for their online commerce. Discover premium products or start selling today.",
     "cta_btn": "Explore Products"
   }
 }
