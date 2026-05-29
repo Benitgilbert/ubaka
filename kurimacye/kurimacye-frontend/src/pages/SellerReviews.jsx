@@ -177,12 +177,14 @@ const SellerReviews = () => {
 
                                 {/* Reply Section */}
                                 <div className="mt-6 border-t border-gray-100 dark:border-gray-700/60 pt-4">
-                                    {r.reply ? (
+                                    {r.reply && r.reply.text ? (
                                         <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-xl border border-gray-100 dark:border-gray-750">
                                             <div className="flex items-center gap-1.5 mb-1.5">
                                                 <FaReply className="text-indigo-500 text-xs -scale-x-100" />
                                                 <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">{r.reply.authorName || "Store Owner"}</span>
-                                                <span className="text-[10px] text-gray-400 font-mono ml-2">{new Date(r.reply.createdAt).toLocaleDateString()}</span>
+                                                <span className="text-[10px] text-gray-400 font-mono ml-2">
+                                                    {r.reply.createdAt ? new Date(r.reply.createdAt).toLocaleDateString() : ""}
+                                                </span>
                                             </div>
                                             <p className="text-gray-600 dark:text-gray-400 text-sm">{r.reply.text}</p>
                                         </div>
