@@ -15,7 +15,11 @@ export const getSellerProductReviews = async (req, res, next) => {
     };
 
     if (status && status !== 'all') {
-      where.status = status;
+      if (status === 'approved') {
+        where.isApproved = true;
+      } else if (status === 'pending') {
+        where.isApproved = false;
+      }
     }
     if (rating) {
       where.rating = parseInt(rating);
@@ -40,20 +44,18 @@ export const getSellerProductReviews = async (req, res, next) => {
         where: { product: { sellerId } }
       }),
       pending: await prisma.review.count({
-        where: { product: { sellerId }, status: 'pending' }
+        where: { product: { sellerId }, isApproved: false }
       }),
       approved: await prisma.review.count({
-        where: { product: { sellerId }, status: 'approved' }
+        where: { product: { sellerId }, isApproved: true }
       }),
-      rejected: await prisma.review.count({
-        where: { product: { sellerId }, status: 'rejected' }
-      }),
+      rejected: 0,
     };
 
     // Calculate seller average rating
     const avgRatingResult = await prisma.review.aggregate({
       _avg: { rating: true },
-      where: { product: { sellerId }, status: 'approved' }
+      where: { product: { sellerId }, isApproved: true }
     });
 
     stats.averageRating = avgRatingResult._avg.rating ? avgRatingResult._avg.rating.toFixed(1) : 0;

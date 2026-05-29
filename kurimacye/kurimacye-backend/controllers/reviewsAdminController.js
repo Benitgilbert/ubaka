@@ -8,7 +8,13 @@ export const getAllReviews = async (req, res, next) => {
         const { status, rating, reported, page = 1, limit = 20 } = req.query;
 
         const where = {};
-        if (status && status !== 'all') where.status = status;
+        if (status && status !== 'all') {
+            if (status === 'approved') {
+                where.isApproved = true;
+            } else if (status === 'pending') {
+                where.isApproved = false;
+            }
+        }
         if (rating) where.rating = parseInt(rating);
         if (reported === 'true') where.reported = true;
 
@@ -16,8 +22,7 @@ export const getAllReviews = async (req, res, next) => {
             where,
             include: {
                 user: { select: { name: true, email: true } },
-                product: { select: { name: true, image: true, slug: true } },
-                moderatedBy: { select: { name: true } }
+                product: { select: { name: true, image: true, slug: true } }
             },
             orderBy: { createdAt: 'desc' },
             skip: (Number(page) - 1) * Number(limit),
@@ -29,16 +34,16 @@ export const getAllReviews = async (req, res, next) => {
         // Stats
         const stats = {
             total: await prisma.review.count(),
-            pending: await prisma.review.count({ where: { status: 'pending' } }),
-            approved: await prisma.review.count({ where: { status: 'approved' } }),
-            rejected: await prisma.review.count({ where: { status: 'rejected' } }),
+            pending: await prisma.review.count({ where: { isApproved: false } }),
+            approved: await prisma.review.count({ where: { isApproved: true } }),
+            rejected: 0,
             reported: await prisma.review.count({ where: { reported: true } }),
         };
 
         // Average rating
         const avgRatingResult = await prisma.review.aggregate({
             _avg: { rating: true },
-            where: { status: 'approved' }
+            where: { isApproved: true }
         });
 
         stats.averageRating = avgRatingResult._avg.rating ? avgRatingResult._avg.rating.toFixed(1) : 0;
@@ -70,8 +75,7 @@ export const getReviewDetails = async (req, res, next) => {
             where: { id },
             include: {
                 user: { select: { name: true, email: true } },
-                product: { select: { name: true, image: true, slug: true, sellerId: true } },
-                moderatedBy: { select: { name: true } }
+                product: { select: { name: true, image: true, slug: true, sellerId: true } }
             }
         });
 
@@ -101,11 +105,8 @@ export const approveReview = async (req, res, next) => {
         const review = await prisma.review.update({
             where: { id },
             data: {
-                status: 'approved',
-                moderatedById: req.user.id,
-                moderatedAt: new Date(),
-                reported: false,
-                reportReason: ''
+                isApproved: true,
+                reported: false
             }
         });
 
@@ -128,15 +129,11 @@ export const approveReview = async (req, res, next) => {
 export const rejectReview = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { reason } = req.body;
 
         const review = await prisma.review.update({
             where: { id },
             data: {
-                status: 'rejected',
-                moderatedById: req.user.id,
-                moderatedAt: new Date(),
-                moderationNote: reason || ''
+                isApproved: false
             }
         });
 
@@ -222,7 +219,7 @@ export const clearReport = async (req, res, next) => {
 
         const review = await prisma.review.update({
             where: { id },
-            data: { reported: false, reportReason: '' }
+            data: { reported: false }
         });
 
         res.json({
