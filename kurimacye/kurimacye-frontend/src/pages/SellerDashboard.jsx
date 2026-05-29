@@ -5,6 +5,7 @@ import {
     FaChartLine, FaDollarSign, FaBox, FaShoppingCart, FaMoneyBillWave
 } from 'react-icons/fa';
 import api from '../utils/axiosInstance';
+import { useTheme } from '../context/ThemeContext';
 
 import {
     Chart as ChartJS,
@@ -32,6 +33,7 @@ ChartJS.register(
 );
 
 export default function SellerDashboard() {
+    const { theme } = useTheme();
 
     const formatCurrency = (amount) => `RWF ${(amount || 0).toLocaleString()}`;
     const getStatusBadge = (status) => {
@@ -148,12 +150,18 @@ export default function SellerDashboard() {
         scales: {
             y: {
                 beginAtZero: true,
-                grid: { color: '#f3f4f6' }, // Chart.js grid doesn't automatically support dark mode via tailwind classes, would need js logic. Keeping light for now or can use "rgba(0,0,0,0.1)"
-                ticks: { fontSize: 10 }
+                grid: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#f3f4f6' },
+                ticks: {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                    font: { size: 10 }
+                }
             },
             x: {
                 grid: { display: false },
-                ticks: { fontSize: 10 }
+                ticks: {
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                    font: { size: 10 }
+                }
             }
         },
         maintainAspectRatio: false
@@ -161,10 +169,91 @@ export default function SellerDashboard() {
 
     if (isLoading) {
         return (
-            <main className="flex-1 p-8 flex items-center justify-center">
-                <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-2"></div>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Loading dashboard...</p>
+            <main className="flex-1 overflow-y-auto p-4 md:p-8 animate-pulse">
+                <div className="max-w-7xl mx-auto">
+                    {/* Welcome Header Skeleton */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-48 mb-2"></div>
+                            <div className="h-4 bg-gray-150 dark:bg-gray-800 rounded-md w-64"></div>
+                        </div>
+                        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-36"></div>
+                    </div>
+
+                    {/* Stats Grid Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                                </div>
+                                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-28"></div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Sales Chart Skeleton */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 mb-8">
+                        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-6"></div>
+                        <div className="h-72 bg-gray-100 dark:bg-gray-800/50 rounded-lg flex items-center justify-center">
+                            <div className="w-full h-full flex flex-col justify-between p-4">
+                                <div className="flex justify-between">
+                                    <div className="w-8 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                    <div className="w-8 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                    <div className="w-8 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                </div>
+                                <div className="h-1/2 border-b border-dashed border-gray-200 dark:border-gray-700 w-full"></div>
+                                <div className="flex justify-between">
+                                    <div className="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                    <div className="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                    <div className="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Content Grid Skeleton */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Recent Orders Skeleton */}
+                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20 flex justify-between items-center">
+                                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                            </div>
+                            <div className="p-6 space-y-4">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/50 last:border-0">
+                                        <div className="space-y-2">
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                                            <div className="h-3 bg-gray-150 dark:bg-gray-800 rounded w-24"></div>
+                                        </div>
+                                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Top Products Skeleton */}
+                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20 flex justify-between items-center">
+                                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                            </div>
+                            <div className="p-4 space-y-4">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex-shrink-0"></div>
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                                            <div className="h-3 bg-gray-150 dark:bg-gray-800 rounded w-1/4"></div>
+                                        </div>
+                                        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         );
