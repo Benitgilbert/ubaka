@@ -173,11 +173,11 @@ export default function SellerDashboard() {
                 <div className="max-w-7xl mx-auto">
                     {/* Welcome Header Skeleton */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                        <div>
+                        <div className="md:hidden">
                             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-lg w-48 mb-2"></div>
                             <div className="h-4 bg-gray-150 dark:bg-gray-800 rounded-md w-64"></div>
                         </div>
-                        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-36"></div>
+                        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-36 md:ml-auto"></div>
                     </div>
 
                     {/* Stats Grid Skeleton */}
@@ -264,7 +264,7 @@ export default function SellerDashboard() {
                     <div className="max-w-7xl mx-auto">
                         {/* Welcome Header */}
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                            <div>
+                            <div className="md:hidden">
                                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
                                     {user?.role === 'cashier' ? "Cashier Workstation" : `Welcome back, ${user?.name || 'Seller'}!`}
                                 </h1>
@@ -272,7 +272,7 @@ export default function SellerDashboard() {
                             </div>
                             <Link
                                 to="/seller/products"
-                                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
+                                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm md:ml-auto"
                             >
                                 <FaBox className="text-sm" /> Manage Products
                             </Link>

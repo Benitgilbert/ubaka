@@ -100,11 +100,22 @@ function Topbar({ onMenuClick, title }) {
           <FaBars className="text-lg" />
         </button>
 
-        {/* Page Title */}
-        {title && (
+        {/* Page Title or Welcome Message */}
+        {title ? (
           <h1 className="text-lg lg:text-xl font-bold text-charcoal-800 dark:text-white truncate">
             {title}
           </h1>
+        ) : (
+          user && (
+            <div className="hidden sm:flex flex-col justify-center">
+              <h1 className="text-sm md:text-base font-bold text-charcoal-800 dark:text-white leading-tight">
+                {user.role === 'cashier' ? "Cashier Workstation" : `Welcome back, ${user.name || 'Abelus'}!`}
+              </h1>
+              <p className="hidden md:block text-[10px] md:text-xs text-charcoal-500 dark:text-charcoal-400 leading-normal">
+                Here's what's happening with your store today.
+              </p>
+            </div>
+          )
         )}
       </div>
 
