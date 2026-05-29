@@ -72,6 +72,8 @@ const allowedOrigins = [
   "https://pastorbonus.vercel.app",
   "https://pastorbonuss.vercel.app",
   "https://kurimacye.rw",
+  "https://kurimacye.co.rw",
+  "https://www.kurimacye.co.rw",
   "https://www.impressa.rw",
   "https://impressa-backend.vercel.app",
   "http://localhost:5000",

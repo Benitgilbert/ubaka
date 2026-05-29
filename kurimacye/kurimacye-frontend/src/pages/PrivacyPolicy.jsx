@@ -113,8 +113,8 @@ const PrivacyPolicy = () => {
                             </div>
                             <p className="text-base text-charcoal-600 dark:text-charcoal-300 leading-relaxed">
                                 If you have any questions about this Privacy Policy, please reach out to our team at
-                                <a href="mailto:support@kurimacye.rw" className="ml-1.5 text-terracotta-500 font-bold hover:underline underline-offset-4 transition-all">
-                                    support@kurimacye.rw
+                                <a href="mailto:support@kurimacye.co.rw" className="ml-1.5 text-terracotta-500 font-bold hover:underline underline-offset-4 transition-all">
+                                    support@kurimacye.co.rw
                                 </a>.
                             </p>
                         </section>

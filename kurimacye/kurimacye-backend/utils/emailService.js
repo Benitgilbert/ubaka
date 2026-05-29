@@ -29,7 +29,7 @@ const createTransporter = () => {
 };
 
 export const sendEmail = async ({ to, subject, text, html, headers }) => {
-    const from = process.env.SMTP_FROM || "Kuri Macye <noreply@kurimacye.rw>";
+    const from = process.env.SMTP_FROM || "Kuri Macye <noreply@kurimacye.co.rw>";
     
     // 1. Try Resend first if configured
     if (resend) {

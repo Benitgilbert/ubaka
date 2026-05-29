@@ -1,136 +1,111 @@
-# IMPRESSA - Unified Commerce & Business Management Platform
+# UBAKA - Enterprise Commerce & Business Management Workspace
 
-![Impressa Banner](impressa_banner.png)
+![Abelus Banner](abelus_banner.png)
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Framework: React 19](https://img.shields.io/badge/Frontend-React%2019-blue.svg)](https://react.dev/)
 [![Backend: Node.js](https://img.shields.io/badge/Backend-Node.js-green.svg)](https://nodejs.org/)
-[![Database: Supabase/Prisma](https://img.shields.io/badge/Database-Supabase%20%2F%20Prisma-blueviolet.svg)](https://supabase.com/)
+[![Database: Supabase / Prisma](https://img.shields.io/badge/Database-Supabase%20%2F%20Prisma-blueviolet.svg)](https://supabase.com/)
 
-**Impressa** is an enterprise-grade, multi-tenant commerce ecosystem designed to bridge the gap between digital marketplaces and physical retail operations. It provides a seamless experience for customers, a robust operating system for sellers, and a high-level command center for business owners.
+**Ubaka** is a centralized, multi-tenant enterprise software workspace managed by **Ubaka Tech**. It houses customized business management portals, e-commerce storefronts, and compliance systems designed to scale digital commerce and physical retail operations across Rwanda.
 
 ---
 
-## 🌟 Core Pillars
+## 📂 Project Architecture
 
-### 🛒 Consumer Marketplace
-A high-performance storefront designed for conversion.
-- **Advanced Discovery**: Multi-vendor search, category filtering, and attribute-based navigation.
-- **Seamless Checkout**: Multi-seller cart management and integrated payment gateways.
-- **Trust & Engagement**: Product reviews, wishlists, and real-time order tracking.
+This repository is organized as a multi-project workspace:
 
-### 🏪 Seller & POS Operating System
-A comprehensive toolset for day-to-day business operations.
-- **Hybrid POS**: A unified Point of Sale system for both walk-in and online orders.
-- **Shift & Cash Management**: Strict shift enforcement with automated reconciliation and expense tracking.
-- **Inventory Control**: Real-time stock management with support for variations and packaging.
-- **Abonne Tracking**: Advanced credit and subscription management with "Fiche de Suivi" (tracking sheets).
+```text
+ubaka/
+├── kurimacye/               # Kuri Macye Marketplace & POS Ecosystem
+│   ├── kurimacye-backend/   # Node.js Express API (Prisma + Supabase)
+│   └── kurimacye-frontend/  # React 19 Storefront (Tailwind CSS)
+│
+├── inzozigroup/             # Inzozi Group Platform (MIS Portal)
+│   ├── inzozi-backend/      # Express API + WebSockets
+│   └── inzozi-frontend/     # Vite + React Client Application
+│
+└── rra-certification-docs/  # Rwanda Revenue Authority Compliance Documents
+    └── VSDC specifications and monitoring forms
+```
 
-### 🛡️ Administrative Command Center
-Strategic oversight and system governance.
-- **Financial Auditing**: Deep-dive reporting with audit-ready PDF generation and dynamic status tracking.
-- **Multi-Vendor Governance**: Seller verification, commission management, and payout processing.
-- **CMS & Marketing**: Integrated tools for banners, blogs, coupons, and flash sales.
+---
+
+## 🌟 Main Sub-Projects
+
+### 🏪 1. Kuri Macye (`kurimacye/`)
+A premium hybrid retail ecosystem connecting independent local merchants with customers, integrated with the custom domain **`kurimacye.co.rw`**.
+* **Unified POS & Shift Security**: Local cashier interface featuring cash/mobile money payment integrations and active shift drawer auditing.
+* **Abonné Subscriptions**: Credit-based representative tracking and monthly subscription ledger systems.
+* **Professional Reporting Engine**: Dynamic layout generation using `pdfkit` for accounting audits.
+* **Multivendor Governance**: Direct control over commissions, seller payouts, and products.
+
+### 🏢 2. Inzozi Group (`inzozigroup/`)
+An internal Management Information System (MIS) portal for Ubaka Tech, bridging organizational tools and services.
+* **Vite-based SPA**: Lightweight, fast, modern frontend application.
+* **Real-time Synchronization**: Powered by `Socket.io` for instant updates.
+* **Lightweight DB Mapping**: Prisma Schema tailored for rapid operations.
+
+### 🛡️ 3. RRA Compliance (`rra-certification-docs/`)
+Specifications and monitoring guides for Rwanda Revenue Authority (RRA) Virtual Sales Data Controller (VSDC) integration, ensuring that billing systems are aligned with local tax compliance standards.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology |
+| Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, Tailwind CSS, Chart.js, React Router 7 |
-| **Backend** | Node.js (Express 5), Pino (Advanced Logging) |
-| **Database** | PostgreSQL via Supabase, Prisma ORM |
-| **Auth** | Supabase Auth + JWT / Passport.js |
-| **Reporting** | PDFKit (Dynamic PDF Generation), Handlebars |
-| **Storage** | Cloudinary (Media Asset Management) |
+| **Frontend Clients** | React 19, Vite, Tailwind CSS, Chart.js, React Router 7 |
+| **Backend Services** | Node.js (Express 4/5), WebSockets (Socket.io), Pino Logger |
+| **Database & ORM** | PostgreSQL via Supabase, Prisma ORM |
+| **Auth & Security** | Supabase Auth + JWT, Passport.js, Helmet |
+| **Reporting & PDF** | PDFKit (Dynamic invoice generation), Handlebars Templates |
+| **Media Assets** | Cloudinary integration |
 
 ---
 
-## 🚀 Key Features Highlights
-
-### 📊 Professional Financial Reporting
-Impressa features a sophisticated reporting engine that generates high-fidelity PDF documents.
-- **Audit Parity**: Reports are designed for pixel-perfect parity with accounting standards.
-- **Dynamic Metrics**: 4-card dashboard summaries for real-time financial snapshots.
-- **Verification Logs**: Detailed "Collected By" tracking for physical goods movement.
-
-### ⏱️ Shift-Based Security
-To ensure financial accountability, the system mandates an active shift for all POS operations.
-- **Balance Reconciliation**: Automated calculation of expected vs. actual drawer balances.
-- **Expense Integration**: Direct recording of shift-related expenses with automatic deduction from totals.
-
-### 💳 Abonne (Subscription/Credit) System
-Specialized module for managing recurring customers and credit-based transactions.
-- **Transaction History**: Comprehensive logging of credit usage and repayments.
-- **Representative Tracking**: Tracking which staff member fulfilled specific "Abonne" requests.
-
----
-
-## 📂 Project Structure
-
-```text
-impressa/
-├── impressa-backend/       # Express 5 API (Prisma + Supabase)
-│   ├── prisma/             # Schema & Migrations
-│   ├── controllers/        # Business Logic
-│   ├── routes/             # RESTful API Endpoints
-│   ├── middleware/         # RBAC & Security
-│   └── config/             # Logger & Passport Config
-│
-└── impressa-frontend/      # React 19 Application (Tailwind CSS)
-    ├── src/
-    │   ├── components/     # UI Design System
-    │   ├── context/        # Global State Management
-    │   ├── pages/          # Feature-specific Views
-    │   └── utils/          # API & Formatting Helpers
-```
-
----
-
-## ⚙️ Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v20+)
-- Supabase Project (PostgreSQL)
-- Cloudinary Account (for media)
+* Node.js (v20+)
+* PostgreSQL / Supabase DB instance
+* Cloudinary API keys (for media upload)
 
-### Installation
+### Quick Setup
 
-1. **Clone & Setup Environment**
+#### 🛒 Setup Kuri Macye
+1. **Configure Backend**:
    ```bash
-   git clone https://github.com/Benitgilbert/impressas.git
-   cd impressas/impressa
-   ```
-
-2. **Backend Configuration**
-   ```bash
-   cd impressa-backend
+   cd kurimacye/kurimacye-backend
    npm install
-   # Create .env with MONGO_URI, SUPABASE_URL, SUPABASE_KEY, etc.
+   # Create .env using env.example (configure DATABASE_URL and SUPABASE keys)
    npx prisma generate
    npm run dev
    ```
-
-3. **Frontend Configuration**
+2. **Configure Frontend**:
    ```bash
-   cd ../impressa-frontend
+   cd ../kurimacye-frontend
    npm install
+   # Configure .env.production / .env.example (set REACT_APP_API_URL to http://localhost:5000/api)
    npm start
+   ```
+
+#### 🏢 Setup Inzozi Group
+1. **Configure Backend**:
+   ```bash
+   cd inzozigroup/inzozi-backend
+   npm install
+   # Create .env using .env.example
+   npx prisma generate
+   npm run dev
+   ```
+2. **Configure Frontend**:
+   ```bash
+   cd ../inzozi-frontend
+   npm install
+   npm run dev
    ```
 
 ---
 
-## 📈 Recent Updates
-- ✅ **Optimized PDF Engine**: Enhanced column layouts and status indicators for audit-ready reports.
-- ✅ **Owner Overview**: New strategic dashboard for global business performance tracking.
-- ✅ **Strict Shift Enforcement**: Mandatory shift verification for POS security.
-- ✅ **Abonne Representative Tracking**: Added "Collected By" field for improved accountability.
-
----
-
-## 📄 License
-Proprietary to Impressa Custom Solutions. Unauthorized copying of this project, via any medium, is strictly prohibited.
-
----
-*Generated with ❤️ by Antigravity for Impressa.*
+*Copyright © 2026 Ubaka Tech. Proprietary License. All rights reserved.*

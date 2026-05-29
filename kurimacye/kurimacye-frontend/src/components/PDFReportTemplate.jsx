@@ -304,7 +304,7 @@ const PDFReportTemplate = ({
       <footer style={styles.footer}>
         <div style={styles.footerContent}>
           <span>Kuri Macye Custom Solutions | Gicumbi, Byumba</span>
-          <span>info@kurimacye.rw | +250 788 000 000</span>
+          <span>info@kurimacye.co.rw | +250 788 000 000</span>
           <span>Page 1</span>
         </div>
       </footer>

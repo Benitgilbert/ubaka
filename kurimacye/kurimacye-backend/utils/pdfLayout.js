@@ -56,7 +56,7 @@ export const createKuriMacyePDF = ({
       .strokeColor("#E5E7EB").lineWidth(0.5).stroke();
 
     const contactInfo = [
-      companyEmail || "support@kurimacye.rw",
+      companyEmail || "support@kurimacye.co.rw",
       companyPhone || "+250 000 000 000",
       companyAddress || "Kuri Macye Platform"
     ].filter(Boolean).join(" | ");
