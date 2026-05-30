@@ -1529,21 +1529,9 @@ const Landing = ({ onEnterPortal }) => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-900/60 pt-6 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-600 gap-4">
-          <div className="flex items-center gap-1 font-medium">
-            <span>© {new Date().getFullYear()} Ubaka Tech Ltd. Made with </span>
-            <span className="text-rose-500 animate-pulse">♥</span>
-            <span> for civic and vendor empowerment in Rwanda.</span>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <span className="font-semibold">Workspace Console v2.0</span>
-            {/* Developer Gateway Switch */}
-            <span 
-              onClick={onEnterPortal}
-              className="w-2.5 h-2.5 rounded-full bg-gray-950 border border-gray-900 hover:bg-purple-500/20 cursor-pointer transition-all duration-300"
-              title="MIS Login Secure Gateway"
-            />
+        <div className="border-t border-gray-900/60 pt-6 flex justify-between items-center text-[10px] text-gray-600">
+          <div className="font-medium">
+            © {new Date().getFullYear()} Ubaka Tech Ltd. All rights reserved.
           </div>
         </div>
       </footer>
