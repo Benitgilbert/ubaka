@@ -1,0 +1,46 @@
+# Dependency directories
+node_modules/
+ubakatech-backend/node_modules/
+ubakatech-frontend/node_modules/
+
+# Local env files
+.env
+.env.*
+!.env.example
+!.env.production.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+ubakatech-backend/.env
+ubakatech-backend/.env.*
+!ubakatech-backend/.env.example
+!ubakatech-backend/.env.production.example
+ubakatech-backend/.env.local
+ubakatech-frontend/.env
+ubakatech-frontend/.env.*
+!ubakatech-frontend/.env.example
+ubakatech-frontend/.env.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE/Editors
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Build outputs
+ubakatech-frontend/dist/
+ubakatech-frontend/dist-ssr/

@@ -21,9 +21,9 @@ ubaka/
 │   ├── kurimacye-backend/   # Node.js Express API (Prisma + Supabase)
 │   └── kurimacye-frontend/  # React 19 Storefront (Tailwind CSS)
 │
-├── inzozigroup/             # Inzozi Group Platform (MIS Portal)
-│   ├── inzozi-backend/      # Express API + WebSockets
-│   └── inzozi-frontend/     # Vite + React Client Application
+├── ubakatech/               # Ubaka Tech Platform (MIS Portal)
+│   ├── ubakatech-backend/   # Express API + WebSockets
+│   └── ubakatech-frontend/  # Vite + React Client Application
 │
 └── rra-certification-docs/  # Rwanda Revenue Authority Compliance Documents
     └── VSDC specifications and monitoring forms
@@ -40,8 +40,8 @@ A premium hybrid retail ecosystem connecting independent local merchants with cu
 * **Professional Reporting Engine**: Dynamic layout generation using `pdfkit` for accounting audits.
 * **Multivendor Governance**: Direct control over commissions, seller payouts, and products.
 
-### 🏢 2. Inzozi Group (`inzozigroup/`)
-An internal Management Information System (MIS) portal for Ubaka Tech, bridging organizational tools and services.
+### 🏢 2. Ubaka Tech MIS (`ubakatech/`)
+An internal Management Information System (MIS) portal for Ubaka Tech, bridging organizational tools and services, integrated with the domain **`ubakatech.co.rw`**.
 * **Vite-based SPA**: Lightweight, fast, modern frontend application.
 * **Real-time Synchronization**: Powered by `Socket.io` for instant updates.
 * **Lightweight DB Mapping**: Prisma Schema tailored for rapid operations.
@@ -90,10 +90,10 @@ Specifications and monitoring guides for Rwanda Revenue Authority (RRA) Virtual 
    npm start
    ```
 
-#### 🏢 Setup Inzozi Group
+#### 🏢 Setup Ubaka Tech MIS
 1. **Configure Backend**:
    ```bash
-   cd inzozigroup/inzozi-backend
+   cd ubakatech/ubakatech-backend
    npm install
    # Create .env using .env.example
    npx prisma generate
@@ -101,7 +101,7 @@ Specifications and monitoring guides for Rwanda Revenue Authority (RRA) Virtual 
    ```
 2. **Configure Frontend**:
    ```bash
-   cd ../inzozi-frontend
+   cd ../ubakatech-frontend
    npm install
    npm run dev
    ```
