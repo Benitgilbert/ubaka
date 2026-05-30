@@ -12,7 +12,10 @@ import {
   handleImpressaDataUpdate,
   handleImpressaDataDelete,
   sendImpressaTestEmail,
-  verifyImpressaSeller
+  verifyImpressaSeller,
+  createProject,
+  updateProject,
+  deleteProject
 } from '../controllers/projectController.js';
 import { protect, authorizePermission } from '../middleware/authMiddleware.js';
 
@@ -23,6 +26,9 @@ router.get('/public/showcase', getPublicShowcaseProjects);
 
 // Get list of all projects managed by Ubaka Tech
 router.get('/', protect, getProjects);
+router.post('/', protect, createProject);
+router.put('/:id', protect, updateProject);
+router.delete('/:id', protect, deleteProject);
 
 // Get details of a specific project (e.g. linker, homland, etc.)
 router.get('/:slug', protect, getProjectBySlug);

@@ -48,9 +48,13 @@ import delegationRouter from './routes/delegationRoutes.js';
 import hrRouter from './routes/hrRoutes.js';
 import publicRouter from './routes/publicRoutes.js';
 import { seedRolesAndPermissions } from './config/roles.js';
+import { startHealthMonitor } from './controllers/projectController.js';
 
 // Seed Roles and Permissions
 seedRolesAndPermissions();
+
+// Start Live Status Health Monitor
+startHealthMonitor();
 
 // Mount routes
 app.use('/api/auth', authRouter);

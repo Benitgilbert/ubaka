@@ -9,13 +9,30 @@ import {
   CheckCircle2, 
   AlertTriangle,
   XCircle,
-  ExternalLink
+  ExternalLink,
+  Plus,
+  Edit,
+  Trash2,
+  X
 } from 'lucide-react';
 
 const Dashboard = () => {
   const { token, user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // CRUD State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  const [formName, setFormName] = useState('');
+  const [formDesc, setFormDesc] = useState('');
+  const [formStatus, setFormStatus] = useState('planning');
+  const [formRepo, setFormRepo] = useState('');
+  const [formLive, setFormLive] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const isAdmin = user && (user.role === 'sysadmin' || user.role === 'cto');
 
   const getAverageUptime = () => {
     if (projects.length === 0) return '0%';
@@ -49,25 +66,25 @@ const Dashboard = () => {
     return user.dbMode === 'production' ? 'Supabase Connected' : 'In-Memory Mock Active';
   };
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/projects`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setProjects(data);
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/projects`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (err) {
-        // Fetch projects error
-      } finally {
-        setLoading(false);
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
       }
-    };
+    } catch (err) {
+      console.error('Fetch projects error:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProjects();
   }, [token]);
 
@@ -96,6 +113,105 @@ const Dashboard = () => {
         return <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase"><XCircle className="w-3 h-3" /> Inactive</span>;
       default:
         return null;
+    }
+  };
+
+  // Open modal to add a project
+  const openAddModal = () => {
+    setEditingProject(null);
+    setFormName('');
+    setFormDesc('');
+    setFormStatus('planning');
+    setFormRepo('');
+    setFormLive('');
+    setErrorMsg('');
+    setIsModalOpen(true);
+  };
+
+  // Open modal to edit a project
+  const openEditModal = (project) => {
+    setEditingProject(project);
+    setFormName(project.name);
+    setFormDesc(project.description || '');
+    setFormStatus(project.status);
+    setFormRepo(project.repositoryUrl || '');
+    setFormLive(project.liveUrl || '');
+    setErrorMsg('');
+    setIsModalOpen(true);
+  };
+
+  // Handle Save
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!formName.trim()) {
+      setErrorMsg('Project Name is required.');
+      return;
+    }
+
+    setSaving(true);
+    setErrorMsg('');
+
+    const payload = {
+      name: formName,
+      description: formDesc,
+      status: formStatus,
+      repositoryUrl: formRepo,
+      liveUrl: formLive
+    };
+
+    try {
+      const url = editingProject 
+        ? `${API_BASE_URL}/projects/${editingProject.id}`
+        : `${API_BASE_URL}/projects`;
+      
+      const method = editingProject ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsModalOpen(false);
+        fetchProjects();
+      } else {
+        setErrorMsg(data.error || 'Failed to save project.');
+      }
+    } catch (err) {
+      setErrorMsg('Server connection failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Handle Delete
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (res.ok) {
+        fetchProjects();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete project.');
+      }
+    } catch (err) {
+      alert('Server connection failed.');
     }
   };
 
@@ -162,7 +278,18 @@ const Dashboard = () => {
 
       {/* Projects Grid Container */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Product Portfolio</h3>
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Product Portfolio</h3>
+          {isAdmin && (
+            <button 
+              onClick={openAddModal}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg hover:shadow-purple-500/20 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Register System
+            </button>
+          )}
+        </div>
         
         {loading ? (
           <div className="flex justify-center items-center py-20">
@@ -183,14 +310,34 @@ const Dashboard = () => {
                       </h4>
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mt-0.5">/ubakatech/{proj.slug}</span>
                     </div>
-                    <span className={`inline-flex px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide border ${
-                      proj.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                      proj.status === 'testing' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                      proj.status === 'development' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                      'bg-slate-800 text-slate-400 border-slate-700'
-                    }`}>
-                      {proj.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {isAdmin && (
+                        <>
+                          <button 
+                            onClick={() => openEditModal(proj)}
+                            title="Edit System Info"
+                            className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition-colors cursor-pointer"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(proj.id, proj.name)}
+                            title="Delete System"
+                            className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                      <span className={`inline-flex px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide border ${
+                        proj.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        proj.status === 'testing' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                        proj.status === 'development' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                        'bg-slate-800 text-slate-400 border-slate-700'
+                      }`}>
+                        {proj.status}
+                      </span>
+                    </div>
                   </div>
                   
                   <p className="text-slate-400 text-xs leading-relaxed min-h-12">
@@ -229,10 +376,14 @@ const Dashboard = () => {
                 </div>
 
                 {/* Operations Metrics Bar */}
-                <div className="bg-slate-950 p-4 border-t border-slate-850 grid grid-cols-3 gap-2 text-center">
+                <div className="bg-slate-950 p-4 border-t border-slate-850 grid grid-cols-4 gap-1 text-center">
                   <div>
                     <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Uptime</span>
                     <span className="text-xs font-bold text-slate-300">{proj.metrics?.uptime || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Latency</span>
+                    <span className="text-xs font-bold text-slate-300">{proj.metrics?.latency || 'N/A'}</span>
                   </div>
                   <div>
                     <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Active Users</span>
@@ -249,6 +400,116 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* CRUD Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl p-6 relative animate-scale-up">
+            
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-lg font-bold text-white tracking-tight mb-1">
+              {editingProject ? 'Modify Registered System' : 'Register New System'}
+            </h3>
+            <p className="text-slate-400 text-xs mb-6">
+              {editingProject ? 'Update connection variables and deployment status' : 'Add a new system to the Ubaka Tech MIS monitoring deck'}
+            </p>
+
+            <form onSubmit={handleSave} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">System Name</label>
+                <input 
+                  type="text" 
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  placeholder="e.g. RRA EBM Gateway"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Description</label>
+                <textarea 
+                  value={formDesc}
+                  onChange={(e) => setFormDesc(e.target.value)}
+                  rows="3"
+                  placeholder="Describe the function, target customers, or primary modules of this system..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Deployment Status</label>
+                  <select 
+                    value={formStatus}
+                    onChange={(e) => setFormStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="planning">Planning</option>
+                    <option value="development">Development</option>
+                    <option value="testing">Testing</option>
+                    <option value="active">Active</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Repository URL</label>
+                <input 
+                  type="text" 
+                  value={formRepo}
+                  onChange={(e) => setFormRepo(e.target.value)}
+                  placeholder="https://github.com/Benitgilbert/..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Live Endpoint URL</label>
+                <input 
+                  type="text" 
+                  value={formLive}
+                  onChange={(e) => setFormLive(e.target.value)}
+                  placeholder="https://ebm.ubakatech.co.rw"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              {errorMsg && (
+                <div className="text-xs font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded-lg flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  {errorMsg}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800/60">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg hover:shadow-purple-500/20 disabled:opacity-50 cursor-pointer"
+                >
+                  {saving ? 'Saving...' : 'Save Configuration'}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

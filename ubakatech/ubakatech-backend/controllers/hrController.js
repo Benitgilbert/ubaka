@@ -1,4 +1,46 @@
 import prisma, { isDbConnected } from '../config/db.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, '../data');
+
+// Helper to ensure data directory and file exists
+async function getFileRecords(fileName) {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    const filePath = path.join(DATA_DIR, fileName);
+    try {
+      const fileData = await fs.readFile(filePath, 'utf-8');
+      return JSON.parse(fileData);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        // File does not exist yet, write empty array
+        await fs.writeFile(filePath, '[]', 'utf-8');
+        return [];
+      }
+      throw err;
+    }
+  } catch (err) {
+    console.error(`[HRController] Error reading file ${fileName}:`, err.message);
+    return [];
+  }
+}
+
+// Helper to save records
+async function saveFileRecords(fileName, records) {
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    const filePath = path.join(DATA_DIR, fileName);
+    await fs.writeFile(filePath, JSON.stringify(records, null, 2), 'utf-8');
+    return true;
+  } catch (err) {
+    console.error(`[HRController] Error saving file ${fileName}:`, err.message);
+    return false;
+  }
+}
 
 // ─── MOCK DATA (DB-disconnected fallback) ──────────────────────────────────────
 
@@ -570,4 +612,56 @@ export const getAnalytics = async (req, res) => {
     saasStats: { totalTools: 4, totalSeats: 35, usedSeats: 6, monthlyCost: 86.25, wastedSeats: 29 },
     certifications: MOCK_CERTIFICATIONS.length
   });
+};
+
+// Get all client inquiries
+export const getInquiries = async (req, res) => {
+  if (!isHRAdmin(req)) return res.status(403).json({ error: 'Forbidden: manage_hr permission required.' });
+  const inquiries = await getFileRecords('inquiries.json');
+  return res.json(inquiries);
+};
+
+// Update client inquiry status
+export const updateInquiryStatus = async (req, res) => {
+  if (!isHRAdmin(req)) return res.status(403).json({ error: 'Forbidden: manage_hr permission required.' });
+  const { id } = req.params;
+  const { status } = req.body; // e.g. 'received', 'triaged', 'converted', 'rejected'
+
+  if (!status) return res.status(400).json({ error: 'Status is required.' });
+
+  const inquiries = await getFileRecords('inquiries.json');
+  const idx = inquiries.findIndex(i => i.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Inquiry not found.' });
+
+  inquiries[idx].status = status;
+  inquiries[idx].updatedAt = new Date().toISOString();
+  await saveFileRecords('inquiries.json', inquiries);
+
+  return res.json({ success: true, inquiry: inquiries[idx] });
+};
+
+// Get all job applications
+export const getApplications = async (req, res) => {
+  if (!isHRAdmin(req)) return res.status(403).json({ error: 'Forbidden: manage_hr permission required.' });
+  const applications = await getFileRecords('applications.json');
+  return res.json(applications);
+};
+
+// Update job application status
+export const updateApplicationStatus = async (req, res) => {
+  if (!isHRAdmin(req)) return res.status(403).json({ error: 'Forbidden: manage_hr permission required.' });
+  const { id } = req.params;
+  const { status } = req.body; // e.g. 'pending_review', 'interviewing', 'offered', 'rejected'
+
+  if (!status) return res.status(400).json({ error: 'Status is required.' });
+
+  const applications = await getFileRecords('applications.json');
+  const idx = applications.findIndex(a => a.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Application not found.' });
+
+  applications[idx].status = status;
+  applications[idx].updatedAt = new Date().toISOString();
+  await saveFileRecords('applications.json', applications);
+
+  return res.json({ success: true, application: applications[idx] });
 };

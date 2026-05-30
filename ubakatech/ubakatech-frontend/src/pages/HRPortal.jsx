@@ -6,7 +6,7 @@ import {
   Laptop, Smartphone, Package, RefreshCw, AlertTriangle, ChevronDown,
   ChevronUp, Award, DollarSign, CalendarDays, Layers, ShieldCheck,
   TrendingUp, Inbox, Send, Filter, Search, Tag, Trash2, Edit3,
-  Wifi, Globe, Code2, Palette, MessageSquare, HardDrive
+  Wifi, Globe, Code2, Palette, MessageSquare, HardDrive, FileText
 } from 'lucide-react';
 
 // ─── API HELPER ──────────────────────────────────────────────────────────────
@@ -69,6 +69,13 @@ const Badge = ({ type }) => {
     assigned: { label: 'Assigned', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
     maintenance: { label: 'Maintenance', cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
     retired: { label: 'Retired', cls: 'bg-slate-500/15 text-slate-400 border-slate-500/20' },
+    received: { label: '📩 Received', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
+    contacted: { label: '💬 Contacted', cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+    scoped: { label: '📋 Scoped', cls: 'bg-purple-500/15 text-purple-400 border-purple-500/20' },
+    archived: { label: '📁 Archived', cls: 'bg-slate-500/15 text-slate-400 border-slate-500/20' },
+    pending_review: { label: '⏳ New Review', cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+    interviewing: { label: '👥 Interviewing', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20' },
+    offered: { label: '🎉 Offered', cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
   };
   const b = map[type] || { label: type, cls: 'bg-slate-700 text-slate-300' };
   return <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide border ${b.cls}`}>{b.label}</span>;
@@ -765,6 +772,401 @@ const AnalyticsTab = ({ analytics }) => {
   );
 };
 
+// ─── TAB 6: CLIENT REQUESTS TRIAGE ──────────────────────────────────────────
+
+const InquiriesTab = () => {
+  const api = useHRApi();
+  const [inquiries, setInquiries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await api('/inquiries');
+      setInquiries(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const updateStatus = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      await api(`/inquiries/${id}`, {
+        method: 'PUT',
+        body: { status }
+      });
+      setInquiries(prev => prev.map(item => item.id === id ? { ...item, status, updatedAt: new Date().toISOString() } : item));
+    } catch (err) {
+      alert(err.message || 'Failed to update status');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // Stats calculation
+  const total = inquiries.length;
+  const received = inquiries.filter(i => i.status === 'received').length;
+  const contacted = inquiries.filter(i => i.status === 'contacted').length;
+  const scoped = inquiries.filter(i => i.status === 'scoped').length;
+  const archived = inquiries.filter(i => i.status === 'archived').length;
+
+  const filteredInquiries = inquiries.filter(i => {
+    const matchesSearch = 
+      i.name.toLowerCase().includes(search.toLowerCase()) ||
+      i.email.toLowerCase().includes(search.toLowerCase()) ||
+      i.org.toLowerCase().includes(search.toLowerCase()) ||
+      i.id.toLowerCase().includes(search.toLowerCase()) ||
+      (i.description && i.description.toLowerCase().includes(search.toLowerCase()));
+    
+    const matchesFilter = filter === 'all' || i.status === filter;
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Mini Stats Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard icon={Inbox} label="Total Inquiries" value={total} color="purple" />
+        <StatCard icon={Clock} label="Received (New)" value={received} color="blue" />
+        <StatCard icon={MessageSquare} label="Contacted" value={contacted} color="amber" />
+        <StatCard icon={Code2} label="Scoped" value={scoped} color="emerald" />
+        <StatCard icon={X} label="Archived" value={archived} color="rose" />
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/40 p-4 border border-slate-800 rounded-2xl">
+        <div className="flex items-center gap-1.5 bg-slate-950/80 border border-slate-800 rounded-xl p-1 shrink-0">
+          {['all', 'received', 'contacted', 'scoped', 'archived'].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${filter === f ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-slate-400 hover:text-white'}`}
+            >
+              {f === 'received' ? 'New' : f}
+            </button>
+          ))}
+        </div>
+        <div className="relative flex-1 max-w-md w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Input
+            className="pl-9 bg-slate-950 border-slate-850"
+            placeholder="Search requests by name, organization, description..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-20 text-slate-500 text-sm flex flex-col items-center gap-2">
+          <RefreshCw className="w-6 h-6 animate-spin text-purple-400" />
+          Loading inquiries...
+        </div>
+      ) : filteredInquiries.length === 0 ? (
+        <EmptyState icon={MessageSquare} text="No client requests found matching the filters." />
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {filteredInquiries.map(inq => (
+            <div key={inq.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col md:flex-row gap-5">
+              <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white">{inq.name}</span>
+                      <span className="text-xs text-slate-500 font-mono">({inq.org})</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">ID: {inq.id} · Received {new Date(inq.createdAt).toLocaleString()}</div>
+                  </div>
+                  <Badge type={inq.status} />
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-950/40 border border-slate-800/60 p-3 rounded-xl text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Service Required</span>
+                    <span className="font-semibold text-slate-200 capitalize">{inq.serviceType}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Est. Budget</span>
+                    <span className="font-semibold text-amber-400">{inq.budget}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Timeline</span>
+                    <span className="font-semibold text-blue-400">{inq.timeline}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Contact Email</span>
+                    <a href={`mailto:${inq.email}`} className="font-semibold text-purple-400 hover:underline truncate block">{inq.email}</a>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wide mb-1">Project Description</span>
+                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/20 p-3 border border-slate-850 rounded-xl whitespace-pre-wrap">{inq.description}</p>
+                </div>
+
+                {inq.features && inq.features.length > 0 && (
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide mb-1.5">Requested Features</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {inq.features.map((feat, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-slate-800/80 border border-slate-700/60 text-slate-300 text-[10px] font-semibold rounded-md">
+                          {feat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Operations Triage Action Panel */}
+              <div className="md:w-52 shrink-0 md:border-l md:border-slate-800/60 md:pl-5 flex flex-col justify-between gap-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wide mb-2">Triage Control</span>
+                  <div className="space-y-1.5">
+                    {[
+                      { status: 'received', label: 'New / Reset', color: 'ghost' },
+                      { status: 'contacted', label: 'Contacted Client', color: 'primary' },
+                      { status: 'scoped', label: 'Project Scoped', color: 'success' },
+                      { status: 'archived', label: 'Archive Request', color: 'danger' }
+                    ].map(btn => (
+                      <button
+                        key={btn.status}
+                        disabled={updatingId === inq.id || inq.status === btn.status}
+                        onClick={() => updateStatus(inq.id, btn.status)}
+                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold border flex items-center justify-between transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                          inq.status === btn.status
+                            ? 'bg-purple-600/10 border-purple-500/30 text-purple-400 font-bold'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                        }`}
+                      >
+                        <span>{btn.label}</span>
+                        {inq.status === btn.status && <Check className="w-3 h-3 text-purple-400" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="text-[9px] text-slate-600 font-medium">
+                  {inq.updatedAt && `Last update: ${new Date(inq.updatedAt).toLocaleDateString()}`}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── TAB 7: JOB APPLICATIONS TRIAGE ─────────────────────────────────────────
+
+const ApplicationsTab = () => {
+  const api = useHRApi();
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await api('/applications');
+      setApplications(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const updateStatus = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      await api(`/applications/${id}`, {
+        method: 'PUT',
+        body: { status }
+      });
+      setApplications(prev => prev.map(item => item.id === id ? { ...item, status, updatedAt: new Date().toISOString() } : item));
+    } catch (err) {
+      alert(err.message || 'Failed to update status');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // Stats calculation
+  const total = applications.length;
+  const pending = applications.filter(a => a.status === 'pending_review').length;
+  const interviewing = applications.filter(a => a.status === 'interviewing').length;
+  const offered = applications.filter(a => a.status === 'offered').length;
+  const rejected = applications.filter(a => a.status === 'rejected').length;
+
+  const filteredApps = applications.filter(a => {
+    const matchesSearch = 
+      a.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.email.toLowerCase().includes(search.toLowerCase()) ||
+      a.roleName.toLowerCase().includes(search.toLowerCase()) ||
+      a.id.toLowerCase().includes(search.toLowerCase()) ||
+      (a.pitch && a.pitch.toLowerCase().includes(search.toLowerCase()));
+    
+    const matchesFilter = filter === 'all' || a.status === filter;
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard icon={Users} label="Total Applications" value={total} color="purple" />
+        <StatCard icon={Clock} label="Pending Review" value={pending} color="amber" />
+        <StatCard icon={Inbox} label="Interviewing" value={interviewing} color="blue" />
+        <StatCard icon={CheckSquare} label="Offered" value={offered} color="emerald" />
+        <StatCard icon={X} label="Rejected" value={rejected} color="rose" />
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/40 p-4 border border-slate-800 rounded-2xl">
+        <div className="flex items-center gap-1.5 bg-slate-950/80 border border-slate-800 rounded-xl p-1 shrink-0">
+          {['all', 'pending_review', 'interviewing', 'offered', 'rejected'].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${filter === f ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-slate-400 hover:text-white'}`}
+            >
+              {f === 'pending_review' ? 'New' : f}
+            </button>
+          ))}
+        </div>
+        <div className="relative flex-1 max-w-md w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Input
+            className="pl-9 bg-slate-950 border-slate-850"
+            placeholder="Search applications by name, role, email, pitch..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-20 text-slate-500 text-sm flex flex-col items-center gap-2">
+          <RefreshCw className="w-6 h-6 animate-spin text-purple-400" />
+          Loading applications...
+        </div>
+      ) : filteredApps.length === 0 ? (
+        <EmptyState icon={Users} text="No applications found matching the filters." />
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {filteredApps.map(app => (
+            <div key={app.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col md:flex-row gap-5">
+              <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white">{app.name}</span>
+                      <span className="text-xs text-slate-500 font-mono">({app.email})</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">ID: {app.id} · Applied {new Date(app.createdAt).toLocaleString()}</div>
+                  </div>
+                  <Badge type={app.status} />
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-slate-950/40 border border-slate-800/60 p-3 rounded-xl text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Applied Position</span>
+                    <span className="font-semibold text-slate-200">{app.roleName}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Resume Document</span>
+                    <a
+                      href={app.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-purple-400 hover:underline flex items-center gap-1.5 mt-0.5 truncate"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      View CV / Resume
+                    </a>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wide">Portfolio / GitHub</span>
+                    {app.portfolioUrl ? (
+                      <a
+                        href={app.portfolioUrl.startsWith('http') ? app.portfolioUrl : `https://${app.portfolioUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-blue-400 hover:underline flex items-center gap-1.5 mt-0.5 truncate"
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                        Portfolio Link
+                      </a>
+                    ) : (
+                      <span className="text-slate-500 italic mt-0.5">Not provided</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wide mb-1">Cover Pitch</span>
+                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/20 p-3 border border-slate-850 rounded-xl whitespace-pre-wrap font-sans">{app.pitch}</p>
+                </div>
+              </div>
+
+              {/* Triage controls */}
+              <div className="md:w-52 shrink-0 md:border-l md:border-slate-800/60 md:pl-5 flex flex-col justify-between gap-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 block uppercase tracking-wide mb-2">Stage Management</span>
+                  <div className="space-y-1.5">
+                    {[
+                      { status: 'pending_review', label: 'In Review', color: 'ghost' },
+                      { status: 'interviewing', label: 'Interviewing', color: 'primary' },
+                      { status: 'offered', label: 'Extend Offer', color: 'success' },
+                      { status: 'rejected', label: 'Reject / Archive', color: 'danger' }
+                    ].map(btn => (
+                      <button
+                        key={btn.status}
+                        disabled={updatingId === app.id || app.status === btn.status}
+                        onClick={() => updateStatus(app.id, btn.status)}
+                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold border flex items-center justify-between transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                          app.status === btn.status
+                            ? 'bg-purple-600/10 border-purple-500/30 text-purple-400 font-bold'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                        }`}
+                      >
+                        <span>{btn.label}</span>
+                        {app.status === btn.status && <Check className="w-3 h-3 text-purple-400" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="text-[9px] text-slate-600 font-medium">
+                  {app.updatedAt && `Last update: ${new Date(app.updatedAt).toLocaleDateString()}`}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── MAIN HR PORTAL ──────────────────────────────────────────────────────────
 
 const HRPortal = () => {
@@ -786,6 +1188,8 @@ const HRPortal = () => {
 
   const tabs = [
     ...(isHR ? [{ id: 'overview', label: 'Overview', icon: BarChart3 }] : []),
+    ...(isHR ? [{ id: 'inquiries', label: 'Client Requests', icon: MessageSquare }] : []),
+    ...(isHR ? [{ id: 'applications', label: 'Job Applicants', icon: Users }] : []),
     ...(isHR ? [{ id: 'onboarding', label: 'Onboarding', icon: CheckSquare }] : []),
     { id: 'approvals', label: 'Approvals', icon: Inbox },
     ...(isHR ? [{ id: 'hardware', label: 'Hardware & SaaS', icon: Monitor }] : []),
@@ -795,6 +1199,8 @@ const HRPortal = () => {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview': return <OverviewTab analytics={analytics} approvals={approvals} hardware={[]} />;
+      case 'inquiries': return <InquiriesTab />;
+      case 'applications': return <ApplicationsTab />;
       case 'onboarding': return <OnboardingTab isHR={isHR} />;
       case 'approvals': return <ApprovalsTab isHR={isHR} />;
       case 'hardware': return <HardwareTab />;

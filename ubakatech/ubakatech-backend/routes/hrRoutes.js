@@ -6,7 +6,9 @@ import {
   getHardware, createHardware, updateHardware,
   getSaas, createSaas, updateSaas,
   getCertifications, createCertification,
-  getAnalytics
+  getAnalytics,
+  getInquiries, updateInquiryStatus,
+  getApplications, updateApplicationStatus
 } from '../controllers/hrController.js';
 
 const router = express.Router();
@@ -41,5 +43,11 @@ router.post('/certifications', createCertification);
 
 // ─── People Analytics ──────────────────────────────────────────────────────
 router.get('/analytics', getAnalytics);
+
+// ─── Client Inquiries & Job Applications Triage ──────────────────────────────
+router.get('/inquiries', getInquiries);
+router.put('/inquiries/:id', updateInquiryStatus);
+router.get('/applications', getApplications);
+router.put('/applications/:id', updateApplicationStatus);
 
 export default router;
