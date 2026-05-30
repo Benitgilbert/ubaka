@@ -6,6 +6,10 @@
     },
     "rewrites": [
         {
+            "source": "/sitemap.xml",
+            "destination": "https://abelus-backend.onrender.com/api/sitemap.xml"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

@@ -59,6 +59,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import careersRoutes from "./routes/careersRoutes.js";
 import sellerCouponRoutes from "./routes/sellerCouponRoutes.js";
 import sellerReviewRoutes from "./routes/sellerReviewRoutes.js";
+import seoRoutes from "./routes/seoRoutes.js";
 import { seedEmailTemplates } from "./utils/emailService.js";
 
 dotenv.config();
@@ -194,6 +195,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/careers", careersRoutes);
 app.use("/api/seller/coupons", sellerCouponRoutes);
 app.use("/api/seller/reviews", sellerReviewRoutes);
+app.use("/api", seoRoutes);
 
 app.get("/api", (req, res) => {
   res.json({
