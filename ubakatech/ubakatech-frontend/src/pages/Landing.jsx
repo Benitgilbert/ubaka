@@ -1374,7 +1374,7 @@ const Landing = ({ onEnterPortal }) => {
               </div>
             ) : (
               <form onSubmit={handleApplySubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Full Name *</label>
                     <input 
@@ -1399,7 +1399,7 @@ const Landing = ({ onEnterPortal }) => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Resume / CV Link *</label>
                     <input 
