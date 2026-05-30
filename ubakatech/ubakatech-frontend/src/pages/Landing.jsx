@@ -496,18 +496,18 @@ const Landing = ({ onEnterPortal }) => {
             <div className="lg:col-span-6 space-y-8 text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold tracking-wide">
                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                Empowering Rwandan Innovation & Businesses
+                Custom Digital Solutions for Any Challenge
               </div>
 
               <div className="space-y-4">
                 <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] text-white">
-                  Software for the <br />
+                  Solving Problems <br />
                   <span className="bg-gradient-to-r from-purple-400 via-rose-300 to-amber-300 bg-clip-text text-transparent">
-                    Rhythm of Daily Life
+                    Exactly How You Want It
                   </span>
                 </h2>
                 <p className="text-gray-400 leading-relaxed text-sm md:text-base max-w-xl font-medium">
-                  Ubaka Tech designs and engineers digital infrastructure that simplifies local workflows. From enabling RRA EBM compliant point-of-sale platforms to designing secure integrations, we build technology with human empathy.
+                  Ubaka Tech is a premium software development and product design agency. We engineer custom digital solutions that address your unique workflows. Whether you need a web platform, a mobile application, an enterprise system, or a custom API gateway, we solve your business problems digitally.
                 </p>
               </div>
 
@@ -515,18 +515,18 @@ const Landing = ({ onEnterPortal }) => {
               <div className="grid grid-cols-2 gap-4 max-w-lg">
                 <div className="p-4 bg-gray-900/30 border border-gray-900 rounded-2xl">
                   <div className="w-8 h-8 rounded-lg bg-purple-950/30 border border-purple-500/20 flex items-center justify-center mb-3">
-                    <ShieldCheck className="w-4 h-4 text-purple-400" />
+                    <Cpu className="w-4 h-4 text-purple-400" />
                   </div>
-                  <h4 className="text-xs font-bold text-gray-200">Legal Compliance</h4>
-                  <p className="text-[10px] text-gray-500 mt-1">Out-of-the-box support for RRA EBM tax rules and merchant invoicing audit ledger PDFs.</p>
+                  <h4 className="text-xs font-bold text-gray-200">Custom Engineering</h4>
+                  <p className="text-[10px] text-gray-500 mt-1">We build exactly what you need—web tools, mobile apps, databases, or API integrations.</p>
                 </div>
 
                 <div className="p-4 bg-gray-900/30 border border-gray-900 rounded-2xl">
                   <div className="w-8 h-8 rounded-lg bg-indigo-950/30 border border-indigo-500/20 flex items-center justify-center mb-3">
-                    <Users className="w-4 h-4 text-indigo-400" />
+                    <ShieldCheck className="w-4 h-4 text-indigo-400" />
                   </div>
-                  <h4 className="text-xs font-bold text-gray-200">Human-First Design</h4>
-                  <p className="text-[10px] text-gray-500 mt-1">Usability-optimized for local shop cashiers, smartphone traders, and low-bandwidth networks.</p>
+                  <h4 className="text-xs font-bold text-gray-200">Tailored Problem Solving</h4>
+                  <p className="text-[10px] text-gray-500 mt-1">We align closely with your team to simplify complex processes, ensuring technology matches your requirements.</p>
                 </div>
               </div>
 
@@ -567,8 +567,8 @@ const Landing = ({ onEnterPortal }) => {
                   {/* Embedded Badge */}
                   <div className="absolute bottom-9 left-9 right-9 p-4 rounded-xl bg-gray-950/80 border border-gray-850 backdrop-blur-md flex items-center justify-between">
                     <div>
-                      <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Completed Flagship Release</div>
-                      <div className="text-xs font-black text-white mt-1">Kuri Macye Multi-Vendor POS</div>
+                      <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Featured Case Study</div>
+                      <div className="text-xs font-black text-white mt-1">Kuri Macye E-Commerce</div>
                     </div>
                     <button
                       onClick={() => setActiveTab('portfolio')}
