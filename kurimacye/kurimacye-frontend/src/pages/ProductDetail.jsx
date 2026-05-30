@@ -48,7 +48,7 @@ export default function ProductDetail() {
         document.title = `${productData.name} | Kuri Macye`;
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) {
-          metaDesc.setAttribute("content", productData.description || `Buy ${productData.name} at Kuri Macye. Premium custom printing solutions.`);
+          metaDesc.setAttribute("content", productData.description || `Buy ${productData.name} at Kuri Macye. Premium multivendor e-commerce marketplace.`);
         }
 
         // Inject JSON-LD Structured Data for Google
