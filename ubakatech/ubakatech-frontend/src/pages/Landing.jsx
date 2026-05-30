@@ -72,6 +72,7 @@ const Landing = ({ onEnterPortal }) => {
   });
   const [intakeErrors, setIntakeErrors] = useState({});
   const [submittingIntake, setSubmittingIntake] = useState(false);
+  const [intakeSubmitError, setIntakeSubmitError] = useState(null);
   const [intakeSuccessResult, setIntakeSuccessResult] = useState(null); // saved inquiry info
 
   // Kigali Clock Integration
@@ -279,7 +280,7 @@ const Landing = ({ onEnterPortal }) => {
 
   const handleIntakeSubmit = async () => {
     if (!validateIntakeStep(3)) return;
-
+    setIntakeSubmitError(null);
     setSubmittingIntake(true);
     try {
       const res = await fetch(`${BACKEND_URL}/api/public/inquiry`, {
@@ -292,10 +293,10 @@ const Landing = ({ onEnterPortal }) => {
         setIntakeSuccessResult(data.inquiry);
         setIntakeStep(4); // Success screen
       } else {
-        alert(data.error || 'Failed to submit project inquiry.');
+        setIntakeSubmitError(data.error || 'Failed to submit project inquiry.');
       }
     } catch (err) {
-      alert('Error connecting to backend server. Please check your connection.');
+      setIntakeSubmitError('Error connecting to backend server. Please check your connection.');
     } finally {
       setSubmittingIntake(false);
     }
@@ -1277,6 +1278,13 @@ const Landing = ({ onEnterPortal }) => {
                     <div>Budget: <strong className="text-purple-300">{intakeForm.budget}</strong></div>
                   </div>
 
+                  {intakeSubmitError && (
+                    <div className="mb-4 flex items-start gap-2.5 px-4 py-3 rounded-xl border border-red-500/30 bg-red-950/40 text-red-300">
+                      <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span className="text-xs leading-relaxed">{intakeSubmitError}</span>
+                      <button onClick={() => setIntakeSubmitError(null)} className="ml-auto text-red-400 hover:text-red-200 transition-colors cursor-pointer shrink-0">✕</button>
+                    </div>
+                  )}
                   <div className="pt-6 border-t border-gray-900 flex justify-between">
                     <button
                       onClick={handlePrevStep}

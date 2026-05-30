@@ -7,6 +7,7 @@ import {
   Check, 
   X, 
   AlertCircle,
+  AlertTriangle,
   HelpCircle,
   MessageSquare,
   Activity,
@@ -1395,6 +1396,8 @@ const ImpressaAdmin = () => {
   const [modalMode, setModalMode] = useState('create'); // 'create' | 'edit'
   const [editRecordId, setEditRecordId] = useState(null);
   const [formData, setFormData] = useState({});
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // record id | null
+  const [isDeletePending, setIsDeletePending] = useState(false);
 
   const userPermissions = user?.permissions || [];
 
@@ -1559,24 +1562,34 @@ const ImpressaAdmin = () => {
     }
   };
 
-  // Generic CRUD Delete
-  const handleGenericDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this record?')) return;
+  // Generic CRUD Delete — trigger custom modal
+  const handleGenericDelete = (id) => {
+    setDeleteConfirm(id);
+  };
+
+  const executeGenericDelete = async () => {
+    if (!deleteConfirm || isDeletePending) return;
+    setIsDeletePending(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/projects/impressa/data/${selectedFeature}/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/projects/impressa/data/${selectedFeature}/${deleteConfirm}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
+        setDeleteConfirm(null);
         setMsg({ type: 'success', text: 'Record successfully deleted!' });
-        setGenericData(prev => prev.filter(item => item.id !== id));
+        setGenericData(prev => prev.filter(item => item.id !== deleteConfirm));
         setTimeout(() => setMsg(null), 3000);
       } else {
         const err = await response.json();
+        setDeleteConfirm(null);
         setMsg({ type: 'error', text: err.error || 'Failed to delete record.' });
       }
     } catch (err) {
+      setDeleteConfirm(null);
       setMsg({ type: 'error', text: 'Failed to process delete request.' });
+    } finally {
+      setIsDeletePending(false);
     }
   };
 
@@ -2120,6 +2133,49 @@ const ImpressaAdmin = () => {
             </div>
           )}
 
+        </div>
+      )}
+
+      {/* 2b. Custom Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-5">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="space-y-1.5 flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-white">Delete Record?</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  This record will be permanently removed from the <span className="text-slate-200 font-semibold">{activeTabConfig?.label}</span> database. This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirm(null)}
+                disabled={isDeletePending}
+                className="flex-1 py-2.5 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeGenericDelete}
+                disabled={isDeletePending}
+                className="flex-1 py-2.5 inline-flex items-center justify-center gap-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-60 active:scale-95"
+              >
+                {isDeletePending ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5" />
+                )}
+                {isDeletePending ? 'Deleting...' : 'Delete Record'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

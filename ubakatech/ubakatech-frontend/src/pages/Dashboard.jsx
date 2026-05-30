@@ -16,7 +16,8 @@ import {
   X,
   Terminal,
   Database,
-  HardDrive
+  HardDrive,
+  Loader2
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -34,6 +35,21 @@ const Dashboard = () => {
   const [formLive, setFormLive] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null); // { id, name } | null
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toast, setToast] = useState(null); // { type, message } | null
+
+  // Auto-dismiss toast notification
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+  };
 
   // Live Operations Mock State
   const [terminalLogs, setTerminalLogs] = useState([
@@ -253,10 +269,14 @@ const Dashboard = () => {
   };
 
   // Handle Delete
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
-      return;
-    }
+  const handleDelete = (id, name) => {
+    setConfirmDelete({ id, name });
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDelete || isDeleting) return;
+    setIsDeleting(true);
+    const { id, name } = confirmDelete;
 
     try {
       const res = await fetch(`${API_BASE_URL}/projects/${id}`, {
@@ -267,13 +287,17 @@ const Dashboard = () => {
       });
 
       if (res.ok) {
+        setConfirmDelete(null);
+        showToast('success', `System "${name}" was successfully deleted.`);
         fetchProjects();
       } else {
         const data = await res.json();
-        alert(data.error || 'Failed to delete project.');
+        showToast('error', data.error || 'Failed to delete system.');
       }
     } catch (err) {
-      alert('Server connection failed.');
+      showToast('error', 'Server connection failed.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -615,7 +639,7 @@ const Dashboard = () => {
 
       {/* CRUD Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-955/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl p-6 relative animate-scale-up">
             
             <button 
@@ -705,7 +729,7 @@ const Dashboard = () => {
                 <button 
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  className="px-4 py-2 bg-slate-955 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -719,6 +743,73 @@ const Dashboard = () => {
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-955/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-5 animate-scale-up">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+              </div>
+              <div className="space-y-1.5 flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-white">Delete Registered System?</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Are you sure you want to delete <span className="text-slate-200 font-bold">"{confirmDelete.name}"</span>? This action is permanent and cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(null)}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50 active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeDelete}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 inline-flex items-center justify-center gap-1.5 bg-rose-550/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-95"
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5" />
+                )}
+                {isDeleting ? 'Deleting...' : 'Delete System'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md ${
+            toast.type === 'success' 
+              ? 'bg-emerald-950/80 border-emerald-500/30 text-emerald-300' 
+              : 'bg-rose-950/80 border-rose-500/30 text-rose-300'
+          }`}>
+            {toast.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            )}
+            <span className="text-xs font-semibold">{toast.message}</span>
+            <button 
+              onClick={() => setToast(null)}
+              className="p-0.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-all ml-1 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       )}

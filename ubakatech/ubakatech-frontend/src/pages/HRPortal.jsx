@@ -235,6 +235,9 @@ const OnboardingTab = ({ isHR }) => {
   const [showAddModal, setShowAddModal] = useState(null); // employeeId
   const [newTask, setNewTask] = useState({ task: '', category: 'IT Setup', dueDate: '' });
 
+  const [confirmDelete, setConfirmDelete] = useState(null); // task | null
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const load = async () => {
     setLoading(true);
     try { setData(await api('/onboarding')); } catch { } finally { setLoading(false); }
@@ -248,9 +251,20 @@ const OnboardingTab = ({ isHR }) => {
     try { await api(`/onboarding/tasks/${taskId}`, { method: 'PUT', body: { isComplete: val } }); load(); } catch { }
   };
 
-  const deleteTask = async (taskId) => {
-    if (!confirm('Delete this task?')) return;
-    try { await api(`/onboarding/tasks/${taskId}`, { method: 'DELETE' }); load(); } catch { }
+  const deleteTask = (task) => {
+    setConfirmDelete(task);
+  };
+
+  const executeDeleteTask = async () => {
+    if (!confirmDelete || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await api(`/onboarding/tasks/${confirmDelete.id}`, { method: 'DELETE' });
+      setConfirmDelete(null);
+      load();
+    } catch { } finally {
+      setIsDeleting(false);
+    }
   };
 
   const submitTask = async () => {
@@ -300,7 +314,7 @@ const OnboardingTab = ({ isHR }) => {
                       <span className="text-[10px] text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">{task.category}</span>
                     </div>
                   </div>
-                  {isHR && <button onClick={() => deleteTask(task.id)} className="text-slate-600 hover:text-rose-400 transition-colors cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>}
+                  {isHR && <button onClick={() => deleteTask(task)} className="text-slate-600 hover:text-rose-400 transition-colors cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>}
                 </div>
               ))}
               {isHR && (
@@ -329,6 +343,49 @@ const OnboardingTab = ({ isHR }) => {
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Custom Task Delete Confirmation Modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setConfirmDelete(null)}>
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-5 animate-scale-up" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="space-y-1 flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-white">Delete Task?</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Are you sure you want to delete the task <span className="text-slate-200 font-semibold">"{confirmDelete.task}"</span>? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(null)}
+                disabled={isDeleting}
+                className="flex-1 py-2 bg-slate-950/60 hover:bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50 active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeDeleteTask}
+                disabled={isDeleting}
+                className="flex-1 py-2 inline-flex items-center justify-center gap-2 bg-red-550/15 hover:bg-red-500/25 border border-red-500/30 text-red-400 font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-95"
+              >
+                {isDeleting ? (
+                  <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Trash2 className="w-3.5 h-3.5" />
+                )}
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -782,6 +839,20 @@ const InquiriesTab = () => {
   const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
 
+  const [toast, setToast] = useState(null); // { type, message } | null
+
+  // Auto-dismiss toast notification
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+  };
+
   const load = async () => {
     setLoading(true);
     try {
@@ -806,8 +877,9 @@ const InquiriesTab = () => {
         body: { status }
       });
       setInquiries(prev => prev.map(item => item.id === id ? { ...item, status, updatedAt: new Date().toISOString() } : item));
+      showToast('success', `Request status updated to "${status}".`);
     } catch (err) {
-      alert(err.message || 'Failed to update status');
+      showToast('error', err.message || 'Failed to update status.');
     } finally {
       setUpdatingId(null);
     }
@@ -964,6 +1036,29 @@ const InquiriesTab = () => {
           ))}
         </div>
       )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md ${
+            toast.type === 'success' 
+              ? 'bg-emerald-950/80 border-emerald-500/30 text-emerald-300' 
+              : 'bg-rose-950/80 border-rose-500/30 text-rose-300'
+          }`}>
+            {toast.type === 'success' ? (
+              <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            )}
+            <span className="text-xs font-semibold">{toast.message}</span>
+            <button 
+              onClick={() => setToast(null)}
+              className="p-0.5 rounded hover:bg-slate-850 text-slate-400 hover:text-white transition-all ml-1 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -977,6 +1072,18 @@ const ApplicationsTab = () => {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
+
+  const [toast, setToast] = useState(null); // { type, message } | null
+
+  // Auto-dismiss toast notification
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (type, message) => setToast({ type, message });
 
   const load = async () => {
     setLoading(true);
@@ -1002,8 +1109,9 @@ const ApplicationsTab = () => {
         body: { status }
       });
       setApplications(prev => prev.map(item => item.id === id ? { ...item, status, updatedAt: new Date().toISOString() } : item));
+      showToast('success', `Applicant stage updated to "${status}".`);
     } catch (err) {
-      alert(err.message || 'Failed to update status');
+      showToast('error', err.message || 'Failed to update status.');
     } finally {
       setUpdatingId(null);
     }
@@ -1161,6 +1269,29 @@ const ApplicationsTab = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md ${
+            toast.type === 'success'
+              ? 'bg-emerald-950/80 border-emerald-500/30 text-emerald-300'
+              : 'bg-rose-950/80 border-rose-500/30 text-rose-300'
+          }`}>
+            {toast.type === 'success' ? (
+              <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            )}
+            <span className="text-xs font-semibold">{toast.message}</span>
+            <button
+              onClick={() => setToast(null)}
+              className="p-0.5 rounded hover:bg-slate-850 text-slate-400 hover:text-white transition-all ml-1 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
     </div>
