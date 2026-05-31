@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = path.join(__dirname, '../data');
 
 // Static Job Openings list
-const STATIC_JOBS = [
+export const STATIC_JOBS = [
   {
     id: 'role-senior-frontend',
     title: 'Senior Frontend Engineer',

@@ -205,14 +205,7 @@ export const getProjects = async (req, res) => {
 
   if (dbActive) {
     try {
-      let projects = await prisma.project.findMany();
-      if (projects.length === 0) {
-        console.log('[ProjectController] Seeding initial projects in database...');
-        await prisma.project.createMany({
-          data: INITIAL_PROJECTS.map(({ metrics, ...p }) => p)
-        });
-        projects = await prisma.project.findMany();
-      }
+      const projects = await prisma.project.findMany();
       
       const projectsWithMetrics = projects.map(p => {
         const slug = p.slug;
@@ -531,13 +524,6 @@ export const getPublicShowcaseProjects = async (req, res) => {
   if (dbActive) {
     try {
       projects = await prisma.project.findMany();
-      if (projects.length === 0) {
-        console.log('[ProjectController] Seeding initial projects in database...');
-        await prisma.project.createMany({
-          data: INITIAL_PROJECTS.map(({ metrics, ...p }) => p)
-        });
-        projects = await prisma.project.findMany();
-      }
     } catch (err) {
       console.warn('[ProjectController] DB error fetching showcase projects, falling back to mock:', err.message);
       projects = INITIAL_PROJECTS;

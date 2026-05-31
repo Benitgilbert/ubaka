@@ -2,6 +2,7 @@ import prisma, { isDbConnected } from '../config/db.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { STATIC_JOBS } from './publicController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -625,7 +626,7 @@ export const getHrStats = async (req, res) => {
         prisma.employee.count(),
         prisma.employee.count({ where: { isActive: true } }),
         prisma.approvalRequest.count({ where: { type: 'time_off', status: 'approved' } }),
-        prisma.approvalRequest.count({ where: { type: 'job_opening', status: 'pending' } }),
+        Promise.resolve(STATIC_JOBS.length),
         prisma.onboardingChecklist.count({ where: { isComplete: false } })
       ]);
       return res.json({

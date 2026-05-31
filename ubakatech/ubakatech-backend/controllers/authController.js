@@ -75,71 +75,69 @@ export const MOCK_EMPLOYEES = [
   }
 ];
 
-// Function to sync employees from auth.users
-export const syncEmployeesFromAuth = async () => {
+// Function to sync a single employee from auth.users on-the-fly
+export const syncSingleEmployeeFromAuth = async (email) => {
   const dbActive = await isDbConnected();
   if (!dbActive) {
     console.log('[Sync] Database is not active, skipping sync.');
-    return;
+    return null;
   }
 
   try {
-    // 1. Fetch all users from Supabase auth.users schema
-    const authUsers = await prisma.$queryRaw`
+    // Fetch only the specific user from Supabase auth.users schema
+    const authUsers = await prisma.$queryRawUnsafe(`
       SELECT id, email, encrypted_password, raw_user_meta_data, created_at
-      FROM auth.users;
-    `;
+      FROM auth.users
+      WHERE email = $1
+    `, email);
 
     if (!authUsers || authUsers.length === 0) {
-      console.log('[Sync] No users found in auth.users.');
-      return;
+      console.log(`[Sync] User ${email} not found in auth.users.`);
+      return null;
     }
 
-    // 2. Sync each user into Employee table
-    for (const u of authUsers) {
-      const email = u.email;
-      if (!email) continue;
-      const id = u.id;
-      const metadata = u.raw_user_meta_data || {};
-      const name = metadata.name || metadata.full_name || email.split('@')[0];
-      const avatar = metadata.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
-      
-      // Default roles / title mapping
-      let roleCode = metadata.role || 'software_engineer';
-      if (email.toLowerCase() === 'byiringirobenitg@gmail.com') {
-        roleCode = 'sysadmin'; // Make the owner/creator an admin by default
+    const u = authUsers[0];
+    const metadata = u.raw_user_meta_data || {};
+    const name = metadata.name || metadata.full_name || email.split('@')[0];
+    const avatar = metadata.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
+    
+    // Default roles / title mapping
+    let roleCode = metadata.role || 'software_engineer';
+    if (email.toLowerCase() === 'byiringirobenitg@gmail.com') {
+      roleCode = 'sysadmin'; // Make the owner/creator an admin by default
+    }
+    
+    const dbRole = await prisma.role.findFirst({
+      where: { code: roleCode }
+    });
+    const roleId = dbRole ? dbRole.id : null;
+
+    const employee = await prisma.employee.upsert({
+      where: { email },
+      update: {
+        name,
+        password: u.encrypted_password || '',
+        avatar,
+        isActive: true
+      },
+      create: {
+        id: u.id,
+        email,
+        name,
+        password: u.encrypted_password || '',
+        roleId,
+        title: metadata.title || (roleCode === 'sysadmin' ? 'System Administrator' : 'Software Engineer'),
+        avatar,
+        isActive: true,
+        createdAt: u.created_at ? new Date(u.created_at) : new Date()
       }
-      
-      const dbRole = await prisma.role.findFirst({
-        where: { code: roleCode }
-      });
-      const roleId = dbRole ? dbRole.id : null;
+    });
 
-      // Sync user details
-      await prisma.employee.upsert({
-        where: { email },
-        update: {
-          name,
-          password: u.encrypted_password || '', // sync the encrypted password directly
-          avatar,
-          isActive: true
-        },
-        create: {
-          id, // use the same UUID as auth.users
-          email,
-          name,
-          password: u.encrypted_password || '',
-          roleId,
-          title: metadata.title || (roleCode === 'sysadmin' ? 'System Administrator' : 'Software Engineer'),
-          avatar,
-          isActive: true,
-          createdAt: u.created_at ? new Date(u.created_at) : new Date()
-        }
-      });
-    }
-    console.log(`[Sync] Successfully synchronized ${authUsers.length} employees from auth.users.`);
+    console.log(`[Sync] Successfully synchronized employee ${email} from auth.users.`);
+    return employee;
   } catch (err) {
-    console.error('❌ Failed to sync employees from auth.users:', err.message);
+    console.error(`❌ Failed to sync employee ${email} from auth.users:`, err.message);
+    return null;
   }
 };
 
@@ -321,8 +319,8 @@ export const login = async (req, res) => {
 
   if (dbActive) {
     try {
-      // Synchronize employees from Supabase auth.users
-      await syncEmployeesFromAuth();
+      // Sync only this logging-in user on-the-fly
+      await syncSingleEmployeeFromAuth(email);
 
       const user = await prisma.employee.findUnique({ where: { email } });
       if (user && (await bcrypt.compare(password, user.password))) {
@@ -579,9 +577,6 @@ export const getEmployees = async (req, res) => {
   const dbActive = await isDbConnected();
   if (dbActive) {
     try {
-      // Synchronize employees from Supabase auth.users
-      await syncEmployeesFromAuth();
-
       const users = await prisma.employee.findMany({
         include: { role: true },
         orderBy: { name: 'asc' }
