@@ -140,11 +140,11 @@ const Chat = () => {
 
   // Initialize
   useEffect(() => {
-    if (token) {
+    if (token && user?.id) {
       fetchRooms();
       fetchContacts();
     }
-  }, [token]);
+  }, [token, user?.id]);
 
   // Handle active room switch
   useEffect(() => {
@@ -608,7 +608,7 @@ const Chat = () => {
               )}
             </>
           ) : (
-            /* Rendering Active Chat Rooms */
+            /* Rendering Active Chat Rooms & Company Directory */
             <>
               <div className="text-[9px] font-bold text-slate-500 px-3 uppercase tracking-wider mb-2">Active Conversations</div>
               {loading ? (
@@ -616,8 +616,8 @@ const Chat = () => {
                   <Loader2 className="w-6 h-6 text-purple-500 animate-spin" />
                 </div>
               ) : rooms.length === 0 ? (
-                <div className="text-center py-10 px-4">
-                  <div className="text-xs text-slate-500 leading-relaxed">No active chats. Search a contact to start messaging.</div>
+                <div className="text-center py-6 px-4">
+                  <div className="text-xs text-slate-650">No active chats. Start one below.</div>
                 </div>
               ) : (
                 rooms.map((room) => {
@@ -693,6 +693,30 @@ const Chat = () => {
                     </button>
                   );
                 })
+              )}
+
+              {/* Company Directory Section */}
+              <div className="text-[9px] font-bold text-slate-500 px-3 uppercase tracking-wider mt-5 mb-2 border-t border-slate-900/60 pt-4">Company Directory</div>
+              {contacts.length === 0 ? (
+                <div className="text-center py-4 text-slate-600 text-xs">No employees found.</div>
+              ) : (
+                contacts.map(contact => (
+                  <button
+                    key={contact.id}
+                    onClick={() => handleStartDM(contact)}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 border border-transparent hover:border-slate-800/40 transition-all cursor-pointer text-left"
+                  >
+                    <img 
+                      src={contact.avatar || 'https://api.dicebear.com/7.x/adventurer/svg'} 
+                      alt={contact.name} 
+                      className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-850 shrink-0"
+                    />
+                    <div className="overflow-hidden">
+                      <div className="text-xs font-bold text-slate-200 truncate">{contact.name}</div>
+                      <div className="text-[9px] text-slate-500 font-semibold uppercase truncate">{contact.title || contact.roleName}</div>
+                    </div>
+                  </button>
+                ))
               )}
             </>
           )}

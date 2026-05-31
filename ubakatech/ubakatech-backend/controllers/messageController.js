@@ -199,11 +199,10 @@ export const createRoom = async (req, res) => {
       const existingRooms = await prisma.chatRoom.findMany({
         where: {
           isGroup: false,
-          members: {
-            every: {
-              employeeId: { in: [creatorId, targetId] }
-            }
-          }
+          AND: [
+            { members: { some: { employeeId: creatorId } } },
+            { members: { some: { employeeId: targetId } } }
+          ]
         },
         include: {
           members: {
