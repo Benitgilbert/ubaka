@@ -143,13 +143,8 @@ export const getRooms = async (req, res) => {
 
     return res.json(formattedRooms);
   } catch (err) {
-    console.error("Error in getRooms:", err);
-    return res.status(500).json({ 
-      error: 'Failed to retrieve chat rooms',
-      message: err.message,
-      stack: err.stack,
-      dbUrl: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:[^:@]+@/, ":****@") : "undefined"
-    });
+    console.error("Error in getRooms:", err.message);
+    return res.status(500).json({ error: 'Failed to retrieve chat rooms' });
   }
 };
 
@@ -356,13 +351,8 @@ export const createRoom = async (req, res) => {
       return res.status(201).json(formattedRoom);
     }
   } catch (err) {
-    console.error("Error in createRoom:", err);
-    return res.status(500).json({ 
-      error: 'Failed to create chat room',
-      message: err.message,
-      stack: err.stack,
-      dbUrl: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:[^:@]+@/, ":****@") : "undefined"
-    });
+    console.error("Error in createRoom:", err.message);
+    return res.status(500).json({ error: 'Failed to create chat room' });
   }
 };
 
