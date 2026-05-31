@@ -224,7 +224,7 @@ export const ALL_ROLES = [
 
 // Helper to seed roles and permissions into database if connected
 export const seedRolesAndPermissions = async () => {
-  const connected = await isDbConnected();
+  const connected = await isDbConnected(true);
   if (!connected) {
     console.log('⚠️ Database disconnected. Skipping DB seeding of Roles & Permissions.');
     return;
