@@ -192,7 +192,7 @@ export default function Home() {
 
       <main id="main-content">
         {/* Hero Section - Warm Humanised Design */}
-        <section className="relative overflow-hidden max-h-[340px] md:max-h-[320px]">
+        <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-charcoal-700 via-charcoal-800 to-charcoal-900 dark:from-charcoal-900 dark:via-black dark:to-charcoal-900"></div>
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1600&auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20"></div>
 
