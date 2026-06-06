@@ -5,10 +5,7 @@ const router = express.Router();
 
 router.get("/sitemap.xml", async (req, res) => {
   try {
-    let baseUrl = process.env.FRONTEND_URL || "https://www.kurimacye.co.rw";
-    if (baseUrl.endsWith("/")) {
-      baseUrl = baseUrl.slice(0, -1);
-    }
+    const baseUrl = "https://www.kurimacye.co.rw";
 
     // 1. Fetch products
     const products = await prisma.product.findMany({
