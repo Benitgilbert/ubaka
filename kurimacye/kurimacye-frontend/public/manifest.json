@@ -3,6 +3,12 @@
   "name": "Kuri Macye Premium Market",
   "icons": [
     {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
       "src": "images/logo192.png",
       "type": "image/png",
       "sizes": "192x192"
