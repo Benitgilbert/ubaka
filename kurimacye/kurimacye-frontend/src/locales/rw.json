@@ -55,7 +55,7 @@
       "title_part1": "Vumbura",
       "title_premium": "Ibicuruzwa",
       "title_part2": "Byiza cyane",
-      "description": "Ibice byatoranijwe neza n'ibiciro bidasanzwe. Shakira ibyo ukeneye byose hano.",
+      "description": "Ihahiro ryawe ryizewe rihuza abacuruzi benshi bigenga, inzobere mu gucapa, n'abagurisha. Shakira ibicuruzwa na serivisi byiza muri bumwe mu buryo bworoshye.",
       "cta_shop": "Tangira ubu",
       "cta_deals": "Reba ibigabanijwe"
     },
@@ -100,21 +100,21 @@
       "view_all": "Reba byose"
     },
     "features": {
-      "shipping": {
-        "title": "Kugezwaho ku buntu",
-        "description": "Ku bicuruzwa birengeje 50,000 Rwf"
+      "vendors": {
+        "title": "Abacuruzi Bacu Bapimwe",
+        "description": "Abacuruzi n'inzobere mu gucapa b'imbere mu gihugu"
       },
       "payment": {
-        "title": "Kwishura kwizewe",
-        "description": "100% birinzwe"
+        "title": "Mobile Money & Ikarita",
+        "description": "Kwishura birinzwe binyuze kuri MTN MoMo, Airtel & Ikarita"
       },
-      "returns": {
-        "title": "Kugarura byoroshye",
-        "description": "Muri minsi 30"
+      "ebm": {
+        "title": "Inyemezabwishyu za EBM",
+        "description": "Bona inyemezabwishyu zikomoka kuri RRA ako kanya"
       },
-      "support": {
-        "title": "Ubufasha bw'amasaha 24/7",
-        "description": "Turi hano ngo tugufashe"
+      "delivery": {
+        "title": "Kugezwaho Vuba Aho Uri",
+        "description": "Gukwirakwiza ku buryo bwizewe mu Rwanda ryose"
       }
     },
     "community": {

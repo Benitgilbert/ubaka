@@ -15,11 +15,9 @@ router.get("/", productController.getAllProducts);
 router.get("/featured/list", productController.getFeaturedProducts);
 router.get("/trending", productController.getTrendingProducts);
 router.get("/by-ids", productController.getProductsByIds);
+router.get("/seller/my-products", authMiddleware(["seller", "admin", "owner", "inventory"]), productController.getSellerProducts);
 router.get("/:id", productController.getProductById);
 router.get("/:id/related", productController.getRelatedProducts);
-
-// Seller routes
-router.get("/seller/my-products", authMiddleware(["seller", "admin", "owner", "inventory"]), productController.getSellerProducts);
 
 // Admin/Seller/Staff routes
 router.post("/", authMiddleware(["admin", "owner", "seller", "inventory"]), upload.any(), productController.createProduct);

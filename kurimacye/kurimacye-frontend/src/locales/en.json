@@ -55,7 +55,7 @@
       "title_part1": "Discover",
       "title_premium": "Premium",
       "title_part2": "Products",
-      "description": "Curated collections and exclusive deals. Find everything you need in one seamless experience.",
+      "description": "Your trusted multi-vendor marketplace connecting independent local sellers, print specialists, and merchants. Find premium products and services in one seamless experience.",
       "cta_shop": "Explore Now",
       "cta_deals": "View Deals"
     },
@@ -100,21 +100,21 @@
       "view_all": "See All"
     },
     "features": {
-      "shipping": {
-        "title": "Free Shipping",
-        "description": "On orders over 50,000 Rwf"
+      "vendors": {
+        "title": "Verified Local Vendors",
+        "description": "Independent sellers & print shops"
       },
       "payment": {
-        "title": "Secure Payment",
-        "description": "100% protected"
+        "title": "Mobile Money & Card Payments",
+        "description": "MTN MoMo, Airtel Money & Card secure checkout"
       },
-      "returns": {
-        "title": "Easy Returns",
-        "description": "30-day policy"
+      "ebm": {
+        "title": "Automated EBM Receipts",
+        "description": "RRA tax-compliant receipts instantly"
       },
-      "support": {
-        "title": "24/7 Support",
-        "description": "Always here to help"
+      "delivery": {
+        "title": "Fast Doorstep Delivery",
+        "description": "Reliable shipping across Rwanda"
       }
     },
     "community": {

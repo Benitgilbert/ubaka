@@ -18,6 +18,7 @@ export default function LandingFooter() {
     logo: '/logo.png',
     socialLinks: { facebook: '', twitter: '', instagram: '', linkedin: '' }
   });
+  const [hasPrintingServices, setHasPrintingServices] = useState(false);
 
   useEffect(() => {
     const fetchFooterSettings = async () => {
@@ -36,6 +37,19 @@ export default function LandingFooter() {
       }
     };
     fetchFooterSettings();
+  }, []);
+
+  useEffect(() => {
+    const checkPrintingServices = async () => {
+      try {
+        const res = await api.get('/products?tags=printing_service');
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          setHasPrintingServices(res.data.data.length > 0);
+        }
+      } catch (err) {
+      }
+    };
+    checkPrintingServices();
   }, []);
 
   const socialIcons = [
@@ -90,12 +104,12 @@ export default function LandingFooter() {
             <ul className="space-y-3 p-0 list-none">
               {[
                 { label: t('footer.all_products'), to: '/shop' },
-                { label: t('footer.print_portal'), to: '/print-portal' },
+                hasPrintingServices && { label: t('footer.print_portal'), to: '/print-portal' },
                 { label: t('footer.new_arrivals'), to: '/shop?category=new' },
                 { label: t('footer.best_sellers'), to: '/shop?sort=popular' },
                 { label: t('footer.deals'), to: '/daily-deals' },
                 { label: t('footer.gift_cards'), to: '/gift-cards' }
-              ].map((link, idx) => (
+              ].filter(Boolean).map((link, idx) => (
                 <li key={idx}>
                   <Link to={link.to} className="hover:text-terracotta-500 dark:hover:text-terracotta-400 transition-colors no-underline text-inherit">
                     {link.label}
@@ -114,7 +128,8 @@ export default function LandingFooter() {
                 { label: t('footer.blog'), to: '/blog' },
                 { label: t('footer.contact'), to: '/contact' },
                 { label: t('footer.faq'), to: '/faq' },
-                { label: t('footer.careers'), to: '/careers' }
+                { label: t('footer.careers'), to: '/careers' },
+                { label: "Become a Seller", to: '/register?role=seller' }
               ].map((link, idx) => (
                 <li key={idx}>
                   <Link to={link.to} className="hover:text-terracotta-500 dark:hover:text-terracotta-400 transition-colors no-underline text-inherit">

@@ -70,6 +70,7 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
     variations: parseVariations(product?.variations),
     bundleConfigurations: parseBundles(product?.bundleConfigurations),
     costPrice: product?.costPrice || "",
+    isPrintingService: product?.tags?.includes("printing_service") || false,
   });
 
   useEffect(() => {
@@ -345,6 +346,17 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
         fd.append("categories", JSON.stringify(form.selectedCategories));
       }
 
+      // Handle tags
+      let productTags = Array.isArray(product?.tags) ? [...product.tags] : [];
+      if (form.type === "service" && form.isPrintingService) {
+        if (!productTags.includes("printing_service")) {
+          productTags.push("printing_service");
+        }
+      } else {
+        productTags = productTags.filter(t => t !== "printing_service");
+      }
+      fd.append("tags", JSON.stringify(productTags));
+
       if (form.image instanceof File) {
         fd.append("image", form.image);
       }
@@ -426,6 +438,23 @@ function ProductCreateEditModal({ product, onClose, onSaved }) {
                   <option value="service">Service (Print/Edit/etc)</option>
                 </select>
               </div>
+
+              {form.type === "service" && (
+                <div className="md:col-span-1 flex items-center h-[42px] mt-6">
+                  <label className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="isPrintingService"
+                      checked={form.isPrintingService}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-indigo-600 border-gray-300 dark:border-gray-500 rounded focus:ring-indigo-500 dark:bg-gray-700 transition-all"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white">
+                      This is a Printing Service
+                    </span>
+                  </label>
+                </div>
+              )}
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categories</label>

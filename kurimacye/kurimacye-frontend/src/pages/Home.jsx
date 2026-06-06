@@ -13,6 +13,7 @@ import { useWishlist } from "../context/WishlistContext";
 import AIChatWidget from "../components/AdminChatBot"; // Using the generic Chatbot
 import FlashSaleBanner from "../components/FlashSaleBanner";
 import assetUrl from "../utils/assetUrl";
+import { supabase } from "../utils/supabaseClient";
 
 const getRating = (rating) => {
   if (!rating) return 0;
@@ -127,17 +128,19 @@ export default function Home() {
   const [newsletterStatus, setNewsletterStatus] = useState({ loading: false, message: '', type: '' });
 
   const [promoBanner, setPromoBanner] = useState(null);
+  const [hasPrintingServices, setHasPrintingServices] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [featuredRes, trendingRes, categoriesRes, bannersRes, testimonialsRes, brandPartnersRes, siteSettingsRes] = await Promise.all([
+      const [featuredRes, trendingRes, categoriesRes, bannersRes, testimonialsRes, brandPartnersRes, siteSettingsRes, printingRes] = await Promise.all([
         api.get('/products/featured/list'),
         api.get('/products/trending'),
         api.get('/categories'),
         api.get('/banners/active?position=hero'),
         api.get('/testimonials/active?limit=6'),
         api.get('/brand-partners/active'),
-        api.get('/site-settings/public')
+        api.get('/site-settings/public'),
+        api.get('/products?tags=printing_service')
       ]);
 
       const featuredData = featuredRes.data;
@@ -192,6 +195,12 @@ export default function Home() {
       if (siteSettingsData.success && siteSettingsData.data?.trustBadges) {
         setTrustBadges(siteSettingsData.data.trustBadges);
       }
+
+      // Check printing services
+      const printingData = printingRes.data;
+      if (printingData.success && Array.isArray(printingData.data)) {
+        setHasPrintingServices(printingData.data.length > 0);
+      }
     } catch (error) {
     } finally {
       setLoading(false);
@@ -209,6 +218,31 @@ export default function Home() {
     }
 
     fetchData();
+
+    // Subscribe to Product changes to update hasPrintingServices dynamically
+    const channel = supabase
+      .channel('home-product-tag-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Product'
+        },
+        async () => {
+          try {
+            const res = await api.get('/products?tags=printing_service');
+            if (res.data && res.data.success && Array.isArray(res.data.data)) {
+              setHasPrintingServices(res.data.data.length > 0);
+            }
+          } catch (err) {}
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
@@ -249,7 +283,8 @@ export default function Home() {
         </section>
 
         {/* Print Portal Promotion */}
-        <section className="py-10 bg-indigo-900/95 overflow-hidden relative">
+        {hasPrintingServices && (
+          <section className="py-10 bg-indigo-900/95 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl"></div>
           <div className="mx-auto max-w-7xl px-6 relative z-10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-10">
@@ -279,6 +314,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        )}
 
         {/* Categories Section */}
         <section className="py-16">
@@ -528,10 +564,10 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 py-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {(trustBadges.length > 0 ? trustBadges : [
-                { icon: 'truck', title: t('home.features.shipping.title'), description: t('home.features.shipping.description') },
+                { icon: 'star', title: t('home.features.vendors.title'), description: t('home.features.vendors.description') },
                 { icon: 'shield', title: t('home.features.payment.title'), description: t('home.features.payment.description') },
-                { icon: 'undo', title: t('home.features.returns.title'), description: t('home.features.returns.description') },
-                { icon: 'headset', title: t('home.features.support.title'), description: t('home.features.support.description') }
+                { icon: 'check', title: t('home.features.ebm.title'), description: t('home.features.ebm.description') },
+                { icon: 'truck', title: t('home.features.delivery.title'), description: t('home.features.delivery.description') }
               ]).map((badge, idx) => {
                 const iconMap = {
                   truck: <FaTruck className="text-2xl" />,
@@ -544,11 +580,10 @@ export default function Home() {
                   heart: <FaHeart className="text-2xl" />
                 };
                 const featureKeyMap = {
-                  truck: 'shipping',
+                  star: 'vendors',
                   shield: 'payment',
-                  undo: 'returns',
-                  headset: 'support',
-                  clock: 'support'
+                  check: 'ebm',
+                  truck: 'delivery'
                 };
                 const key = featureKeyMap[badge.icon];
 

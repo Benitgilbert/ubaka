@@ -82,7 +82,7 @@ export const getProductRecommendations = async (req, res) => {
       },
       select: {
         id: true, name: true, price: true, image: true, slug: true,
-        seller: { select: { id: true, storeName: true } }
+        seller: { select: { id: true, storeName: true, storeSlug: true, storeLogo: true } }
       }
     });
 
@@ -411,7 +411,7 @@ export const getAllProducts = async (req, res) => {
 
     let products = await prisma.product.findMany({
       where,
-      include: { seller: { select: { id: true, name: true, storeName: true } } },
+      include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } },
       orderBy,
       take: limitValue + 1,
       ...(cursor && { skip: 1, cursor: { id: cursor } })
@@ -464,7 +464,7 @@ export const getFeaturedProducts = async (req, res) => {
         visibility: "public",
         approvalStatus: "approved"
       },
-      include: { seller: { select: { id: true, name: true, storeName: true } } },
+      include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } },
       orderBy: { createdAt: 'desc' },
       take
     });
@@ -486,7 +486,7 @@ export const getProductsByIds = async (req, res) => {
         visibility: "public",
         approvalStatus: "approved"
       },
-      include: { seller: { select: { id: true, name: true, storeName: true } } }
+      include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } }
     });
 
     const enriched = await attachFlashSaleInfo(products);
@@ -534,14 +534,14 @@ export const getTrendingProducts = async (req, res) => {
     if (products.length === 0) {
       const fallback = await prisma.product.findMany({
         where: { featured: true, visibility: "public", approvalStatus: "approved" },
-        include: { seller: { select: { id: true, name: true, storeName: true } } },
+        include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } },
         take: 5
       });
       if (fallback.length > 0) return res.json(await attachFlashSaleInfo(fallback));
 
       const latest = await prisma.product.findMany({
         where: { visibility: "public", approvalStatus: "approved" },
-        include: { seller: { select: { id: true, name: true, storeName: true } } },
+        include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } },
         orderBy: { createdAt: 'desc' },
         take: 5
       });
@@ -561,7 +561,7 @@ export const getProductById = async (req, res) => {
     const product = await prisma.product.findFirst({
       where: isUuid ? { id: req.params.id } : { slug: req.params.id },
       include: {
-        seller: { select: { id: true, name: true, storeName: true, storeDescription: true, storeLogo: true, sellerStatus: true } },
+        seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeDescription: true, storeLogo: true, sellerStatus: true, storePhone: true, createdAt: true } },
         categories: true,
         variations: true
       }
@@ -730,7 +730,7 @@ export const updateProduct = async (req, res) => {
       include: {
         categories: { select: { id: true, name: true } },
         variations: true,
-        seller: { select: { id: true, name: true, storeName: true } }
+        seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } }
       }
     });
 

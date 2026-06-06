@@ -70,6 +70,68 @@ export const getAllSellers = async (req, res, next) => {
 };
 
 /**
+ * Public seller directory for the marketplace storefront.
+ */
+export const getPublicSellers = async (req, res, next) => {
+    try {
+        const { search, limit = 24 } = req.query;
+        const take = Math.min(Number(limit) || 24, 60);
+
+        const where = {
+            role: { in: ["seller", "admin", "owner"] },
+            sellerStatus: "active",
+            storeName: { not: null }
+        };
+
+        if (search) {
+            where.OR = [
+                { storeName: { contains: search, mode: "insensitive" } },
+                { storeDescription: { contains: search, mode: "insensitive" } },
+                { name: { contains: search, mode: "insensitive" } }
+            ];
+        }
+
+        const sellers = await prisma.user.findMany({
+            where,
+            select: {
+                id: true,
+                name: true,
+                storeName: true,
+                storeDescription: true,
+                storeLogo: true,
+                storeSlug: true,
+                storePhone: true,
+                createdAt: true,
+                _count: {
+                    select: {
+                        products: {
+                            where: {
+                                visibility: "public",
+                                approvalStatus: "approved"
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: { createdAt: "desc" },
+            take
+        });
+
+        const data = sellers
+            .filter((seller) => seller._count.products > 0)
+            .map((seller) => ({
+                ...seller,
+                productCount: seller._count.products,
+                _count: undefined
+            }));
+
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * 👨‍💼 Get single seller details with products and order stats (admin)
  */
 export const getSellerDetails = async (req, res, next) => {

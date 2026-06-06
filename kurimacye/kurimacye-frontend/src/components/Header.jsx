@@ -43,6 +43,7 @@ export default function Header() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hasPrintingServices, setHasPrintingServices] = useState(false);
 
   const toggleLanguage = () => {
     const currentLang = i18n.language || 'en';
@@ -85,6 +86,38 @@ export default function Header() {
         },
         () => {
           fetchCategories();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkPrintingServices = async () => {
+      try {
+        const res = await api.get('/products?tags=printing_service');
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          setHasPrintingServices(res.data.data.length > 0);
+        }
+      } catch (err) {
+      }
+    };
+    checkPrintingServices();
+
+    const channel = supabase
+      .channel('header-product-tag-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Product'
+        },
+        () => {
+          checkPrintingServices();
         }
       )
       .subscribe();
@@ -198,13 +231,18 @@ export default function Header() {
             </div>
 
             <Link to="/shop" className="px-1 xl:px-2 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">{t('nav.shop')}</Link>
-            <Link to="/print-portal" className="px-1 xl:px-2 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors whitespace-nowrap">{t('nav.print_portal')}</Link>
+            {hasPrintingServices && (
+              <Link to="/print-portal" className="px-1 xl:px-2 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors whitespace-nowrap">{t('nav.print_portal')}</Link>
+            )}
             <Link to="/daily-deals" className="px-1 xl:px-2 py-2 text-sm font-medium text-sand-400 hover:text-sand-300 transition-colors whitespace-nowrap">{t('nav.deals')}</Link>
             <Link to="/gift-cards" className="px-1 xl:px-2 py-2 text-sm font-medium text-terracotta-400 hover:text-terracotta-300 transition-colors whitespace-nowrap">{t('nav.gift_cards')}</Link>
             <Link to="/track" className="flex items-center gap-1 px-1 xl:px-2 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors whitespace-nowrap">
               <LuTruck className="w-4 h-4" /> {t('nav.track')}
             </Link>
             <Link to="/blog" className="px-1 xl:px-2 py-2 text-sm font-medium text-cream-300 hover:text-white transition-colors">{t('nav.blog')}</Link>
+            <Link to="/register?role=seller" className="px-1 xl:px-2 py-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors whitespace-nowrap">
+              Sell on Kuri Macye
+            </Link>
           </nav>
         )}
 
@@ -456,13 +494,15 @@ export default function Header() {
                 >
                   {t('nav.shop')}
                 </Link>
-                <Link
-                  to="/print-portal"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-4 rounded-xl bg-charcoal-800 text-blue-400 font-medium hover:bg-charcoal-700 flex items-center gap-2"
-                >
-                  <LuSearch className="w-4 h-4" /> {t('nav.print_portal')}
-                </Link>
+                {hasPrintingServices && (
+                  <Link
+                    to="/print-portal"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-4 rounded-xl bg-charcoal-800 text-blue-400 font-medium hover:bg-charcoal-700 flex items-center gap-2"
+                  >
+                    <LuSearch className="w-4 h-4" /> {t('nav.print_portal')}
+                  </Link>
+                )}
                 <Link
                   to="/daily-deals"
                   onClick={() => setMobileMenuOpen(false)}
@@ -490,6 +530,13 @@ export default function Header() {
                   className="p-4 rounded-xl bg-charcoal-800 text-cream-200 font-medium hover:bg-charcoal-700"
                 >
                   {t('nav.blog')}
+                </Link>
+                <Link
+                  to="/register?role=seller"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-4 rounded-xl bg-charcoal-800 text-amber-400 font-medium hover:bg-charcoal-700 flex items-center gap-2"
+                >
+                  <LuLayoutDashboard className="w-4 h-4 text-amber-400" /> Sell on Kuri Macye
                 </Link>
 
                 <div className="h-px bg-charcoal-800 my-2" />

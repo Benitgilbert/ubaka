@@ -6,13 +6,15 @@ import {
     getSellerProducts,
     deleteSeller,
     getSellerPerformanceReports,
-    getStorefront
+    getStorefront,
+    getPublicSellers
 } from "../controllers/sellerController.js";
 import { verifyAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Public routes
+router.get("/public", getPublicSellers);
 router.get("/storefront/:slug", getStorefront);
 
 // Admin routes

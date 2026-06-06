@@ -51,6 +51,13 @@ function Register() {
 
     const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("role") === "seller") {
+            setIsSeller(true);
+        }
+    }, []);
+
     // Fetch Terms & Conditions when seller mode is activated
     // Fetch Terms & Conditions when seller mode is activated
     useEffect(() => {
