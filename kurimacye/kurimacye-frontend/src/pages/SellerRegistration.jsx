@@ -263,16 +263,16 @@ export default function SellerRegistration() {
         <div className="min-h-screen bg-cream-100 dark:bg-slate-950 transition-colors duration-300">
             <Header />
 
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
-                    <div className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 p-10 text-center text-white relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 py-6">
+                <div className="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
+                    <div className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 p-6 text-center text-white relative overflow-hidden">
                         {/* Decorative background */}
                         <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
                         <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-48 h-48 bg-terracotta-400/20 rounded-full blur-2xl"></div>
 
-                        <FaStore className="text-6xl mx-auto mb-6 relative z-10 animate-pulse" />
-                        <h1 className="text-4xl font-black mb-2 relative z-10">Become a Seller</h1>
-                        <p className="text-terracotta-50 font-medium relative z-10">Register your business, upload credentials, and launch your store on Kuri Macye</p>
+                        <FaStore className="text-4xl mx-auto mb-3 relative z-10" />
+                        <h1 className="text-2xl font-black mb-1 relative z-10">Become a Seller</h1>
+                        <p className="text-terracotta-50 font-medium text-sm relative z-10">Register your business, upload credentials, and launch your store on Kuri Macye</p>
                     </div>
 
                     {error && (
@@ -281,14 +281,14 @@ export default function SellerRegistration() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="p-10 space-y-6">
+                    <form onSubmit={handleSubmit} className="p-6 space-y-4">
                         
                         {/* Accordion 1: Store Information */}
                         <div className="bg-white dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800 rounded-3xl overflow-hidden transition-all duration-300">
                             <button
                                 type="button"
                                 onClick={() => handleAccordionToggle(1)}
-                                className="w-full flex items-center justify-between px-8 py-6 text-left focus:outline-none"
+                                className="w-full flex items-center justify-between px-5 py-4 text-left focus:outline-none"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs transition-colors ${activeAccordion === 1 ? 'bg-terracotta-500 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-500'}`}>
@@ -308,7 +308,7 @@ export default function SellerRegistration() {
                             </button>
 
                             <div className={`transition-all duration-300 overflow-hidden ${activeAccordion === 1 ? 'max-h-[600px] border-t border-gray-100 dark:border-slate-800' : 'max-h-0'}`}>
-                                <div className="p-8 space-y-6 animate-fadeIn">
+                                <div className="p-5 space-y-4 animate-fadeIn">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Store Name *</label>
                                         <input
@@ -369,7 +369,7 @@ export default function SellerRegistration() {
                                 type="button"
                                 onClick={() => handleAccordionToggle(2)}
                                 disabled={isLocked(2)}
-                                className="w-full flex items-center justify-between px-8 py-6 text-left focus:outline-none"
+                                className="w-full flex items-center justify-between px-5 py-4 text-left focus:outline-none"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs transition-colors ${activeAccordion === 2 ? 'bg-terracotta-500 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-500'}`}>
@@ -393,7 +393,7 @@ export default function SellerRegistration() {
                             </button>
 
                             <div className={`transition-all duration-300 overflow-hidden ${activeAccordion === 2 && !isLocked(2) ? 'max-h-[800px] border-t border-gray-100 dark:border-slate-800' : 'max-h-0'}`}>
-                                <div className="p-8 space-y-6 animate-fadeIn">
+                                <div className="p-5 space-y-4 animate-fadeIn">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">TIN Number *</label>
@@ -516,7 +516,7 @@ export default function SellerRegistration() {
                                 type="button"
                                 onClick={() => handleAccordionToggle(3)}
                                 disabled={isLocked(3)}
-                                className="w-full flex items-center justify-between px-8 py-6 text-left focus:outline-none"
+                                className="w-full flex items-center justify-between px-5 py-4 text-left focus:outline-none"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs transition-colors ${activeAccordion === 3 ? 'bg-terracotta-500 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-500'}`}>
@@ -540,7 +540,7 @@ export default function SellerRegistration() {
                             </button>
 
                             <div className={`transition-all duration-300 overflow-hidden ${activeAccordion === 3 && !isLocked(3) ? 'max-h-[1000px] border-t border-gray-100 dark:border-slate-800' : 'max-h-0'}`}>
-                                <div className="p-8 space-y-6 animate-fadeIn">
+                                <div className="p-5 space-y-4 animate-fadeIn">
                                     <div className="flex items-center gap-3 bg-terracotta-50/50 dark:bg-terracotta-900/10 border border-terracotta-100 dark:border-terracotta-900/20 rounded-2xl p-4">
                                         <FaFileAlt className="text-terracotta-500 text-xl shrink-0" />
                                         <p className="text-xs font-bold text-terracotta-800 dark:text-terracotta-300 leading-normal">
@@ -610,7 +610,7 @@ export default function SellerRegistration() {
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="px-8 py-4 bg-emerald-600 text-white rounded-xl font-black text-base hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98] flex items-center justify-center gap-3 group"
+                                            className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-black text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98] flex items-center justify-center gap-2 group"
                                         >
                                             {loading ? (
                                                 <><FaSpinner className="animate-spin text-lg" /> Submitting...</>
