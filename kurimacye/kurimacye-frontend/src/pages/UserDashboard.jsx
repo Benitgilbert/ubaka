@@ -6,6 +6,7 @@ import { getProvinces, getDistricts, getSectors, getCells } from "../utils/locat
 import { FaBox, FaMapMarkerAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
+import SEO from "../components/SEO";
 
 
 function UserDashboard() {
@@ -178,6 +179,7 @@ function UserDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-charcoal-900 flex flex-col items-center justify-center transition-colors duration-300 font-sans">
+        <SEO title="My Dashboard" noindex={true} />
         <div className="flex flex-col items-center gap-5">
           <div className="relative flex items-center justify-center">
             <div className="w-14 h-14 rounded-full border-4 border-violet-500/20 dark:border-violet-450/10"></div>
@@ -199,6 +201,7 @@ function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-charcoal-900 transition-colors duration-300 font-sans">
+      <SEO title="My Dashboard" noindex={true} />
       <Header />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">

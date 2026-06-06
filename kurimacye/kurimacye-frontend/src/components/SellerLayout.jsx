@@ -3,12 +3,14 @@ import { Outlet } from "react-router-dom";
 import SellerSidebar from "./SellerSidebar";
 import Topbar from "./Topbar";
 import AdminChatBot from "./AdminChatBot";
+import SEO from "./SEO";
 
 function SellerLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 overflow-hidden">
+            <SEO noindex={true} />
             <SellerSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             
             <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">

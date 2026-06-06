@@ -18,6 +18,7 @@ import { useToast } from "../context/ToastContext";
 import Breadcrumbs from "../components/Breadcrumbs";
 import FlashSaleBanner from "../components/FlashSaleBanner";
 import ProductCard from "../components/ProductCard";
+import SEO from "../components/SEO";
 
 const getRating = (rating) => {
   if (!rating) return 0;
@@ -351,6 +352,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream-100 to-cream-200 dark:from-charcoal-900 dark:to-charcoal-800 transition-colors duration-300">
+      <SEO title={selectedCategory ? `${selectedCategory} | Shop` : "Shop"} description="Browse premium custom prints and goods at Kuri Macye Rwandan marketplace." />
       <Header />
 
       <main className="pb-16">

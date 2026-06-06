@@ -5,9 +5,10 @@ const router = express.Router();
 
 router.get("/sitemap.xml", async (req, res) => {
   try {
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host || 'kurimacye.co.rw';
-    const baseUrl = `${protocol}://${host}`;
+    let baseUrl = process.env.FRONTEND_URL || "https://www.kurimacye.co.rw";
+    if (baseUrl.endsWith("/")) {
+      baseUrl = baseUrl.slice(0, -1);
+    }
 
     // 1. Fetch products
     const products = await prisma.product.findMany({

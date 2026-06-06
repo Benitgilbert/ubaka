@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../utils/supabaseClient";
 import { FaEnvelope, FaLock, FaArrowRight, FaShieldAlt, FaArrowLeft, FaGoogle } from "react-icons/fa";
 import TrendingProductsSidebar from "../components/TrendingProductsSidebar";
+import SEO from "../components/SEO";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -107,6 +108,7 @@ function Login() {
 
   return (
     <div className="h-screen flex overflow-hidden bg-white dark:bg-charcoal-900 transition-colors duration-300">
+      <SEO title="Login" noindex={true} />
       {/* Left Side - Trending Products */}
       <TrendingProductsSidebar />
 

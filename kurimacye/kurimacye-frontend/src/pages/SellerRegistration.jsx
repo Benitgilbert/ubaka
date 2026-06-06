@@ -8,6 +8,7 @@ import {
 } from 'react-icons/fa';
 import Header from '../components/Header';
 import LandingFooter from '../components/LandingFooter';
+import SEO from '../components/SEO';
 
 export default function SellerRegistration() {
     const navigate = useNavigate();
@@ -219,6 +220,7 @@ export default function SellerRegistration() {
     if (success) {
         return (
             <div className="min-h-screen bg-cream-100 dark:bg-slate-950 transition-colors duration-300">
+                <SEO title="Become a Seller" description="Register your business, upload credentials, and launch your store on Kuri Macye multivendor marketplace." />
                 <Header />
                 <div className="max-w-7xl mx-auto px-4 py-16 flex justify-center">
                     <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-[2.5rem] p-12 text-center shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
@@ -261,6 +263,7 @@ export default function SellerRegistration() {
 
     return (
         <div className="min-h-screen bg-cream-100 dark:bg-slate-950 transition-colors duration-300">
+            <SEO title="Become a Seller" description="Register your business, upload credentials, and launch your store on Kuri Macye multivendor marketplace." />
             <Header />
 
             <div className="max-w-7xl mx-auto px-4 py-6">

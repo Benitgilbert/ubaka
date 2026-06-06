@@ -10,6 +10,7 @@ import LandingFooter from "../components/LandingFooter";
 import Header from "../components/Header";
 import Breadcrumbs from "../components/Breadcrumbs";
 import FlashSaleBanner from "../components/FlashSaleBanner";
+import SEO from "../components/SEO";
 import {
   FaHeart, FaShoppingCart, FaStar,
   FaTshirt, FaPlus, FaMinus
@@ -208,6 +209,7 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+      <SEO title={product?.name} description={product?.description} />
       <Header />
 
       <main className="py-4 md:py-12">

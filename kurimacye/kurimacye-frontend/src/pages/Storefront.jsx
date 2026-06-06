@@ -11,6 +11,7 @@ import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../context/ToastContext";
+import SEO from "../components/SEO";
 
 const getRating = (rating) => {
   if (!rating) return 0;
@@ -124,6 +125,7 @@ export default function Storefront() {
 
   return (
     <div className="min-h-screen bg-cream-50 dark:bg-charcoal-900 transition-colors duration-300">
+      <SEO title={storeData?.storeName || storeData?.name} description={storeData?.storeDescription} />
       <Header />
       
       {/* Store Banner */}

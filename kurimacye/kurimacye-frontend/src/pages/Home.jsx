@@ -15,6 +15,7 @@ import FlashSaleBanner from "../components/FlashSaleBanner";
 import assetUrl from "../utils/assetUrl";
 import { supabase } from "../utils/supabaseClient";
 import ProductCard from "../components/ProductCard";
+import SEO from "../components/SEO";
 
 const getRating = (rating) => {
   if (!rating) return 0;
@@ -189,6 +190,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-cream-100 dark:bg-charcoal-900 transition-colors duration-300">
+      <SEO />
       <Header />
 
       <main id="main-content">

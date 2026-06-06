@@ -7,6 +7,7 @@ import {
     FaExclamationTriangle, FaStore
 } from "react-icons/fa";
 import TrendingProductsSidebar from "../components/TrendingProductsSidebar";
+import SEO from "../components/SEO";
 
 function Register() {
     const navigate = useNavigate();
@@ -95,6 +96,7 @@ function Register() {
 
     return (
         <div className="h-screen flex overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
+            <SEO title="Register" noindex={true} />
             <TrendingProductsSidebar />
 
             <div className="flex-1 flex flex-col justify-center py-4 px-4 sm:px-6 lg:px-16 xl:px-20 bg-white dark:bg-slate-950 relative overflow-y-auto">

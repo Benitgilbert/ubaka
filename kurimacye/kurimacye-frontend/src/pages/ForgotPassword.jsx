@@ -3,6 +3,7 @@ import { supabase } from "../utils/supabaseClient";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaKey, FaArrowRight, FaArrowLeft, FaSpinner } from "react-icons/fa";
 import TrendingProductsSidebar from "../components/TrendingProductsSidebar";
+import SEO from "../components/SEO";
 
 function ForgotPassword() {
   const step = "request";
@@ -35,6 +36,7 @@ function ForgotPassword() {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+      <SEO title="Reset Password" noindex={true} />
       {/* Left Side - Trending Products Sidebar */}
       <TrendingProductsSidebar />
 
