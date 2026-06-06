@@ -385,8 +385,17 @@ export default function Home() {
             </div>
 
             {loading ? (
-              <div className="flex justify-center py-12">
-                <div className="w-8 h-8 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin"></div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="animate-pulse bg-white dark:bg-charcoal-800 rounded-2xl border border-cream-300 dark:border-charcoal-600 flex flex-col h-[280px] sm:h-[360px] overflow-hidden">
+                    <div className="aspect-square bg-cream-200 dark:bg-charcoal-700 w-full"></div>
+                    <div className="p-3 sm:p-4 flex flex-col flex-1 gap-2">
+                      <div className="h-4 bg-cream-200 dark:bg-charcoal-700 rounded w-3/4"></div>
+                      <div className="h-3 bg-cream-200 dark:bg-charcoal-700 rounded w-1/2"></div>
+                      <div className="h-4 bg-cream-200 dark:bg-charcoal-700 rounded w-1/3 mt-auto"></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
@@ -478,8 +487,17 @@ export default function Home() {
             </div>
 
             {loading ? (
-              <div className="flex justify-center py-12">
-                <div className="w-8 h-8 border-4 border-terracotta-200 border-t-terracotta-500 rounded-full animate-spin"></div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="animate-pulse bg-white dark:bg-charcoal-800 rounded-2xl border border-cream-300 dark:border-charcoal-600 flex flex-col h-[280px] sm:h-[360px] overflow-hidden">
+                    <div className="aspect-square bg-cream-200 dark:bg-charcoal-700 w-full"></div>
+                    <div className="p-3 sm:p-4 flex flex-col flex-1 gap-2">
+                      <div className="h-4 bg-cream-200 dark:bg-charcoal-700 rounded w-3/4"></div>
+                      <div className="h-3 bg-cream-200 dark:bg-charcoal-700 rounded w-1/2"></div>
+                      <div className="h-4 bg-cream-200 dark:bg-charcoal-700 rounded w-1/3 mt-auto"></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
