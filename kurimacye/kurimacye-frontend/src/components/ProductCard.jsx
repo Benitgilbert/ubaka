@@ -32,6 +32,8 @@ export default function ProductCard({ product }) {
             <img
               src={assetUrl(product.image || product.images?.[0])}
               alt={product.name}
+              width="300"
+              height="300"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -41,6 +43,7 @@ export default function ProductCard({ product }) {
         <button
           onClick={toggleWishlist}
           className="absolute top-3 right-3 w-10 h-10 bg-white/90 dark:bg-charcoal-800/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white dark:hover:bg-charcoal-700 transition text-charcoal-400 hover:text-terracotta-500"
+          aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
         >
           {isWishlisted ? <FaHeart className="text-terracotta-500" /> : <FaRegHeart />}
         </button>
@@ -76,6 +79,7 @@ export default function ProductCard({ product }) {
           <Link
             to={`/product/${product.id}`}
             className="text-terracotta-500 dark:text-terracotta-400 hover:text-terracotta-600 dark:hover:text-terracotta-300 text-[11px] sm:text-sm font-semibold mt-1 inline-block"
+            aria-label={`View details of ${product.name}`}
           >
             View →
           </Link>
