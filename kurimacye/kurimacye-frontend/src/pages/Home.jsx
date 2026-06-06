@@ -224,39 +224,7 @@ export default function Home() {
           <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-sand-400 rounded-full blur-[128px] opacity-20"></div>
         </section>
 
-        {/* Print Portal Promotion */}
-        {hasPrintingServices && (
-          <section className="py-10 bg-indigo-900/95 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl"></div>
-          <div className="mx-auto max-w-7xl px-6 relative z-10">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-              <div className="flex-1 text-center md:text-left">
-                <span className="inline-block bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 border border-blue-500/30">
-                  {t('home.print.badge')}
-                </span>
-                <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 leading-tight">
-                  {t('home.print.title_part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-emerald-300">{t('home.print.title_highlight')}</span> {t('home.print.title_part2')}
-                </h2>
-                <p className="text-blue-100 text-base mb-6 opacity-75 max-w-lg font-medium">
-                  {t('home.print.description')}
-                </p>
-                <Link to="/print-portal" className="inline-flex items-center gap-2 bg-white text-indigo-950 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:bg-blue-50 transition-all active:scale-95">
-                  {t('home.print.cta')} <FaArrowRight className="text-sm" />
-                </Link>
-              </div>
-              <div className="w-full md:w-64 aspect-video md:aspect-square bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-6 flex items-center justify-center relative group">
-                <div className="text-6xl text-white/10 group-hover:text-white/20 transition-colors">
-                  <FaPrint />
-                </div>
-                <div className="absolute -bottom-2 -right-2 bg-terracotta-500 text-white px-4 py-2 rounded-xl shadow-xl transform -rotate-3">
-                  <span className="block text-lg font-bold">{t('home.print.speed')}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-tighter opacity-80">{t('home.print.turnaround')}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        )}
+
 
         {/* Categories Section */}
         <section className="py-16">
@@ -435,6 +403,40 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Print Portal Promotion */}
+        {hasPrintingServices && (
+          <section className="py-10 bg-indigo-900/95 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl"></div>
+          <div className="mx-auto max-w-7xl px-6 relative z-10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+              <div className="flex-1 text-center md:text-left">
+                <span className="inline-block bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 border border-blue-500/30">
+                  {t('home.print.badge')}
+                </span>
+                <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 leading-tight">
+                  {t('home.print.title_part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-emerald-300">{t('home.print.title_highlight')}</span> {t('home.print.title_part2')}
+                </h2>
+                <p className="text-blue-100 text-base mb-6 opacity-75 max-w-lg font-medium">
+                  {t('home.print.description')}
+                </p>
+                <Link to="/print-portal" className="inline-flex items-center gap-2 bg-white text-indigo-950 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:bg-blue-50 transition-all active:scale-95">
+                  {t('home.print.cta')} <FaArrowRight className="text-sm" />
+                </Link>
+              </div>
+              <div className="w-full md:w-64 aspect-video md:aspect-square bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-6 flex items-center justify-center relative group">
+                <div className="text-6xl text-white/10 group-hover:text-white/20 transition-colors">
+                  <FaPrint />
+                </div>
+                <div className="absolute -bottom-2 -right-2 bg-terracotta-500 text-white px-4 py-2 rounded-xl shadow-xl transform -rotate-3">
+                  <span className="block text-lg font-bold">{t('home.print.speed')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-tighter opacity-80">{t('home.print.turnaround')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        )}
 
         {/* Trending Products */}
         <section className="py-16 bg-white dark:bg-charcoal-800 border-y border-cream-200 dark:border-charcoal-700">
