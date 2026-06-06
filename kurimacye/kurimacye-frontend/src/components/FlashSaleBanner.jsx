@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { FaArrowRight } from 'react-icons/fa';
 import api from '../utils/axiosInstance';
+
+// Custom inline SVG icons to replace react-icons/fa (reduces bundle size)
+const ArrowRightIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+  </svg>
+);
 
 const FlashSaleBanner = () => {
     const { t } = useTranslation();
@@ -85,7 +91,7 @@ const FlashSaleBanner = () => {
                         ))}
                     </div>
                     <Link to="/daily-deals" className="bg-white text-red-500 hover:bg-red-50 px-6 py-3 rounded-full font-bold transition shadow-lg flex items-center gap-2 whitespace-nowrap active:scale-95">
-                        {t('home.flash_sale.cta')} <FaArrowRight />
+                        {t('home.flash_sale.cta')} <ArrowRightIcon />
                     </Link>
                 </div>
             </div>

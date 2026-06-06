@@ -1,11 +1,52 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import {
-  FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,
-  FaEnvelope, FaPhone, FaMapMarkerAlt
-} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import api from "../utils/axiosInstance";
+
+// Custom inline SVG icons to replace react-icons/fa (reduces bundle size)
+const FacebookIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+    <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
+  </svg>
+);
+
+const TwitterIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+  </svg>
+);
+
+const InstagramIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4" aria-hidden="true">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
+  </svg>
+);
+
+const LinkedinIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+  </svg>
+);
+
+const EnvelopeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0l-7.5-4.615a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+  </svg>
+);
+
+const PhoneIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.622c0-1.272.759-2.399 1.898-2.825 1.139-.427 2.428-.016 3.197.94l1.378 1.723a3 3 0 0 1-.03 4.1l-1.05 1.05a20.084 20.084 0 0 0 7.376 7.376l1.05-1.05a3 3 0 0 1 4.1-.03l1.723 1.378c.956.765 1.367 2.058.94 3.197-.426 1.139-1.553 1.898-2.825 1.898h-.697c-7.763 0-14.078-6.314-14.078-14.078v-.697Z" />
+  </svg>
+);
+
+const MapPinIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+  </svg>
+);
 
 export default function LandingFooter() {
   const { t } = useTranslation();
@@ -53,10 +94,10 @@ export default function LandingFooter() {
   }, []);
 
   const socialIcons = [
-    { key: 'facebook', Icon: FaFacebookF, url: footerData.socialLinks.facebook },
-    { key: 'twitter', Icon: FaTwitter, url: footerData.socialLinks.twitter },
-    { key: 'instagram', Icon: FaInstagram, url: footerData.socialLinks.instagram },
-    { key: 'linkedin', Icon: FaLinkedinIn, url: footerData.socialLinks.linkedin }
+    { key: 'facebook', Icon: FacebookIcon, url: footerData.socialLinks.facebook },
+    { key: 'twitter', Icon: TwitterIcon, url: footerData.socialLinks.twitter },
+    { key: 'instagram', Icon: InstagramIcon, url: footerData.socialLinks.instagram },
+    { key: 'linkedin', Icon: LinkedinIcon, url: footerData.socialLinks.linkedin }
   ];
 
   return (
@@ -146,19 +187,19 @@ export default function LandingFooter() {
             <ul className="space-y-4 p-0 list-none">
               <li className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-cream-200 dark:bg-charcoal-700 rounded-lg flex items-center justify-center text-terracotta-500 dark:text-terracotta-400">
-                  <FaEnvelope />
+                  <EnvelopeIcon />
                 </div>
                 <span className="text-charcoal-600 dark:text-cream-300">{footerData.contactEmail}</span>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-cream-200 dark:bg-charcoal-700 rounded-lg flex items-center justify-center text-terracotta-500 dark:text-terracotta-400">
-                  <FaPhone />
+                  <PhoneIcon />
                 </div>
                 <span className="text-charcoal-600 dark:text-cream-300">{footerData.contactPhone}</span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-cream-200 dark:bg-charcoal-700 rounded-lg flex items-center justify-center text-terracotta-500 dark:text-terracotta-400 shrink-0">
-                  <FaMapMarkerAlt />
+                  <MapPinIcon />
                 </div>
                 <span className="text-charcoal-600 dark:text-cream-300">{t('footer.address')}</span>
               </li>

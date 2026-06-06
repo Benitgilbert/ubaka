@@ -1,8 +1,32 @@
 import { Link } from "react-router-dom";
-import { FaHeart, FaRegHeart, FaStar, FaStore } from "react-icons/fa";
 import { useWishlist } from "../context/WishlistContext";
 import { formatRwf } from "../utils/currency";
 import assetUrl from "../utils/assetUrl";
+
+// Custom inline SVG icons to replace react-icons/fa (reduces bundle size)
+const HeartIconSolid = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
+    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001Z" />
+  </svg>
+);
+
+const HeartIconOutline = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+  </svg>
+);
+
+const StarIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
+    <path d="M12 .587l3.668 7.431 8.2 1.191-5.934 5.784 1.4 8.168L12 18.897l-7.334 3.857 1.4-8.168L.132 9.209l8.2-1.191L12 .587z" />
+  </svg>
+);
+
+const StoreIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V21m-9-9l9-9 9 9m-16.5 0h15" />
+  </svg>
+);
 
 const getRating = (rating) => {
   if (!rating) return 0;
@@ -45,7 +69,7 @@ export default function ProductCard({ product }) {
           className="absolute top-3 right-3 w-10 h-10 bg-white/90 dark:bg-charcoal-800/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white dark:hover:bg-charcoal-700 transition text-charcoal-400 hover:text-terracotta-500"
           aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
         >
-          {isWishlisted ? <FaHeart className="text-terracotta-500" /> : <FaRegHeart />}
+          {isWishlisted ? <HeartIconSolid className="text-terracotta-500" /> : <HeartIconOutline />}
         </button>
       </div>
       <div className="p-3 sm:p-4 flex flex-col flex-1">
@@ -54,12 +78,12 @@ export default function ProductCard({ product }) {
         </Link>
         {product.seller && (
           <Link to={`/store/${product.seller.storeSlug || product.seller.id}`} className="text-[10px] sm:text-xs text-terracotta-700 hover:text-terracotta-800 dark:text-terracotta-400 font-medium mb-1.5 flex items-center gap-1 w-fit line-clamp-1 mt-auto py-1 pr-1">
-            <FaStore className="text-[10px] shrink-0"/> Sold by: {product.seller.storeName || product.seller.name}
+            <StoreIcon className="text-[10px] shrink-0"/> Sold by: {product.seller.storeName || product.seller.name}
           </Link>
         )}
         <div className="flex items-center gap-1 mb-2 mt-auto">
           {[...Array(5)].map((_, i) => (
-            <FaStar key={i} className={`${i < getRating(product.averageRating)
+            <StarIcon key={i} className={`${i < getRating(product.averageRating)
               ? "text-sand-400" : "text-charcoal-200 dark:text-charcoal-700"} text-[10px] sm:text-xs`} />
           ))}
           <span className="text-[10px] sm:text-xs text-charcoal-600 dark:text-charcoal-300 ml-1">({getRating(product.averageRating).toFixed(1)})</span>
