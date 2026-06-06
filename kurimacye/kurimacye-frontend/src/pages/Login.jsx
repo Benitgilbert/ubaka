@@ -106,12 +106,12 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-charcoal-900 transition-colors duration-300">
+    <div className="h-screen flex overflow-hidden bg-white dark:bg-charcoal-900 transition-colors duration-300">
       {/* Left Side - Trending Products */}
       <TrendingProductsSidebar />
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white dark:bg-charcoal-900 relative overflow-hidden">
+      <div className="flex-1 flex flex-col justify-center py-4 px-4 sm:px-6 lg:px-16 xl:px-20 bg-white dark:bg-charcoal-900 relative overflow-y-auto">
         {/* Decorative background elements for dark mode */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-terracotta-500/5 dark:bg-terracotta-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-sand-500/5 dark:bg-sand-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
@@ -124,8 +124,8 @@ function Login() {
         </Link>
 
         <div className="mx-auto w-full max-w-sm lg:w-96 relative z-10">
-          <div className="text-center lg:text-left mb-10">
-            <h2 className="text-4xl font-black text-charcoal-800 dark:text-white tracking-tight mb-2">
+          <div className="text-center lg:text-left mb-5">
+            <h2 className="text-2xl font-black text-charcoal-800 dark:text-white tracking-tight mb-1">
               Welcome Back
             </h2>
             <p className="text-charcoal-500 dark:text-charcoal-400 font-medium">
@@ -140,7 +140,7 @@ function Login() {
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleCredentialsSubmit}>
+          <form className="space-y-4" onSubmit={handleCredentialsSubmit}>
             <div className="space-y-2">
               <label className="text-sm font-bold text-charcoal-700 dark:text-charcoal-300 ml-1">Email address</label>
               <div className="relative group">
@@ -151,7 +151,7 @@ function Login() {
                   name="email"
                   type="email"
                   required
-                  className="block w-full pl-12 pr-4 py-4 bg-cream-100 dark:bg-charcoal-800 border border-cream-200 dark:border-charcoal-700 rounded-2xl text-charcoal-800 dark:text-white placeholder:text-charcoal-400 focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition-all shadow-inner"
+                  className="block w-full pl-12 pr-4 py-2.5 bg-cream-100 dark:bg-charcoal-800 border border-cream-200 dark:border-charcoal-700 rounded-2xl text-charcoal-800 dark:text-white placeholder:text-charcoal-400 focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition-all shadow-inner"
                   placeholder="you@example.com"
                   value={form.email}
                   onChange={handleChange}
@@ -169,7 +169,7 @@ function Login() {
                   name="password"
                   type="password"
                   required
-                  className="block w-full pl-12 pr-4 py-4 bg-cream-100 dark:bg-charcoal-800 border border-cream-200 dark:border-charcoal-700 rounded-2xl text-charcoal-800 dark:text-white placeholder:text-charcoal-400 focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition-all shadow-inner"
+                  className="block w-full pl-12 pr-4 py-2.5 bg-cream-100 dark:bg-charcoal-800 border border-cream-200 dark:border-charcoal-700 rounded-2xl text-charcoal-800 dark:text-white placeholder:text-charcoal-400 focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition-all shadow-inner"
                   placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
@@ -199,13 +199,13 @@ function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center gap-2 py-4 px-6 bg-terracotta-500 text-white rounded-2xl font-black text-lg hover:bg-terracotta-600 transition-all shadow-lg shadow-terracotta-200 dark:shadow-none active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
+                className="w-full flex justify-center items-center gap-2 py-2.5 px-6 bg-terracotta-500 text-white rounded-2xl font-black text-base hover:bg-terracotta-600 transition-all shadow-lg shadow-terracotta-200 dark:shadow-none active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
               >
                 {loading ? "Signing in..." : "Sign in"}
                 {!loading && <FaArrowRight className="group-hover:translate-x-1 transition-transform" />}
               </button>
 
-              <div className="relative my-8 text-center">
+              <div className="relative my-4 text-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-cream-200 dark:border-charcoal-700"></div>
                 </div>
@@ -217,14 +217,14 @@ function Login() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white dark:bg-charcoal-800 border border-cream-200 dark:border-charcoal-700 rounded-2xl text-charcoal-700 dark:text-charcoal-300 font-bold hover:bg-cream-100 dark:hover:bg-charcoal-700 transition-all active:scale-[0.98] shadow-sm"
+                className="w-full flex items-center justify-center gap-3 py-2.5 px-6 bg-white dark:bg-charcoal-800 border border-cream-200 dark:border-charcoal-700 rounded-2xl text-charcoal-700 dark:text-charcoal-300 font-bold hover:bg-cream-100 dark:hover:bg-charcoal-700 transition-all active:scale-[0.98] shadow-sm"
               >
                 <FaGoogle className="text-terracotta-500 text-lg" />
                 Continue with Google
               </button>
             </div>
 
-            <p className="mt-8 text-center text-sm font-medium text-charcoal-500 dark:text-charcoal-400">
+            <p className="mt-4 text-center text-sm font-medium text-charcoal-500 dark:text-charcoal-400">
 
               Don't have an account?{' '}
               <Link to="/register" className="font-black text-terracotta-500 dark:text-terracotta-400 hover:text-terracotta-400 transition-colors">

@@ -94,10 +94,10 @@ function Register() {
     };
 
     return (
-        <div className="min-h-screen flex bg-white dark:bg-slate-950 transition-colors duration-300">
+        <div className="h-screen flex overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
             <TrendingProductsSidebar />
 
-            <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white dark:bg-slate-950 relative overflow-hidden">
+            <div className="flex-1 flex flex-col justify-center py-4 px-4 sm:px-6 lg:px-16 xl:px-20 bg-white dark:bg-slate-950 relative overflow-y-auto">
                 {/* Decorative background elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
@@ -110,8 +110,8 @@ function Register() {
                 </Link>
 
                 <div className="mx-auto w-full max-w-sm lg:w-[32rem] relative z-10 transition-all duration-500">
-                    <div className="text-center lg:text-left mb-10">
-                        <h2 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+                    <div className="text-center lg:text-left mb-4">
+                        <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-1">
                             Create Account
                         </h2>
                         <p className="text-gray-500 dark:text-gray-400 font-medium">Join Kuri Macye to start shopping for amazing products.</p>
@@ -124,8 +124,8 @@ function Register() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-6 animate-fade-in-right">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-4 animate-fade-in-right">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Full Name</label>
                                 <div className="relative group">
@@ -136,7 +136,7 @@ function Register() {
                                         name="name"
                                         type="text"
                                         required
-                                        className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
+                                        className="block w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
                                         placeholder="John Doe"
                                         value={formData.name}
                                         onChange={handleChange}
@@ -154,7 +154,7 @@ function Register() {
                                         name="email"
                                         type="email"
                                         required
-                                        className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
+                                        className="block w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
                                         placeholder="you@example.com"
                                         value={formData.email}
                                         onChange={handleChange}
@@ -162,7 +162,7 @@ function Register() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Password</label>
                                     <div className="relative group">
@@ -173,7 +173,7 @@ function Register() {
                                             name="password"
                                             type="password"
                                             required
-                                            className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
+                                            className="block w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
                                             placeholder="••••••••"
                                             value={formData.password}
                                             onChange={handleChange}
@@ -191,7 +191,7 @@ function Register() {
                                             name="confirmPassword"
                                             type="password"
                                             required
-                                            className="block w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
+                                            className="block w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner"
                                             placeholder="••••••••"
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
@@ -205,7 +205,7 @@ function Register() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full sm:w-auto px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black text-lg shadow-xl shadow-violet-200 dark:shadow-none transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+                                className="w-full sm:w-auto px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black text-base shadow-xl shadow-violet-200 dark:shadow-none transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
                             >
                                 {loading ? "Creating..." : "Create Account"} 
                                 {!loading && <FaArrowRight className="group-hover:translate-x-1 transition-transform" />}
@@ -213,7 +213,7 @@ function Register() {
                         </div>
                     </form>
 
-                    <div className="mt-10">
+                    <div className="mt-4">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-200 dark:border-slate-800"></div>
@@ -223,10 +223,10 @@ function Register() {
                             </div>
                         </div>
 
-                        <div className="mt-8">
+                        <div className="mt-4">
                             <button
                                 onClick={handleGoogleLogin}
-                                className="w-full flex justify-center items-center gap-3 py-4 px-4 border-2 border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm bg-white dark:bg-slate-900 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all hover:border-gray-200 dark:hover:border-slate-700"
+                                className="w-full flex justify-center items-center gap-3 py-2.5 px-4 border-2 border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm bg-white dark:bg-slate-900 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all hover:border-gray-200 dark:hover:border-slate-700"
                             >
                                 <FaGoogle className="text-red-500 text-xl" />
                                 Continue with Google
@@ -234,7 +234,7 @@ function Register() {
                         </div>
                     </div>
                     
-                    <div className="mt-8 text-center space-y-4">
+                    <div className="mt-4 text-center space-y-3">
                         <p className="text-sm font-bold text-gray-600 dark:text-gray-400">
                             Already have an account?{" "}
                             <Link to="/login" className="font-black text-violet-600 hover:text-violet-500 transition-colors">
@@ -242,7 +242,7 @@ function Register() {
                             </Link>
                         </p>
                         
-                        <div className="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800">
+                        <div className="pt-3 mt-3 border-t border-gray-100 dark:border-slate-800">
                             <Link to="/become-seller" className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500 rounded-full text-xs font-bold hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-colors">
                                 <FaStore /> Want to sell on Kuri Macye? Become a Seller
                             </Link>
