@@ -244,7 +244,7 @@ export default function Home() {
                   <Link
                     to={`/shop?category=${encodeURIComponent(cat.name || cat.slug)}`}
                     key={cat.id || idx}
-                    className="group relative h-24 sm:h-32 rounded-2xl overflow-hidden shadow-md"
+                    className="group relative h-16 sm:h-20 rounded-xl overflow-hidden shadow-md"
                   >
                     <img src={cat.img} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className={`absolute inset-0 bg-gradient-to-t ${cat.color} opacity-60 group-hover:opacity-70 transition`}></div>
