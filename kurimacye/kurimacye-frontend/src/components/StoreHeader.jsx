@@ -6,9 +6,8 @@ export default function StoreHeader() {
   return (
     <header className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/shop" className="flex items-center gap-2 text-xl font-bold text-blue-700">
-          <img src="/logo-icon.svg" alt="Kuri Macye" className="h-8 w-auto object-contain" />
-          <span>Kuri Macye</span>
+        <Link to="/shop" className="flex items-center shrink-0">
+          <img src="/logo.svg" alt="Kuri Macye" className="h-8 w-auto object-contain" />
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link to="/shop" className="hover:text-blue-700">Shop</Link>
