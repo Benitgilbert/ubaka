@@ -1,10 +1,8 @@
 // Kuri Macye Home Page - Premium Marketplace Design
+// Kuri Macye Home Page - Premium Marketplace Design
 import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import {
-  FaArrowRight, FaHeart, FaRegHeart, FaStar, FaShieldAlt, FaTruck, FaUndo, FaHeadset, FaPrint, FaStore, FaCheckCircle
-} from "react-icons/fa";
 import { formatRwf } from "../utils/currency";
 import api from "../utils/axiosInstance";
 import LandingFooter from "../components/LandingFooter";
@@ -14,6 +12,70 @@ import assetUrl from "../utils/assetUrl";
 import { supabase } from "../utils/supabaseClient";
 import ProductCard from "../components/ProductCard";
 import SEO from "../components/SEO";
+
+// Custom SVG Icons to replace react-icons/fa (saves bundle size on the homepage)
+const ArrowRightIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+  </svg>
+);
+
+const HeartIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
+    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001Z" />
+  </svg>
+);
+
+const StarIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
+    <path d="M12 .587l3.668 7.431 8.2 1.191-5.934 5.784 1.4 8.168L12 18.897l-7.334 3.857 1.4-8.168L.132 9.209l8.2-1.191L12 .587z" />
+  </svg>
+);
+
+const ShieldIcon = ({ className, title }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
+    {title && <title>{title}</title>}
+    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 15l-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z" />
+  </svg>
+);
+
+const TruckIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM19.5 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 5.25h16.5c1.05 0 1.95.82 2.1 1.86l1.35 9.49c.15 1.04-.6 1.9-1.65 1.9H2.25M2.25 5.25v13.5M2.25 18.75h3M8.25 18.75h8.25M19.5 18.75h1.5" />
+  </svg>
+);
+
+const UndoIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+  </svg>
+);
+
+const HeadsetIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 0-14.228 0M2.25 12.013c0-1.782.721-3.395 1.886-4.56l-.001.002A8.955 8.955 0 0 1 12 4.5c2.485 0 4.735 1.009 6.365 2.64l-.001-.001.002-.002A8.953 8.953 0 0 1 20.25 12.013M2.25 12.013H4.5c.621 0 1.125.504 1.125 1.125v3.375c0 .621-.504 1.125-1.125 1.125H3.375a1.125 1.125 0 0 1-1.125-1.125V12.013Zm18 0h-2.25c-.621 0-1.125.504-1.125 1.125v3.375c0 .621.504 1.125 1.125 1.125h1.125a1.125 1.125 0 0 0 1.125-1.125V12.013Z" />
+  </svg>
+);
+
+const PrintIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.844l9.63-9.63M6 21H18M6 17h12M6 13h12M19.5 10.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 9.75h13.5A2.25 2.25 0 0121 12v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6a2.25 2.25 0 012.25-2.25z" />
+  </svg>
+);
+
+const StoreIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V21m-9-9l9-9 9 9m-16.5 0h15" />
+  </svg>
+);
+
+const CheckCircleIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
 
 // Lazy-loaded components for better performance
 const AIChatWidget = lazy(() => import("../components/AdminChatBot"));
@@ -225,7 +287,7 @@ export default function Home() {
               
               <div className="flex flex-wrap gap-2">
                 <Link to="/shop" className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 hover:from-terracotta-600 hover:to-terracotta-700 text-white px-4 py-2 rounded-full font-bold text-sm transition-all shadow-lg shadow-terracotta-500/25 hover:shadow-terracotta-500/40 flex items-center gap-2 active:scale-95">
-                  {t('home.hero.cta_shop')} <FaArrowRight className="text-xs" />
+                  {t('home.hero.cta_shop')} <ArrowRightIcon className="text-xs" />
                 </Link>
                 <Link to="/daily-deals" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-bold text-sm transition-all backdrop-blur-md border border-white/20 active:scale-95">
                   {t('home.hero.cta_deals')}
@@ -249,7 +311,7 @@ export default function Home() {
                 <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{t('home.categories.description')}</p>
               </div>
               <Link to="/shop" aria-label="View all categories" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 text-sm font-semibold flex items-center gap-1">
-                {t('home.categories.view_all')} <FaArrowRight className="text-xs" />
+                {t('home.categories.view_all')} <ArrowRightIcon className="text-xs" />
               </Link>
             </div>
 
@@ -327,7 +389,7 @@ export default function Home() {
                           </div>
                         )}
                         <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
-                          <FaShieldAlt className="text-blue-500 text-sm" title="Verified Seller" />
+                          <ShieldIcon className="text-blue-500 text-sm" title="Verified Seller" />
                         </div>
                       </div>
                       <h3 className="font-bold text-charcoal-800 dark:text-white mb-1 group-hover:text-terracotta-500 transition-colors line-clamp-1">{seller.storeName || seller.name}</h3>
@@ -430,7 +492,7 @@ export default function Home() {
                 <p className="text-charcoal-500 dark:text-charcoal-400">{t('home.featured.description')}</p>
               </div>
               <Link to="/shop?sort=featured" aria-label="View all featured products" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1">
-                {t('home.trending.view_all')} <FaArrowRight className="text-sm" />
+                {t('home.trending.view_all')} <ArrowRightIcon className="text-sm" />
               </Link>
             </div>
 
@@ -508,12 +570,12 @@ export default function Home() {
                   {t('home.print.description')}
                 </p>
                 <Link to="/print-portal" className="inline-flex items-center gap-2 bg-white text-indigo-950 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:bg-blue-50 transition-all active:scale-95">
-                  {t('home.print.cta')} <FaArrowRight className="text-sm" />
+                  {t('home.print.cta')} <ArrowRightIcon className="text-sm" />
                 </Link>
               </div>
               <div className="w-full md:w-64 aspect-video md:aspect-square bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-6 flex items-center justify-center relative group">
                 <div className="text-6xl text-white/10 group-hover:text-white/20 transition-colors">
-                  <FaPrint />
+                  <PrintIcon />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-terracotta-500 text-white px-4 py-2 rounded-xl shadow-xl transform -rotate-3">
                   <span className="block text-lg font-bold">{t('home.print.speed')}</span>
@@ -534,7 +596,7 @@ export default function Home() {
                 <p className="text-charcoal-500 dark:text-charcoal-400">{t('home.trending.description')}</p>
               </div>
               <Link to="/shop?sort=trending" aria-label="View all trending products" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1">
-                {t('home.trending.view_all')} <FaArrowRight className="text-sm" />
+                {t('home.trending.view_all')} <ArrowRightIcon className="text-sm" />
               </Link>
             </div>
 
@@ -575,7 +637,7 @@ export default function Home() {
                   <div key={testimonial.id || idx} className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 shadow-sm border border-cream-200 dark:border-charcoal-700">
                     <div className="flex items-center gap-1 mb-4">
                       {[...Array(testimonial.rating || 5)].map((_, i) => (
-                        <FaStar key={i} className="text-sand-400" />
+                        <StarIcon key={i} className="text-sand-400" />
                       ))}
                     </div>
                     <p className="text-charcoal-600 dark:text-cream-300 mb-6 leading-relaxed">"{testimonial.content || testimonial.text}"</p>
@@ -647,14 +709,14 @@ export default function Home() {
                 { icon: 'truck', title: t('home.features.delivery.title'), description: t('home.features.delivery.description') }
               ]).map((badge, idx) => {
                 const iconMap = {
-                  truck: <FaTruck className="text-2xl" />,
-                  shield: <FaShieldAlt className="text-2xl" />,
-                  undo: <FaUndo className="text-2xl" />,
-                  headset: <FaHeadset className="text-2xl" />,
-                  clock: <FaHeadset className="text-2xl" />,
-                  star: <FaStar className="text-2xl" />,
-                  check: <FaShieldAlt className="text-2xl" />,
-                  heart: <FaHeart className="text-2xl" />
+                  truck: <TruckIcon className="text-2xl" />,
+                  shield: <ShieldIcon className="text-2xl" />,
+                  undo: <UndoIcon className="text-2xl" />,
+                  headset: <HeadsetIcon className="text-2xl" />,
+                  clock: <HeadsetIcon className="text-2xl" />,
+                  star: <StarIcon className="text-2xl" />,
+                  check: <ShieldIcon className="text-2xl" />,
+                  heart: <HeartIcon className="text-2xl" />
                 };
                 const featureKeyMap = {
                   star: 'vendors',
@@ -667,7 +729,7 @@ export default function Home() {
                 return (
                   <div key={badge.id || idx} className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-terracotta-50 dark:bg-charcoal-700 rounded-xl flex items-center justify-center text-terracotta-500 dark:text-terracotta-400">
-                      {iconMap[badge.icon] || <FaShieldAlt className="text-2xl" />}
+                      {iconMap[badge.icon] || <ShieldIcon className="text-2xl" />}
                     </div>
                     <div>
                       <h4 className="font-semibold text-charcoal-800 dark:text-cream-100">
@@ -694,16 +756,16 @@ export default function Home() {
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Grow Your Business on Kuri Macye</h2>
                 <p className="text-charcoal-300 mb-6">Join thousands of verified local merchants reaching customers nationwide. Fast onboarding, secure payments, and lowest fees.</p>
                 <div className="flex items-center gap-4 text-sm text-cream-200 mb-6 justify-center md:justify-start">
-                  <span className="flex items-center gap-1"><FaCheckCircle className="text-terracotta-400"/> Daily Payouts</span>
-                  <span className="flex items-center gap-1"><FaCheckCircle className="text-terracotta-400"/> Seller Support</span>
+                  <span className="flex items-center gap-1"><CheckCircleIcon className="text-terracotta-400"/> Daily Payouts</span>
+                  <span className="flex items-center gap-1"><CheckCircleIcon className="text-terracotta-400"/> Seller Support</span>
                 </div>
                 <Link to="/become-seller" className="inline-flex items-center gap-2 bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-8 py-4 rounded-xl font-bold hover:from-terracotta-600 hover:to-terracotta-700 transition shadow-lg hover:shadow-xl hover:-translate-y-1">
-                  Start Selling Today <FaArrowRight />
+                  Start Selling Today <ArrowRightIcon />
                 </Link>
               </div>
               <div className="relative z-10 hidden lg:block">
                 <div className="w-72 h-72 rounded-full border-8 border-charcoal-700 border-dashed animate-[spin_60s_linear_infinite] flex items-center justify-center">
-                   <FaStore className="text-6xl text-charcoal-600" />
+                   <StoreIcon className="text-6xl text-charcoal-600" />
                 </div>
               </div>
             </div>

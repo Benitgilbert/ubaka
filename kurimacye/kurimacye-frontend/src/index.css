@@ -1,3 +1,21 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: local('Inter'), local('Inter Regular'), local('Inter-Regular'),
+       url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp5SR3q0.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: local('Outfit'), local('Outfit Regular'), local('Outfit-Regular'),
+       url('https://fonts.gstatic.com/s/outfit/v11/Fons3mqG543oN0p7qqS_.woff2') format('woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
