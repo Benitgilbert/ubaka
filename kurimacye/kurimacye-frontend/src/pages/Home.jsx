@@ -405,22 +405,22 @@ export default function Home() {
         </section>
 
         {/* Banner Section */}
-        <section className="py-16">
+        <section className="py-12">
           <div className="mx-auto max-w-7xl px-4">
             <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-terracotta-500 to-terracotta-600">
               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1920')] bg-cover bg-center opacity-20"></div>
-              <div className="relative px-8 md:px-16 py-16 md:py-24 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="relative px-8 md:px-12 py-10 md:py-12 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="text-center md:text-left">
-                  <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium mb-4">
+                  <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-xs font-medium mb-3">
                     {t('home.promo_banner.badge')}
                   </span>
-                  <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
                     {t('home.promo_banner.title')}
                   </h2>
-                  <p className="text-white/80 text-lg mb-6 max-w-md">
+                  <p className="text-white/80 text-base mb-6 max-w-md">
                     {t('home.promo_banner.description')}
                   </p>
-                  <Link to="/daily-deals" className="inline-block bg-white text-terracotta-600 px-8 py-3 rounded-full font-bold hover:bg-cream-100 transition">
+                  <Link to="/daily-deals" className="inline-block bg-white text-terracotta-600 px-6 py-2.5 rounded-full font-bold hover:bg-cream-100 transition shadow-lg active:scale-95">
                     {t('home.promo_banner.cta')}
                   </Link>
                 </div>
@@ -428,7 +428,7 @@ export default function Home() {
                   <img
                     src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400"
                     alt="Sale"
-                    className="w-80 h-80 object-cover rounded-2xl shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500"
+                    className="w-56 h-56 object-cover rounded-2xl shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500"
                   />
                 </div>
               </div>
