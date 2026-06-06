@@ -244,6 +244,15 @@ export default function CheckoutPage() {
     setGiftCardCode("");
   };
 
+  const groupedItems = items.reduce((acc, it) => {
+    const sellerId = it.product?.seller?.id || "kuri_macye";
+    const sellerName = it.product?.seller?.storeName || it.product?.seller?.name || "Kuri Macye Retail";
+    
+    if (!acc[sellerId]) acc[sellerId] = { name: sellerName, items: [] };
+    acc[sellerId].items.push(it);
+    return acc;
+  }, {});
+
   const grandTotal = Math.max(0, (totals.subtotal - (totals.discount || 0)) + shippingCost + taxData.totalTax - giftCardDiscount);
 
 
@@ -576,24 +585,31 @@ export default function CheckoutPage() {
                     Your Order
                   </h2>
 
-                  <div className="space-y-3 mb-6 max-h-[320px] overflow-y-auto pr-1">
-                    {items.map((item, idx) => (
-                      <div key={idx} className="flex gap-4 items-center bg-gray-50/50 dark:bg-slate-800/30 p-3 rounded-xl border border-gray-100 dark:border-slate-800/50 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-sm hover:shadow-md group">
-                        <div className="w-16 h-16 bg-white dark:bg-slate-950 rounded-lg overflow-hidden shadow-inner flex-shrink-0 flex items-center justify-center">
-                          {item.product?.image || item.image ? (
-                            <img src={assetUrl(item.product?.image || item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-slate-700 bg-gray-100 dark:bg-slate-800 text-base font-bold">IMP</div>
-                          )}
-                        </div>
-                        <div className="flex-grow min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors mb-0.5">{item.name}</p>
-                            <p className="text-xs font-bold text-gray-400 dark:text-gray-500">Qty: {item.quantity}</p>
-                          </div>
-                          <p className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap">
-                            {formatRwf(item.quantity * (item.price || item.product?.price || 0))}
-                          </p>
+                  <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-1">
+                    {Object.entries(groupedItems).map(([sellerId, group]) => (
+                      <div key={sellerId} className="space-y-2">
+                        <h3 className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">{group.name}</h3>
+                        <div className="space-y-2">
+                          {group.items.map((item, idx) => (
+                            <div key={idx} className="flex gap-4 items-center bg-gray-50/50 dark:bg-slate-800/30 p-3 rounded-xl border border-gray-100 dark:border-slate-800/50 transition-all hover:bg-white dark:hover:bg-slate-800 shadow-sm hover:shadow-md group">
+                              <div className="w-16 h-16 bg-white dark:bg-slate-950 rounded-lg overflow-hidden shadow-inner flex-shrink-0 flex items-center justify-center">
+                                {item.product?.image || item.image ? (
+                                  <img src={assetUrl(item.product?.image || item.image)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-slate-700 bg-gray-100 dark:bg-slate-800 text-base font-bold">IMP</div>
+                                )}
+                              </div>
+                              <div className="flex-grow min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors mb-0.5">{item.name}</p>
+                                  <p className="text-xs font-bold text-gray-400 dark:text-gray-500">Qty: {item.quantity}</p>
+                                </div>
+                                <p className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                                  {formatRwf(item.quantity * (item.price || item.product?.price || 0))}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}

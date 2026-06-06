@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
-  FaArrowRight, FaHeart, FaRegHeart, FaStar, FaShieldAlt, FaTruck, FaUndo, FaHeadset, FaPrint
+  FaArrowRight, FaHeart, FaRegHeart, FaStar, FaShieldAlt, FaTruck, FaUndo, FaHeadset, FaPrint, FaStore, FaCheckCircle
 } from "react-icons/fa";
 import { formatRwf } from "../utils/currency";
 import api from "../utils/axiosInstance";
@@ -62,6 +62,11 @@ const ProductCard = ({ product }) => {
         <Link to={`/product/${product.id}`}>
           <h3 className="font-semibold text-charcoal-800 dark:text-cream-100 line-clamp-2 mb-2 group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400 transition">{product.name}</h3>
         </Link>
+        {product.seller && (
+          <Link to={`/store/${product.seller.storeSlug || product.seller.id}`} className="text-[11px] text-terracotta-500 hover:text-terracotta-600 dark:text-terracotta-400 font-medium mb-2 flex items-center gap-1 w-fit">
+            <FaStore className="text-[10px]"/> Sold by: {product.seller.storeName || product.seller.name}
+          </Link>
+        )}
         <div className="flex items-center gap-1 mb-2">
           {[...Array(5)].map((_, i) => (
             <FaStar key={i} className={`${i < getRating(product.averageRating)
@@ -118,6 +123,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [trending, setTrending] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [testimonials, setTestimonials] = useState([]);
   const [brandPartners, setBrandPartners] = useState([]);
@@ -132,7 +138,7 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [featuredRes, trendingRes, categoriesRes, bannersRes, testimonialsRes, brandPartnersRes, siteSettingsRes, printingRes] = await Promise.all([
+      const [featuredRes, trendingRes, categoriesRes, bannersRes, testimonialsRes, brandPartnersRes, siteSettingsRes, printingRes, sellersRes] = await Promise.all([
         api.get('/products/featured/list'),
         api.get('/products/trending'),
         api.get('/categories'),
@@ -140,7 +146,8 @@ export default function Home() {
         api.get('/testimonials/active?limit=6'),
         api.get('/brand-partners/active'),
         api.get('/site-settings/public'),
-        api.get('/products?tags=printing_service')
+        api.get('/products?tags=printing_service'),
+        api.get('/sellers/public?limit=8')
       ]);
 
       const featuredData = featuredRes.data;
@@ -150,6 +157,11 @@ export default function Home() {
       const testimonialsData = testimonialsRes.data;
       const brandPartnersData = brandPartnersRes.data;
       const siteSettingsData = siteSettingsRes.data;
+      const sellersData = sellersRes.data;
+
+      if (sellersData && sellersData.success) {
+        setSellers(sellersData.data);
+      }
 
       if (Array.isArray(featuredData)) {
         setFeatured(featuredData.filter(item => item && item.id));
@@ -352,6 +364,41 @@ export default function Home() {
             )}
           </div>
         </section>
+
+        {/* Meet Our Verified Vendors Section */}
+        {sellers.length > 0 && (
+          <section className="py-16 bg-cream-50 dark:bg-charcoal-800/50 border-b border-cream-200 dark:border-charcoal-700">
+            <div className="mx-auto max-w-7xl px-4">
+              <div className="flex items-end justify-between mb-10">
+                <div>
+                  <h2 className="text-3xl font-bold text-charcoal-800 dark:text-white mb-2">{t('home.vendors.title', 'Meet Our Verified Vendors')}</h2>
+                  <p className="text-charcoal-500 dark:text-charcoal-400">{t('home.vendors.description', 'Shop directly from top-rated local merchants')}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {sellers.map((seller) => (
+                  <Link key={seller.id} to={`/store/${seller.storeSlug || seller.id}`} className="bg-white dark:bg-charcoal-800 rounded-2xl p-6 text-center shadow-sm hover:shadow-xl transition-all border border-cream-200 dark:border-charcoal-700 group flex flex-col h-full">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-cream-100 dark:border-charcoal-700 bg-cream-100 flex items-center justify-center text-2xl font-bold text-terracotta-500 relative shrink-0">
+                      {seller.storeLogo ? (
+                        <img src={assetUrl(seller.storeLogo)} alt={seller.storeName} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      ) : (
+                        (seller.storeName || seller.name).charAt(0).toUpperCase()
+                      )}
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
+                        <FaShieldAlt className="text-blue-500 text-sm" title="Verified Seller" />
+                      </div>
+                    </div>
+                    <h3 className="font-bold text-charcoal-800 dark:text-white mb-1 group-hover:text-terracotta-500 transition-colors line-clamp-1">{seller.storeName || seller.name}</h3>
+                    <p className="text-xs text-charcoal-500 dark:text-charcoal-400 mb-4 flex-1">{seller.productCount} Products</p>
+                    <span className="inline-block border border-terracotta-500/30 text-terracotta-600 dark:text-terracotta-400 px-4 py-1.5 rounded-full text-xs font-semibold group-hover:bg-terracotta-50 dark:group-hover:bg-charcoal-700 transition-colors">
+                      Visit Store
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Promotional Banner - Dynamic from Admin */}
         {promoBanner && (
@@ -603,6 +650,32 @@ export default function Home() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        {/* Sell on Kuri Macye CTA */}
+        <section className="py-16 bg-cream-100 dark:bg-charcoal-900">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="bg-gradient-to-r from-charcoal-800 to-charcoal-900 rounded-3xl p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta-500 rounded-full blur-[100px] opacity-20"></div>
+              <div className="relative z-10 md:max-w-xl text-center md:text-left">
+                <span className="inline-block bg-terracotta-500 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">Sell with us</span>
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Grow Your Business on Kuri Macye</h2>
+                <p className="text-charcoal-300 mb-6">Join thousands of verified local merchants reaching customers nationwide. Fast onboarding, secure payments, and lowest fees.</p>
+                <div className="flex items-center gap-4 text-sm text-cream-200 mb-6 justify-center md:justify-start">
+                  <span className="flex items-center gap-1"><FaCheckCircle className="text-terracotta-400"/> Daily Payouts</span>
+                  <span className="flex items-center gap-1"><FaCheckCircle className="text-terracotta-400"/> Seller Support</span>
+                </div>
+                <Link to="/become-seller" className="inline-flex items-center gap-2 bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-8 py-4 rounded-xl font-bold hover:from-terracotta-600 hover:to-terracotta-700 transition shadow-lg hover:shadow-xl hover:-translate-y-1">
+                  Start Selling Today <FaArrowRight />
+                </Link>
+              </div>
+              <div className="relative z-10 hidden lg:block">
+                <div className="w-72 h-72 rounded-full border-8 border-charcoal-700 border-dashed animate-[spin_60s_linear_infinite] flex items-center justify-center">
+                   <FaStore className="text-6xl text-charcoal-600" />
+                </div>
+              </div>
             </div>
           </div>
         </section>

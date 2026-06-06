@@ -129,7 +129,7 @@ export default function LandingFooter() {
                 { label: t('footer.contact'), to: '/contact' },
                 { label: t('footer.faq'), to: '/faq' },
                 { label: t('footer.careers'), to: '/careers' },
-                { label: "Become a Seller", to: '/register?role=seller' }
+                { label: "Become a Seller", to: '/become-seller' }
               ].map((link, idx) => (
                 <li key={idx}>
                   <Link to={link.to} className="hover:text-terracotta-500 dark:hover:text-terracotta-400 transition-colors no-underline text-inherit">

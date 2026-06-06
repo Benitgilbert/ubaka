@@ -1,8 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { formatRwf } from "../utils/currency";
-import { FaShoppingCart, FaTrashAlt, FaArrowRight, FaTimes } from "react-icons/fa";
+import { FaShoppingCart, FaTrashAlt, FaArrowRight, FaTimes, FaStore } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import LandingFooter from "../components/LandingFooter";
 import Header from "../components/Header";
@@ -37,6 +37,16 @@ export default function CartPage() {
     } catch (error) {
     }
   };
+
+  const groupedItems = items.reduce((acc, it, idx) => {
+    const sellerId = it.product?.seller?.id || "kuri_macye";
+    const sellerName = it.product?.seller?.storeName || it.product?.seller?.name || "Kuri Macye Retail";
+    const sellerSlug = it.product?.seller?.storeSlug || it.product?.seller?.id || null;
+
+    if (!acc[sellerId]) acc[sellerId] = { name: sellerName, slug: sellerSlug, items: [] };
+    acc[sellerId].items.push({ ...it, originalIdx: idx });
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-cream-100 dark:bg-charcoal-900 transition-colors duration-300">
@@ -103,57 +113,74 @@ export default function CartPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-cream-50 dark:divide-charcoal-700">
-                          {items.map((it, idx) => (
-                            <tr key={idx} className="group hover:bg-cream-50/50 dark:hover:bg-charcoal-700/30 transition-colors">
-                              <td className="px-6 py-5">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-16 h-16 bg-cream-50 dark:bg-charcoal-900 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-cream-200 dark:border-charcoal-700 shadow-inner">
-                                    {(it.product?.image || it.image) ? (
-                                      <img src={assetUrl(it.product?.image || it.image)} alt={it.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                      <div className="text-charcoal-300 dark:text-charcoal-700 text-xs font-bold">IMP</div>
-                                    )}
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="font-bold text-charcoal-950 dark:text-white group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400 transition-colors mb-1 truncate max-w-[240px] sm:max-w-none">{it.name}</div>
-                                    {it.customText && <div className="text-xs text-charcoal-500 dark:text-charcoal-400">Text: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.customText}</span></div>}
-                                    {it.cloudLink && <div className="text-xs text-charcoal-500 dark:text-charcoal-400 truncate max-w-[200px]">Cloud: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.cloudLink}</span></div>}
-                                    <div className="mt-3">
-                                      <label className="block text-[9px] font-bold text-charcoal-400 uppercase mb-1">{t("cart.customization_file")}</label>
-                                      <input
-                                        type="file"
-                                        accept="image/*,application/pdf"
-                                        onChange={(e) => setFile(idx, e.target.files?.[0] || null)}
-                                        className="block w-full text-[10px] text-charcoal-500 dark:text-charcoal-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-terracotta-50 dark:file:bg-terracotta-900/10 file:text-terracotta-600 dark:file:text-terracotta-400 hover:file:bg-terracotta-100 cursor-pointer"
-                                      />
+                          {Object.entries(groupedItems).map(([sellerId, group]) => (
+                            <React.Fragment key={sellerId}>
+                              <tr className="bg-cream-50 dark:bg-charcoal-750/50">
+                                <td colSpan="5" className="px-6 py-3 border-y border-cream-200 dark:border-charcoal-700">
+                                  {group.slug ? (
+                                    <Link to={`/store/${group.slug}`} className="font-bold text-charcoal-800 dark:text-white hover:text-terracotta-500 dark:hover:text-terracotta-400 flex items-center gap-2 text-sm">
+                                      <FaStore className="text-terracotta-500" /> {group.name}
+                                    </Link>
+                                  ) : (
+                                    <span className="font-bold text-charcoal-800 dark:text-white flex items-center gap-2 text-sm">
+                                      <FaStore className="text-terracotta-500" /> {group.name}
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                              {group.items.map((it) => (
+                                <tr key={it.originalIdx} className="group hover:bg-cream-50/50 dark:hover:bg-charcoal-700/30 transition-colors">
+                                  <td className="px-6 py-5">
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-16 h-16 bg-cream-50 dark:bg-charcoal-900 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-cream-200 dark:border-charcoal-700 shadow-inner">
+                                        {(it.product?.image || it.image) ? (
+                                          <img src={assetUrl(it.product?.image || it.image)} alt={it.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                          <div className="text-charcoal-300 dark:text-charcoal-700 text-xs font-bold">IMP</div>
+                                        )}
+                                      </div>
+                                      <div className="min-w-0 flex-1">
+                                        <div className="font-bold text-charcoal-950 dark:text-white group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400 transition-colors mb-1 truncate max-w-[240px] sm:max-w-none">{it.name}</div>
+                                        {it.customText && <div className="text-xs text-charcoal-500 dark:text-charcoal-400">Text: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.customText}</span></div>}
+                                        {it.cloudLink && <div className="text-xs text-charcoal-500 dark:text-charcoal-400 truncate max-w-[200px]">Cloud: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.cloudLink}</span></div>}
+                                        <div className="mt-3">
+                                          <label className="block text-[9px] font-bold text-charcoal-400 uppercase mb-1">{t("cart.customization_file")}</label>
+                                          <input
+                                            type="file"
+                                            accept="image/*,application/pdf"
+                                            onChange={(e) => setFile(it.originalIdx, e.target.files?.[0] || null)}
+                                            className="block w-full text-[10px] text-charcoal-500 dark:text-charcoal-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-terracotta-50 dark:file:bg-terracotta-900/10 file:text-terracotta-600 dark:file:text-terracotta-400 hover:file:bg-terracotta-100 cursor-pointer"
+                                          />
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-5 text-sm font-semibold text-charcoal-700 dark:text-charcoal-300 hidden sm:table-cell">
-                                {formatRwf(it.price)}
-                              </td>
-                              <td className="px-6 py-5 text-center">
-                                <input
-                                  type="number"
-                                  min={1}
-                                  value={it.quantity}
-                                  onChange={(e) => updateQty(idx, parseInt(e.target.value || "1"))}
-                                  className="w-14 px-2 py-1.5 bg-cream-50 dark:bg-charcoal-700 border border-cream-200 dark:border-charcoal-600 rounded-lg text-xs text-center font-bold text-charcoal-900 dark:text-white focus:ring-2 focus:ring-terracotta-500 outline-none"
-                                />
-                              </td>
-                              <td className="px-6 py-5 text-right text-sm font-bold text-terracotta-500 dark:text-terracotta-400">
-                                {formatRwf(it.subtotal)}
-                              </td>
-                              <td className="px-6 py-5 text-right">
-                                <button
-                                  onClick={() => removeItem(idx)}
-                                  className="p-2 text-charcoal-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-full transition-all active:scale-90 duration-150"
-                                >
-                                  <FaTrashAlt className="text-sm" />
-                                </button>
-                              </td>
-                            </tr>
+                                  </td>
+                                  <td className="px-6 py-5 text-sm font-semibold text-charcoal-700 dark:text-charcoal-300 hidden sm:table-cell">
+                                    {formatRwf(it.price)}
+                                  </td>
+                                  <td className="px-6 py-5 text-center">
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      value={it.quantity}
+                                      onChange={(e) => updateQty(it.originalIdx, parseInt(e.target.value || "1"))}
+                                      className="w-14 px-2 py-1.5 bg-cream-50 dark:bg-charcoal-700 border border-cream-200 dark:border-charcoal-600 rounded-lg text-xs text-center font-bold text-charcoal-900 dark:text-white focus:ring-2 focus:ring-terracotta-500 outline-none"
+                                    />
+                                  </td>
+                                  <td className="px-6 py-5 text-right text-sm font-bold text-terracotta-500 dark:text-terracotta-400">
+                                    {formatRwf(it.subtotal)}
+                                  </td>
+                                  <td className="px-6 py-5 text-right">
+                                    <button
+                                      onClick={() => removeItem(it.originalIdx)}
+                                      className="p-2 text-charcoal-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-full transition-all active:scale-90 duration-150"
+                                    >
+                                      <FaTrashAlt className="text-sm" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </React.Fragment>
                           ))}
                         </tbody>
                       </table>
@@ -161,58 +188,73 @@ export default function CartPage() {
                   </div>
 
                   {/* Mobile View card layout */}
-                  <div className="block md:hidden space-y-4">
-                    {items.map((it, idx) => (
-                      <div key={idx} className="bg-white dark:bg-charcoal-800 rounded-2xl p-4 border border-cream-200 dark:border-charcoal-700/80 shadow-sm relative space-y-4">
-                        <button
-                          onClick={() => removeItem(idx)}
-                          className="absolute top-4 right-4 p-2 text-charcoal-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-full transition-all active:scale-90 duration-150"
-                        >
-                          <FaTrashAlt className="text-sm" />
-                        </button>
-
-                        <div className="flex gap-4">
-                          <div className="w-16 h-16 bg-cream-50 dark:bg-charcoal-900 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-cream-200 dark:border-charcoal-700">
-                            {(it.product?.image || it.image) ? (
-                              <img src={assetUrl(it.product?.image || it.image)} alt={it.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="text-charcoal-300 dark:text-charcoal-700 text-xs font-bold">IMP</div>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1 pr-6">
-                            <h3 className="font-bold text-sm text-charcoal-900 dark:text-white truncate">{it.name}</h3>
-                            <p className="text-xs font-bold text-terracotta-500 dark:text-terracotta-400 mt-1">{formatRwf(it.price)}</p>
-                            {it.customText && <div className="text-[11px] text-charcoal-500 dark:text-charcoal-400 mt-1">Text: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.customText}</span></div>}
-                            {it.cloudLink && <div className="text-[11px] text-charcoal-500 dark:text-charcoal-400 truncate mt-0.5">Cloud: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.cloudLink}</span></div>}
-                          </div>
+                  <div className="block md:hidden space-y-6">
+                    {Object.entries(groupedItems).map(([sellerId, group]) => (
+                      <div key={sellerId} className="space-y-4">
+                        <div className="px-2">
+                          {group.slug ? (
+                            <Link to={`/store/${group.slug}`} className="font-bold text-charcoal-800 dark:text-white hover:text-terracotta-500 dark:hover:text-terracotta-400 flex items-center gap-2 text-sm">
+                              <FaStore className="text-terracotta-500" /> {group.name}
+                            </Link>
+                          ) : (
+                            <span className="font-bold text-charcoal-800 dark:text-white flex items-center gap-2 text-sm">
+                              <FaStore className="text-terracotta-500" /> {group.name}
+                            </span>
+                          )}
                         </div>
+                        {group.items.map((it) => (
+                          <div key={it.originalIdx} className="bg-white dark:bg-charcoal-800 rounded-2xl p-4 border border-cream-200 dark:border-charcoal-700/80 shadow-sm relative space-y-4">
+                            <button
+                              onClick={() => removeItem(it.originalIdx)}
+                              className="absolute top-4 right-4 p-2 text-charcoal-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-full transition-all active:scale-90 duration-150"
+                            >
+                              <FaTrashAlt className="text-sm" />
+                            </button>
 
-                        <div className="pt-3 border-t border-cream-100 dark:border-charcoal-750 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-charcoal-400">Qty:</span>
-                            <input
-                              type="number"
-                              min={1}
-                              value={it.quantity}
-                              onChange={(e) => updateQty(idx, parseInt(e.target.value || "1"))}
-                              className="w-14 px-2 py-1 bg-cream-50 dark:bg-charcoal-700 border border-cream-200 dark:border-charcoal-600 rounded-lg text-xs text-center font-bold text-charcoal-900 dark:text-white focus:ring-2 focus:ring-terracotta-500 outline-none"
-                            />
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[10px] text-charcoal-400 block font-medium">Subtotal</span>
-                            <span className="text-sm font-bold text-terracotta-500 dark:text-terracotta-400">{formatRwf(it.subtotal)}</span>
-                          </div>
-                        </div>
+                            <div className="flex gap-4">
+                              <div className="w-16 h-16 bg-cream-50 dark:bg-charcoal-900 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-cream-200 dark:border-charcoal-700">
+                                {(it.product?.image || it.image) ? (
+                                  <img src={assetUrl(it.product?.image || it.image)} alt={it.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="text-charcoal-300 dark:text-charcoal-700 text-xs font-bold">IMP</div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1 pr-6">
+                                <h3 className="font-bold text-sm text-charcoal-900 dark:text-white truncate">{it.name}</h3>
+                                <p className="text-xs font-bold text-terracotta-500 dark:text-terracotta-400 mt-1">{formatRwf(it.price)}</p>
+                                {it.customText && <div className="text-[11px] text-charcoal-500 dark:text-charcoal-400 mt-1">Text: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.customText}</span></div>}
+                                {it.cloudLink && <div className="text-[11px] text-charcoal-500 dark:text-charcoal-400 truncate mt-0.5">Cloud: <span className="text-terracotta-600 dark:text-terracotta-400 font-medium">{it.cloudLink}</span></div>}
+                              </div>
+                            </div>
 
-                        <div className="pt-2">
-                          <label className="block text-[9px] font-bold text-charcoal-400 dark:text-charcoal-500 uppercase mb-1">{t("cart.customization_file")}</label>
-                          <input
-                            type="file"
-                            accept="image/*,application/pdf"
-                            onChange={(e) => setFile(idx, e.target.files?.[0] || null)}
-                            className="block w-full text-[10px] text-charcoal-500 dark:text-charcoal-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-terracotta-50 dark:file:bg-terracotta-900/10 file:text-terracotta-600 dark:file:text-terracotta-400 hover:file:bg-terracotta-100 cursor-pointer"
-                          />
-                        </div>
+                            <div className="pt-3 border-t border-cream-100 dark:border-charcoal-750 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-charcoal-400">Qty:</span>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  value={it.quantity}
+                                  onChange={(e) => updateQty(it.originalIdx, parseInt(e.target.value || "1"))}
+                                  className="w-14 px-2 py-1 bg-cream-50 dark:bg-charcoal-700 border border-cream-200 dark:border-charcoal-600 rounded-lg text-xs text-center font-bold text-charcoal-900 dark:text-white focus:ring-2 focus:ring-terracotta-500 outline-none"
+                                />
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[10px] text-charcoal-400 block font-medium">Subtotal</span>
+                                <span className="text-sm font-bold text-terracotta-500 dark:text-terracotta-400">{formatRwf(it.subtotal)}</span>
+                              </div>
+                            </div>
+
+                            <div className="pt-2">
+                              <label className="block text-[9px] font-bold text-charcoal-400 dark:text-charcoal-500 uppercase mb-1">{t("cart.customization_file")}</label>
+                              <input
+                                type="file"
+                                accept="image/*,application/pdf"
+                                onChange={(e) => setFile(it.originalIdx, e.target.files?.[0] || null)}
+                                className="block w-full text-[10px] text-charcoal-500 dark:text-charcoal-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[9px] file:font-semibold file:bg-terracotta-50 dark:file:bg-terracotta-900/10 file:text-terracotta-600 dark:file:text-terracotta-400 hover:file:bg-terracotta-100 cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>

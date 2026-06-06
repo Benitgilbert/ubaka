@@ -321,7 +321,7 @@ export const getSellerProducts = async (req, res) => {
     const products = await prisma.product.findMany({
       where: { sellerId: effectiveSellerId },
       include: { 
-        seller: { select: { id: true, name: true, storeName: true } },
+        seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } },
         categories: { select: { id: true, name: true } },
         variations: true
       },
@@ -528,7 +528,7 @@ export const getTrendingProducts = async (req, res) => {
         visibility: "public",
         approvalStatus: "approved"
       },
-      include: { seller: { select: { id: true, name: true, storeName: true } } }
+      include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } }
     });
 
     if (products.length === 0) {
@@ -788,7 +788,7 @@ export const getRelatedProducts = async (req, res) => {
         ]
       },
       take: 4,
-      include: { seller: { select: { id: true, name: true, storeName: true } } }
+      include: { seller: { select: { id: true, name: true, storeName: true, storeSlug: true, storeLogo: true } } }
     });
 
     res.json(related);

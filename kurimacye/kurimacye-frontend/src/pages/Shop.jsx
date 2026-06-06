@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  FaSearch, FaHeart, FaShoppingCart, FaStar, FaTshirt, FaRegHeart, FaFilter, FaTimes
+  FaSearch, FaHeart, FaShoppingCart, FaStar, FaTshirt, FaRegHeart, FaFilter, FaTimes, FaStore
 } from "react-icons/fa";
 import { LuSlidersHorizontal, LuSparkles, LuTrendingUp, LuPackage } from "react-icons/lu";
 
@@ -566,6 +566,11 @@ export default function Shop() {
                             {p.name}
                           </h3>
                         </Link>
+                        {p.seller && (
+                          <Link to={`/store/${p.seller.storeSlug || p.seller.id}`} className="text-[11px] md:text-xs text-terracotta-500 hover:text-terracotta-600 dark:text-terracotta-400 font-medium mb-1 md:mb-2 flex items-center gap-1 w-fit">
+                            <FaStore className="text-[10px]"/> Sold by: {p.seller.storeName || p.seller.name}
+                          </Link>
+                        )}
                         <p className="text-charcoal-500 dark:text-charcoal-400 text-[10px] md:text-sm mb-2 md:mb-4 line-clamp-2 leading-relaxed flex-1">
                           {p.description || t('home.hero.description')}
                         </p>

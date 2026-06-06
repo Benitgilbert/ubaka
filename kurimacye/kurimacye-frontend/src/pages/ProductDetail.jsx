@@ -268,7 +268,7 @@ export default function ProductDetail() {
                   {product.seller && (
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-gray-500 dark:text-gray-400">Sold by:</span>
-                      <Link to={`/shop?seller=${product.seller.id}`} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline">
+                      <Link to={`/store/${product.seller.storeSlug || product.seller.id}`} className="font-semibold text-violet-600 dark:text-violet-400 hover:underline">
                         {product.seller.storeName || product.seller.name}
                       </Link>
                     </div>
