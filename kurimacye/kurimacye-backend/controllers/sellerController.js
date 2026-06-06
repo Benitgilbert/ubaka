@@ -112,20 +112,43 @@ export const getPublicSellers = async (req, res, next) => {
                         }
                     }
                 }
-            },
-            orderBy: { createdAt: "desc" },
-            take
+            }
         });
 
-        const data = sellers
-            .filter((seller) => seller._count.products > 0)
-            .map((seller) => ({
-                ...seller,
-                productCount: seller._count.products,
-                _count: undefined
-            }));
+        // Fetch sales volume for these sellers
+        const sellerIds = sellers.map(s => s.id);
+        const salesAgg = await prisma.orderItem.groupBy({
+            by: ['sellerId'],
+            where: { sellerId: { in: sellerIds } },
+            _sum: { quantity: true }
+        });
 
-        res.json({ success: true, data });
+        const salesMap = {};
+        salesAgg.forEach(s => {
+            salesMap[s.sellerId] = s._sum.quantity || 0;
+        });
+
+        // Filter valid sellers (must have >0 products)
+        let validSellers = sellers.filter((seller) => seller._count.products > 0);
+
+        // Sort by sales (descending), then fallback to newest createdAt
+        validSellers.sort((a, b) => {
+            const salesA = salesMap[a.id] || 0;
+            const salesB = salesMap[b.id] || 0;
+            if (salesA !== salesB) {
+                return salesB - salesA;
+            }
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        // Apply limit
+        const paginatedSellers = validSellers.slice(0, take).map((seller) => ({
+            ...seller,
+            productCount: seller._count.products,
+            _count: undefined
+        }));
+
+        res.json({ success: true, data: paginatedSellers });
     } catch (error) {
         next(error);
     }
