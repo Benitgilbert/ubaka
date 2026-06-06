@@ -17,6 +17,7 @@ import { useWishlist } from "../context/WishlistContext";
 import { useToast } from "../context/ToastContext";
 import Breadcrumbs from "../components/Breadcrumbs";
 import FlashSaleBanner from "../components/FlashSaleBanner";
+import ProductCard from "../components/ProductCard";
 
 const getRating = (rating) => {
   if (!rating) return 0;
@@ -423,7 +424,7 @@ export default function Shop() {
               {/* Sort Bar */}
               <div className="bg-white dark:bg-charcoal-800 rounded-2xl shadow-xl border border-cream-200 dark:border-charcoal-700 p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                  {hasActiveFilters && (
+                  {hasActiveFilters ? (
                     <>
                       {selectedCategory && (
                         <span className="inline-flex items-center gap-2 bg-terracotta-100 dark:bg-terracotta-900/30 text-terracotta-700 dark:text-terracotta-400 px-3 py-1.5 rounded-full text-sm font-medium">
@@ -455,6 +456,10 @@ export default function Shop() {
                         </span>
                       )}
                     </>
+                  ) : (
+                    <span className="text-sm font-bold text-charcoal-500 dark:text-charcoal-400">
+                      Showing {products.length} products
+                    </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
@@ -500,100 +505,7 @@ export default function Shop() {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
                   {products.map((p) => (
-                    <div
-                      key={p.id}
-                      className="group bg-white dark:bg-charcoal-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-cream-200 dark:border-charcoal-700 flex flex-col"
-                    >
-                      {/* Image Container */}
-                      <div className="relative aspect-square bg-cream-100 dark:bg-charcoal-700 overflow-hidden">
-                        <Link to={`/product/${p.id}`} className="block h-full">
-                          {(p.image || p.images?.[0]) ? (
-                            <img
-                              src={assetUrl(p.image || p.images?.[0])}
-                              alt={p.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-terracotta-100 to-terracotta-200 dark:from-charcoal-700 dark:to-charcoal-600">
-                              <FaTshirt className="text-5xl text-terracotta-300 dark:text-terracotta-600" />
-                            </div>
-                          )}
-                        </Link>
-
-                        {/* Wishlist Button */}
-                        <WishlistButton product={p} />
-
-                        {/* Price Badge */}
-                        <div className="absolute top-4 left-4 flex flex-col gap-1 items-start z-10">
-                          {p.flashSaleInfo ? (
-                            <>
-                              <div className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg">
-                                {formatRwf(p.flashSaleInfo.flashSalePrice)}
-                              </div>
-                              <div className="bg-white/90 backdrop-blur-sm text-charcoal-400 px-2 py-0.5 rounded-full text-[10px] font-bold line-through shadow-sm">
-                                {formatRwf(p.price)}
-                              </div>
-                              <div className="bg-amber-400 text-charcoal-900 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm">
-                                FLASH SALE
-                              </div>
-                            </>
-                          ) : (
-                            <div className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg">
-                              {formatRwf(p.price)}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Quick Add Overlay */}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <button
-                            onClick={(e) => { e.preventDefault(); handleAddToCart(p); }}
-                            className="bg-white text-charcoal-800 px-6 py-3 rounded-full font-bold shadow-xl flex items-center gap-2 transform scale-90 group-hover:scale-100 transition-transform duration-300 hover:bg-terracotta-500 hover:text-white"
-                          >
-                            {p.customizable ? (
-                              <>✨ {t('home.hero.cta_shop')}</>
-                            ) : (
-                              <><FaShoppingCart /> {t('shop.add_to_cart')}</>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="p-3 md:p-5 flex flex-col flex-1">
-                        <Link to={`/product/${p.id}`}>
-                          <h3 className="font-bold text-charcoal-800 dark:text-white mb-1 md:mb-2 line-clamp-1 group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400 transition-colors text-sm md:text-base">
-                            {p.name}
-                          </h3>
-                        </Link>
-                        {p.seller && (
-                          <Link to={`/store/${p.seller.storeSlug || p.seller.id}`} className="text-[11px] md:text-xs text-terracotta-500 hover:text-terracotta-600 dark:text-terracotta-400 font-medium mb-1 md:mb-2 flex items-center gap-1 w-fit">
-                            <FaStore className="text-[10px]"/> Sold by: {p.seller.storeName || p.seller.name}
-                          </Link>
-                        )}
-                        <p className="text-charcoal-500 dark:text-charcoal-400 text-[10px] md:text-sm mb-2 md:mb-4 line-clamp-2 leading-relaxed flex-1">
-                          {p.description || t('home.hero.description')}
-                        </p>
-
-                        {/* Rating & Action */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <div className="flex text-sand-400 text-[10px] md:text-sm">
-                              {[...Array(5)].map((_, i) => (
-                                <FaStar key={i} className={i < getRating(p.averageRating) ? "text-sand-400" : "text-charcoal-200 dark:text-charcoal-700"} />
-                              ))}
-                            </div>
-                            <span className="text-[10px] text-charcoal-400 ml-1">({getRating(p.averageRating).toFixed(1)})</span>
-                          </div>
-                          <Link
-                            to={`/product/${p.id}`}
-                            className="text-terracotta-500 dark:text-terracotta-400 text-sm font-bold hover:underline"
-                          >
-                            {t('home.categories.view_all')} →
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
+                    <ProductCard key={p.id} product={p} />
                   ))}
                 </div>
               )}

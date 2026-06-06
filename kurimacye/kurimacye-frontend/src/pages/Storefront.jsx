@@ -4,6 +4,7 @@ import { FaPhone, FaBox, FaCalendarAlt, FaCheckCircle, FaStar, FaHeart, FaRegHea
 import api from "../utils/axiosInstance";
 import Header from "../components/Header";
 import LandingFooter from "../components/LandingFooter";
+import ProductCard from "../components/ProductCard";
 import { formatRwf } from "../utils/currency";
 import assetUrl from "../utils/assetUrl";
 import { useCart } from "../context/CartContext";
@@ -186,56 +187,7 @@ export default function Storefront() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
             {products.map(p => (
-              <div
-                key={p.id}
-                className="group bg-white dark:bg-charcoal-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-cream-200 dark:border-charcoal-700 flex flex-col"
-              >
-                <div className="relative aspect-square bg-cream-100 dark:bg-charcoal-700 overflow-hidden">
-                  <Link to={`/product/${p.id}`} className="block h-full">
-                    {(p.image || p.images?.[0]) ? (
-                      <img
-                        src={assetUrl(p.image || p.images?.[0])}
-                        alt={p.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-terracotta-100 to-terracotta-200 dark:from-charcoal-700 dark:to-charcoal-600">
-                        <FaBox className="text-5xl text-terracotta-300 dark:text-terracotta-600" />
-                      </div>
-                    )}
-                  </Link>
-
-                  <WishlistButton product={p} />
-
-                  <div className="absolute top-3 left-3 flex flex-col gap-1 items-start z-10">
-                    <div className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg">
-                      {formatRwf(p.price)}
-                    </div>
-                  </div>
-
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button
-                      onClick={(e) => { e.preventDefault(); handleAddToCart(p); }}
-                      className="bg-white text-charcoal-800 px-5 py-2.5 rounded-full font-bold shadow-xl flex items-center gap-2 transform scale-90 group-hover:scale-100 transition-transform duration-300 hover:bg-terracotta-500 hover:text-white text-sm"
-                    >
-                      {p.customizable ? "Shop" : <><FaShoppingCart /> Add</>}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-4 flex flex-col flex-1">
-                  <Link to={`/product/${p.id}`}>
-                    <h3 className="font-bold text-charcoal-800 dark:text-white mb-1 line-clamp-1 group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400 transition-colors text-sm">
-                      {p.name}
-                    </h3>
-                  </Link>
-                  <div className="flex items-center gap-1 mt-auto">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className={i < getRating(p.averageRating) ? "text-sand-400 text-[10px]" : "text-charcoal-200 dark:text-charcoal-700 text-[10px]"} />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         )}
