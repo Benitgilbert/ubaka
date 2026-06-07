@@ -1,4 +1,4 @@
-import prisma, { isDbConnected } from '../config/db.js';
+import prisma, { isDbConnected, queryWithTimeout } from '../config/db.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -130,6 +130,24 @@ const requireHR = (req, res) => {
 
 const isHRAdmin = (req) => (req.user.permissions || []).includes('manage_hr');
 
+// WebSocket socket.io reference for real-time updates
+let ioInstance = null;
+
+export const setHrIoInstance = (io) => {
+  ioInstance = io;
+};
+
+export const broadcastHrStatsUpdate = async () => {
+  if (!ioInstance) return;
+  try {
+    const stats = await fetchHrStatsData();
+    ioInstance.emit('hr_stats_updated', stats);
+  } catch (err) {
+    console.error('[HRController] WebSocket broadcast stats update failed:', err.message);
+  }
+};
+
+
 // ─── ONBOARDING ──────────────────────────────────────────────────────────────
 
 export const getOnboarding = async (req, res) => {
@@ -189,6 +207,7 @@ export const addOnboardingTask = async (req, res) => {
       const created = await prisma.onboardingChecklist.create({
         data: { employeeId, task, category: category || 'General', dueDate: dueDate ? new Date(dueDate) : null }
       });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, task: created });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to add onboarding task.' });
@@ -197,6 +216,7 @@ export const addOnboardingTask = async (req, res) => {
 
   const newTask = { id: `onb-${Date.now()}`, employeeId, task, category: category || 'General', isComplete: false, dueDate: dueDate || null, completedAt: null, createdAt: new Date().toISOString() };
   MOCK_ONBOARDING.push(newTask);
+  broadcastHrStatsUpdate();
   return res.json({ success: true, task: newTask });
 };
 
@@ -212,6 +232,7 @@ export const updateOnboardingTask = async (req, res) => {
         where: { id: taskId },
         data: { isComplete: !!isComplete, completedAt: isComplete ? new Date() : null }
       });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, task: updated });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to update onboarding task.' });
@@ -221,6 +242,7 @@ export const updateOnboardingTask = async (req, res) => {
   const idx = MOCK_ONBOARDING.findIndex(t => t.id === taskId);
   if (idx === -1) return res.status(404).json({ error: 'Task not found.' });
   MOCK_ONBOARDING[idx] = { ...MOCK_ONBOARDING[idx], isComplete: !!isComplete, completedAt: isComplete ? new Date().toISOString() : null };
+  broadcastHrStatsUpdate();
   return res.json({ success: true, task: MOCK_ONBOARDING[idx] });
 };
 
@@ -232,6 +254,7 @@ export const deleteOnboardingTask = async (req, res) => {
   if (dbActive) {
     try {
       await prisma.onboardingChecklist.delete({ where: { id: taskId } });
+      broadcastHrStatsUpdate();
       return res.json({ success: true });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to delete onboarding task.' });
@@ -239,6 +262,7 @@ export const deleteOnboardingTask = async (req, res) => {
   }
 
   MOCK_ONBOARDING = MOCK_ONBOARDING.filter(t => t.id !== taskId);
+  broadcastHrStatsUpdate();
   return res.json({ success: true });
 };
 
@@ -293,6 +317,7 @@ export const createApproval = async (req, res) => {
         include: { employee: { select: { id: true, name: true, avatar: true } } }
       });
       if (req.io) req.io.emit('approval_updated', { action: 'created', approval: created });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, approval: created });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to create approval request.' });
@@ -308,6 +333,7 @@ export const createApproval = async (req, res) => {
   };
   MOCK_APPROVALS.push(newApproval);
   if (req.io) req.io.emit('approval_updated', { action: 'created', approval: newApproval });
+  broadcastHrStatsUpdate();
   return res.json({ success: true, approval: newApproval });
 };
 
@@ -329,6 +355,7 @@ export const reviewApproval = async (req, res) => {
         }
       });
       if (req.io) req.io.emit('approval_updated', { action: 'reviewed', approval: updated });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, approval: updated });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to review approval request.' });
@@ -339,6 +366,7 @@ export const reviewApproval = async (req, res) => {
   if (idx === -1) return res.status(404).json({ error: 'Approval request not found.' });
   MOCK_APPROVALS[idx] = { ...MOCK_APPROVALS[idx], status, reviewNote: reviewNote || null, reviewerId: req.user.id, reviewerName: req.user.name, updatedAt: new Date().toISOString() };
   if (req.io) req.io.emit('approval_updated', { action: 'reviewed', approval: MOCK_APPROVALS[idx] });
+  broadcastHrStatsUpdate();
   return res.json({ success: true, approval: MOCK_APPROVALS[idx] });
 };
 
@@ -378,6 +406,7 @@ export const createHardware = async (req, res) => {
           notes: notes || null
         }
       });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, asset });
     } catch (err) {
       if (err.code === 'P2002') return res.status(400).json({ error: 'Serial number already exists.' });
@@ -392,6 +421,7 @@ export const createHardware = async (req, res) => {
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
   };
   MOCK_HARDWARE.push(newAsset);
+  broadcastHrStatsUpdate();
   return res.json({ success: true, asset: newAsset });
 };
 
@@ -417,6 +447,7 @@ export const updateHardware = async (req, res) => {
         data,
         include: { assignedTo: { select: { id: true, name: true, avatar: true } } }
       });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, asset: updated });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to update hardware asset.' });
@@ -426,6 +457,7 @@ export const updateHardware = async (req, res) => {
   const idx = MOCK_HARDWARE.findIndex(h => h.id === id);
   if (idx === -1) return res.status(404).json({ error: 'Asset not found.' });
   MOCK_HARDWARE[idx] = { ...MOCK_HARDWARE[idx], ...req.body, updatedAt: new Date().toISOString() };
+  broadcastHrStatsUpdate();
   return res.json({ success: true, asset: MOCK_HARDWARE[idx] });
 };
 
@@ -463,6 +495,7 @@ export const createSaas = async (req, res) => {
           notes: notes || null
         }
       });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, license });
     } catch (err) {
       if (err.code === 'P2002') return res.status(400).json({ error: 'SaaS tool already exists.' });
@@ -472,6 +505,7 @@ export const createSaas = async (req, res) => {
 
   const newLicense = { id: `saas-${Date.now()}`, tool, category: category || 'Productivity', totalSeats: parseInt(totalSeats) || 0, usedSeats: 0, costPerSeat: costPerSeat ? parseFloat(costPerSeat) : null, renewalDate: renewalDate || null, notes: notes || null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   MOCK_SAAS.push(newLicense);
+  broadcastHrStatsUpdate();
   return res.json({ success: true, license: newLicense });
 };
 
@@ -490,6 +524,7 @@ export const updateSaas = async (req, res) => {
       if (renewalDate !== undefined) data.renewalDate = renewalDate ? new Date(renewalDate) : null;
       if (notes !== undefined) data.notes = notes;
       const updated = await prisma.saasLicense.update({ where: { id }, data });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, license: updated });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to update SaaS license.' });
@@ -499,6 +534,7 @@ export const updateSaas = async (req, res) => {
   const idx = MOCK_SAAS.findIndex(s => s.id === id);
   if (idx === -1) return res.status(404).json({ error: 'SaaS license not found.' });
   MOCK_SAAS[idx] = { ...MOCK_SAAS[idx], ...req.body, updatedAt: new Date().toISOString() };
+  broadcastHrStatsUpdate();
   return res.json({ success: true, license: MOCK_SAAS[idx] });
 };
 
@@ -541,6 +577,7 @@ export const createCertification = async (req, res) => {
         },
         include: { employee: { select: { id: true, name: true, avatar: true } } }
       });
+      broadcastHrStatsUpdate();
       return res.json({ success: true, certification: cert });
     } catch (err) {
       return res.status(500).json({ error: 'Failed to log certification.' });
@@ -549,6 +586,7 @@ export const createCertification = async (req, res) => {
 
   const newCert = { id: `cert-${Date.now()}`, employeeId: targetEmployee, employeeName: req.user.name, employeeAvatar: req.user.avatar, name, issuer: issuer || null, issuedAt: issuedAt || null, expiresAt: expiresAt || null, cost: cost ? parseFloat(cost) : null, badgeUrl: badgeUrl || null, createdAt: new Date().toISOString() };
   MOCK_CERTIFICATIONS.push(newCert);
+  broadcastHrStatsUpdate();
   return res.json({ success: true, certification: newCert });
 };
 
@@ -560,13 +598,15 @@ export const getAnalytics = async (req, res) => {
 
   if (dbActive) {
     try {
-      const [employees, approvals, hardware, saas, certs] = await Promise.all([
+      const analyticsPromise = Promise.all([
         prisma.employee.findMany({ include: { role: true }, where: { isActive: true } }),
         prisma.approvalRequest.findMany(),
         prisma.hardwareAsset.findMany(),
         prisma.saasLicense.findMany(),
         prisma.certification.findMany()
       ]);
+
+      const [employees, approvals, hardware, saas, certs] = await queryWithTimeout(analyticsPromise, 2500);
 
       const roleBreakdown = {};
       for (const e of employees) {
@@ -617,38 +657,45 @@ export const getAnalytics = async (req, res) => {
 
 // ─── DASHBOARD STATS SUMMARY ────────────────────────────────────────────────
 
-export const getHrStats = async (req, res) => {
+export const fetchHrStatsData = async () => {
   const dbActive = await isDbConnected();
 
   if (dbActive) {
     try {
-      const [total, active, onLeave, openPositions, pendingOnboarding] = await Promise.all([
+      const statsPromise = Promise.all([
         prisma.employee.count(),
         prisma.employee.count({ where: { isActive: true } }),
         prisma.approvalRequest.count({ where: { type: 'time_off', status: 'approved' } }),
         Promise.resolve(STATIC_JOBS.length),
         prisma.onboardingChecklist.count({ where: { isComplete: false } })
       ]);
-      return res.json({
+
+      const [total, active, onLeave, openPositions, pendingOnboarding] = await queryWithTimeout(statsPromise, 2500);
+      return {
         totalEmployees: total,
         activeEmployees: active,
         onLeave,
         openPositions,
         pendingOnboarding
-      });
+      };
     } catch (err) {
-      console.warn('[HRController] DB error in getHrStats:', err.message);
+      console.warn('[HRController] DB error in fetchHrStatsData:', err.message);
     }
   }
 
   // Mock fallback
-  return res.json({
+  return {
     totalEmployees: 2,
     activeEmployees: 2,
     onLeave: 0,
     openPositions: 1,
     pendingOnboarding: MOCK_ONBOARDING.filter(t => !t.isComplete).length
-  });
+  };
+};
+
+export const getHrStats = async (req, res) => {
+  const stats = await fetchHrStatsData();
+  return res.json(stats);
 };
 
 

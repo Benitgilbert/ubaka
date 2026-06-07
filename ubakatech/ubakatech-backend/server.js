@@ -85,9 +85,13 @@ import hrRouter from './routes/hrRoutes.js';
 import publicRouter from './routes/publicRoutes.js';
 import { seedRolesAndPermissions } from './config/roles.js';
 import { startHealthMonitor } from './controllers/projectController.js';
+import { setHrIoInstance, fetchHrStatsData } from './controllers/hrController.js';
 
 // Seed Roles and Permissions
 seedRolesAndPermissions();
+
+// Initialize HR socket instance
+setHrIoInstance(io);
 
 // Start Live Status Health Monitor
 startHealthMonitor(io);
@@ -104,6 +108,13 @@ app.use('/api/public', publicRouter);
 // WebSocket Connections
 io.on('connection', (socket) => {
   console.log(`[WebSocket] Client connected: ${socket.id}`);
+
+  // Push initial HR stats immediately on connection for zero latency
+  fetchHrStatsData().then(stats => {
+    socket.emit('hr_stats_updated', stats);
+  }).catch(err => {
+    console.error('[WebSocket] Failed to emit initial HR stats:', err.message);
+  });
 
   // Join a user-specific room for notifications (e.g. room_created)
   socket.on('join_user', (userId) => {

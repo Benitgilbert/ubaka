@@ -14,18 +14,29 @@ try {
 
 export default prisma;
 
-// Actual connection check
+// Actual connection check with timeout to prevent hanging the server on bad connection
 const verifyConnection = async () => {
   if (!process.env.DATABASE_URL || !prisma) {
     return false;
   }
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await Promise.race([
+      prisma.$queryRaw`SELECT 1`,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Connection check timeout')), 2000))
+    ]);
     return true;
   } catch (err) {
     console.error("❌ Database connection check failed:", err.message || err);
     return false;
   }
+};
+
+// Protect any database query from hanging indefinitely
+export const queryWithTimeout = (promise, timeoutMs = 2500) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Database query timeout')), timeoutMs))
+  ]);
 };
 
 // Periodic background checks or cooldown-based check

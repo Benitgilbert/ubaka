@@ -128,6 +128,21 @@ const Dashboard = () => {
     };
   }, [socket]);
 
+  // Real-time HR updates via WebSocket
+  useEffect(() => {
+    if (!socket) return;
+    const handleHrStatsUpdated = (updatedStats) => {
+      setHrStats(updatedStats);
+      setLoadingHr(false);
+      setLastRefresh(new Date());
+    };
+    socket.on('hr_stats_updated', handleHrStatsUpdated);
+    return () => {
+      socket.off('hr_stats_updated', handleHrStatsUpdated);
+    };
+  }, [socket]);
+
+
   // ─── Derived stats ───────────────────────────────────────────────────────────
   const activeCount  = projects.filter(p => p.status === 'active').length;
   const pipeCount    = projects.filter(p => ['development','testing'].includes(p.status)).length;
