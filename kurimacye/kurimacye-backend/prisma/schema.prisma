@@ -133,6 +133,7 @@ model User {
   storeSlug         String?        @unique
   abonnes           ClientAbonne[] @relation("SellerAbonnes")
   categories        Category[]     @relation("SellerCategories")
+  sellerOrders      Order[]        @relation("SellerOrders")
 
   // Staff Management
   managedById       String?
@@ -289,6 +290,12 @@ model Order {
   shifts            Shift[]      @relation("ShiftOrders")
   abonneTransactions AbonneTransaction[]
 
+  parentId          String?
+  parent            Order?       @relation("ParentChildOrders", fields: [parentId], references: [id], onDelete: Cascade)
+  childOrders       Order[]      @relation("ParentChildOrders")
+
+  sellerId          String?
+  seller            User?        @relation("SellerOrders", fields: [sellerId], references: [id])
 
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -299,6 +306,8 @@ model Order {
   @@index([status])
   @@index([publicId])
   @@index([createdAt])
+  @@index([parentId])
+  @@index([sellerId])
 }
 
 model OrderItem {

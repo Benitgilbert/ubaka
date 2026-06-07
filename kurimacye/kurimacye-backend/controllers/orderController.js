@@ -202,16 +202,78 @@ export const createOrder = async (req, res) => {
           tax: Number(tax?.totalTax || 0),
           discount: Number(totals.discount || 0),
           grandTotal: Number(totals.grandTotal),
-          items: {
-            create: orderItemsData
-          }
+          parentId: null,
+          sellerId: null
         },
-        include: { items: true, customer: { select: { id: true, name: true, email: true } } }
+        include: { customer: { select: { id: true, name: true, email: true } } }
+      }).then(async (parentOrder) => {
+        // Group items by seller
+        const itemsBySeller = {};
+        for (const item of orderItemsData) {
+          const sId = item.sellerId;
+          if (!itemsBySeller[sId]) {
+            itemsBySeller[sId] = [];
+          }
+          itemsBySeller[sId].push(item);
+        }
+
+        const sellerIds = Object.keys(itemsBySeller);
+        const totalSellers = sellerIds.length;
+
+        let childIndex = 1;
+        for (const sId of sellerIds) {
+          const sellerItems = itemsBySeller[sId];
+          const childSubtotal = sellerItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+          // Distribute discount
+          const childDiscount = Number(totals.discount || 0) > 0
+            ? Math.round((Number(totals.discount || 0) * (childSubtotal / Number(totals.subtotal))) * 100) / 100
+            : 0;
+
+          // Distribute shipping and tax
+          const childShipping = Math.round((Number(shipping?.cost || 0) / totalSellers) * 100) / 100;
+          const childTax = Math.round((Number(tax?.totalTax || 0) * (childSubtotal / Number(totals.subtotal))) * 100) / 100;
+          const childGrandTotal = Math.max(0, childSubtotal - childDiscount + childShipping + childTax);
+
+          await tx.order.create({
+            data: {
+              publicId: `${parentOrder.publicId}-S${childIndex}`,
+              customerId: req.user?.id || null,
+              guestInfo: req.user ? null : req.body.guestInfo || {},
+              billingAddress,
+              shippingAddress,
+              subtotal: childSubtotal,
+              shippingCost: childShipping,
+              tax: childTax,
+              discount: childDiscount,
+              grandTotal: childGrandTotal,
+              parentId: parentOrder.id,
+              sellerId: sId,
+              items: {
+                create: sellerItems
+              }
+            }
+          });
+          childIndex++;
+        }
+
+        return parentOrder;
       });
     }); // End $transaction
 
     // 📧 Confirmation Email
     try {
+      // Fetch child orders and merge items for the email
+      const childOrders = await prisma.order.findMany({
+        where: { parentId: order.id },
+        include: { items: true }
+      });
+      const allItems = [];
+      childOrders.forEach(co => {
+        allItems.push(...co.items);
+      });
+      order.items = allItems;
+
       await sendOrderConfirmation(order);
     } catch (emailErr) {
       console.error("Failed to send order confirmation email:", emailErr);
@@ -450,6 +512,41 @@ export const submitPrintQuote = async (req, res) => {
 /**
  * 🔄 Update Order Status
  */
+const syncParentOrderStatus = async (parentOrderId) => {
+  const parent = await prisma.order.findUnique({
+    where: { id: parentOrderId },
+    include: { childOrders: true }
+  });
+  if (!parent) return;
+
+  const statuses = parent.childOrders.map(co => co.status);
+  
+  const allDelivered = statuses.every(s => s === "delivered");
+  const allCancelled = statuses.every(s => s === "cancelled");
+  const allRefunded = statuses.every(s => s === "refunded");
+  
+  let newParentStatus = parent.status;
+  if (allDelivered) {
+    newParentStatus = "delivered";
+  } else if (allCancelled) {
+    newParentStatus = "cancelled";
+  } else if (allRefunded) {
+    newParentStatus = "refunded";
+  } else if (statuses.some(s => s === "delivered" || s === "shipped")) {
+    newParentStatus = "processing";
+  }
+
+  if (newParentStatus !== parent.status) {
+    await prisma.order.update({
+      where: { id: parent.id },
+      data: {
+        status: newParentStatus,
+        deliveredAt: newParentStatus === "delivered" ? new Date() : parent.deliveredAt
+      }
+    });
+  }
+};
+
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -471,6 +568,11 @@ export const updateOrderStatus = async (req, res) => {
       },
       include: { items: true, customer: { select: { id: true, name: true, email: true } } }
     });
+
+    // Sync Parent Order status if this is a child order
+    if (updatedOrder.parentId) {
+      await syncParentOrderStatus(updatedOrder.parentId);
+    }
 
     // 📧 Email
     if (oldStatus !== status) {
@@ -728,6 +830,8 @@ export const createPOSOrder = async (req, res) => {
           paymentStatus: "completed",
           paidAt: new Date(),
           status: "delivered",
+          parentId: null,
+          sellerId: effectiveSellerId,
           items: {
             create: txOrderItemsData
           },
@@ -1013,7 +1117,7 @@ export const markReportDownloaded = async (req, res) => {
 export const getMyOrders = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      where: { customerId: req.user.id },
+      where: { customerId: req.user.id, parentId: null },
       orderBy: { createdAt: 'desc' }
     });
     res.json({ success: true, data: orders });
@@ -1027,7 +1131,7 @@ export const getSellerOrders = async (req, res) => {
     const effectiveSellerId = req.user.role === 'cashier' ? req.user.managedById : req.user.id;
     const limit = parseInt(req.query.limit) || undefined;
     const orders = await prisma.order.findMany({
-      where: { items: { some: { sellerId: effectiveSellerId } } },
+      where: { sellerId: effectiveSellerId },
       include: { 
         customer: { select: { id: true, name: true, email: true } },
         items: true
@@ -1035,7 +1139,7 @@ export const getSellerOrders = async (req, res) => {
       orderBy: { createdAt: 'desc' },
       take: limit
     });
-    const total = await prisma.order.count({ where: { items: { some: { sellerId: effectiveSellerId } } } });
+    const total = await prisma.order.count({ where: { sellerId: effectiveSellerId } });
     res.json({ 
       success: true, 
       data: orders,
@@ -1058,7 +1162,7 @@ export const getOrders = async (req, res) => {
     // 🔒 Security: Filter by seller if not admin/owner
     // All users (including admins) see only their own orders by default
     const effectiveSellerId = req.user.role === 'cashier' ? req.user.managedById : req.user.id;
-    where.items = { some: { sellerId: effectiveSellerId } };
+    where.sellerId = effectiveSellerId;
 
     if (status && status !== "all") where.status = status;
     if (search) {
@@ -1097,10 +1201,25 @@ export const getOrderById = async (req, res) => {
       where: { id: req.params.id },
       include: {
         customer: { select: { name: true, email: true } },
-        items: { include: { product: { select: { name: true, price: true, image: true, sku: true } } } }
+        items: { include: { product: { select: { name: true, price: true, image: true, sku: true } } } },
+        childOrders: {
+          include: {
+            items: { include: { product: { select: { name: true, price: true, image: true, sku: true } } } }
+          }
+        }
       }
     });
     if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // Merge child order items if it is a parent order
+    if (order.childOrders && order.childOrders.length > 0) {
+      const allItems = [];
+      order.childOrders.forEach(co => {
+        allItems.push(...co.items);
+      });
+      order.items = allItems;
+    }
+
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch order details" });
@@ -1132,8 +1251,29 @@ export const getOrderAnalytics = async (req, res) => {
 
 export const trackPublicOrder = async (req, res) => {
   try {
-    const order = await prisma.order.findUnique({ where: { publicId: req.params.id } });
+    const order = await prisma.order.findUnique({
+      where: { publicId: req.params.id },
+      include: {
+        customer: { select: { name: true, email: true } },
+        items: { include: { product: { select: { name: true, price: true, image: true, sku: true } } } },
+        childOrders: {
+          include: {
+            items: { include: { product: { select: { name: true, price: true, image: true, sku: true } } } }
+          }
+        }
+      }
+    });
     if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // Merge child order items if it is a parent order
+    if (order.childOrders && order.childOrders.length > 0) {
+      const allItems = [];
+      order.childOrders.forEach(co => {
+        allItems.push(...co.items);
+      });
+      order.items = allItems;
+    }
+
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: "Failed to track order" });

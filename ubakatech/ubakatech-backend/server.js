@@ -51,6 +51,14 @@ app.use((req, res, next) => {
 });
 
 
+// Root endpoint (returns 200 OK for uptime monitoring)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    message: 'Ubaka Tech MIS Backend Server is active'
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({

@@ -128,25 +128,6 @@ export const createOrderFromCart = async (req, res, next) => {
 
       const totals = calculateCartTotals(cart, discountAmount);
 
-      const orderItems = cart.items.map((item) => {
-        let price = item.product.price;
-        if (item.variationId && item.product.variations) {
-            const variation = item.product.variations.find(v => v.id === item.variationId || v.sku === item.variationId);
-            if (variation) price = variation.price;
-        }
-        return {
-          productId: item.productId,
-          productName: item.product.name,
-          productImage: item.product.image,
-          sku: item.product.sku,
-          quantity: item.quantity,
-          price: price,
-          subtotal: price * item.quantity,
-          customizations: item.customizations || {},
-          sellerId: item.product.sellerId,
-        };
-      });
-
       const publicId = crypto.randomBytes(4).toString("hex").toUpperCase();
 
       const orderData = {
@@ -164,16 +145,97 @@ export const createOrderFromCart = async (req, res, next) => {
         
         paymentMethod,
         status: "pending",
-        
-        items: {
-            create: orderItems
-        }
+        parentId: null,
+        sellerId: null,
       };
 
-      const createdOrder = await tx.order.create({
-        data: orderData,
-        include: { items: true }
+      const parentOrder = await tx.order.create({
+        data: orderData
       });
+
+      // Group items by seller
+      const itemsBySeller = {};
+      cart.items.forEach((item) => {
+        const sellerId = item.product.sellerId;
+        if (!itemsBySeller[sellerId]) {
+          itemsBySeller[sellerId] = [];
+        }
+        
+        let price = item.product.price;
+        if (item.variationId && item.product.variations) {
+            const variation = item.product.variations.find(v => v.id === item.variationId || v.sku === item.variationId);
+            if (variation) price = variation.price;
+        }
+
+        itemsBySeller[sellerId].push({
+          productId: item.productId,
+          productName: item.product.name,
+          productImage: item.product.image,
+          sku: item.product.sku,
+          quantity: item.quantity,
+          price: price,
+          subtotal: price * item.quantity,
+          customizations: item.customizations || {},
+          sellerId: sellerId,
+        });
+      });
+
+      const sellerIds = Object.keys(itemsBySeller);
+      const totalSellers = sellerIds.length;
+
+      // Create Child Orders
+      let childIndex = 1;
+      for (const sId of sellerIds) {
+        const sellerItems = itemsBySeller[sId];
+        const childSubtotal = sellerItems.reduce((sum, item) => sum + item.subtotal, 0);
+        
+        // Distribute discount
+        let childDiscount = 0;
+        if (discountAmount > 0) {
+          const coupon = couponCode ? await tx.coupon.findUnique({ where: { code: couponCode } }) : null;
+          if (coupon && coupon.sellerId === sId) {
+            childDiscount = discountAmount;
+          } else if (coupon && coupon.sellerId) {
+            childDiscount = 0;
+          } else {
+            // Global coupon: distribute proportionally
+            childDiscount = Math.round((discountAmount * (childSubtotal / totals.subtotal)) * 100) / 100;
+          }
+        }
+
+        // Distribute shipping and tax
+        const childShipping = Math.round(((totals.shipping || 0) / totalSellers) * 100) / 100;
+        const childTax = Math.round(((totals.tax || 0) * (childSubtotal / totals.subtotal)) * 100) / 100;
+        const childGrandTotal = Math.max(0, childSubtotal - childDiscount + childShipping + childTax);
+
+        const childPublicId = `${publicId}-S${childIndex}`;
+        childIndex++;
+
+        await tx.order.create({
+          data: {
+            publicId: childPublicId,
+            customerId: userId || null,
+            guestInfo: userId ? null : { name: shippingAddress.fullName, email: shippingAddress.email, phone: shippingAddress.phone },
+            shippingAddress,
+            billingAddress: sameAsShipping ? shippingAddress : billingAddress,
+            
+            subtotal: childSubtotal,
+            shippingCost: childShipping,
+            tax: childTax,
+            discount: childDiscount,
+            grandTotal: childGrandTotal,
+            
+            paymentMethod,
+            status: "pending",
+            parentId: parentOrder.id,
+            sellerId: sId,
+            
+            items: {
+              create: sellerItems
+            }
+          }
+        });
+      }
 
       // Update coupon usage inside transaction
       if (validCouponCode) {
@@ -183,7 +245,7 @@ export const createOrderFromCart = async (req, res, next) => {
             usedByList.push({
                 user: userId || null,
                 email: req.user?.email || shippingAddress.email,
-                orderId: createdOrder.id
+                orderId: parentOrder.id
             });
             await tx.coupon.update({
                 where: { id: coupon.id },
@@ -215,7 +277,7 @@ export const createOrderFromCart = async (req, res, next) => {
       // Clear cart inside transaction
       await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
 
-      return createdOrder;
+      return parentOrder;
     }); // End $transaction
 
     logger.info({ orderId: order.id, publicId: order.publicId }, "Order created from cart");

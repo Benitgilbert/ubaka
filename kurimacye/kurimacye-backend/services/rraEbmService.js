@@ -218,7 +218,12 @@ class RraEbmService {
       const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: {
-          items: true
+          items: true,
+          childOrders: {
+            include: {
+              items: true
+            }
+          }
         }
       });
       if (!order) {
@@ -226,9 +231,17 @@ class RraEbmService {
         return { success: false, error: "Order not found" };
       }
 
+      // Collect items from the order itself AND all its child orders
+      const allItems = [...order.items];
+      if (order.childOrders && order.childOrders.length > 0) {
+        order.childOrders.forEach(co => {
+          allItems.push(...co.items);
+        });
+      }
+
       // Group items by sellerId
       const itemsBySeller = {};
-      for (const item of order.items) {
+      for (const item of allItems) {
         if (!item.sellerId) continue;
         if (!itemsBySeller[item.sellerId]) {
           itemsBySeller[item.sellerId] = [];
