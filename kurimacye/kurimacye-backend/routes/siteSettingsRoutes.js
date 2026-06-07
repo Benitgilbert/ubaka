@@ -5,10 +5,7 @@ import {
     updateTrustBadges,
     updateGeneralSettings,
     updateFooterSettings,
-    resetTrustBadges,
-    updateSellerAutoApproval,
-    updatePayoutSettings,
-    updateCommissionRate
+    resetTrustBadges
 } from "../controllers/siteSettingsController.js";
 import { verifyAdmin } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
@@ -25,11 +22,6 @@ router.put("/general", verifyAdmin, upload.single("logo"), updateGeneralSettings
 
 router.put("/footer", verifyAdmin, updateFooterSettings);
 router.post("/trust-badges/reset", verifyAdmin, resetTrustBadges);
-
-// Seller & Payout settings
-router.put("/seller-auto-approval", verifyAdmin, updateSellerAutoApproval);
-router.put("/payout", verifyAdmin, updatePayoutSettings);
-router.put("/commission", verifyAdmin, updateCommissionRate);
 
 export default router;
 

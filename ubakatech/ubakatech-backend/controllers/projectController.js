@@ -873,13 +873,41 @@ const mockDataStore = {
     { id: 'fn-1', date: '2026-05-25T13:00:00Z', description: 'Commission payout fee collected', reference: 'REF-391', type: 'Journal', createdAt: '2026-05-25T13:00:00Z' }
   ],
   commissions: [
-    { id: 'cm-1', defaultRate: 10, posRate: 5, minimumPayoutAmount: 10000, payoutSchedule: 'weekly', createdAt: '2026-01-01T00:00:00Z' }
+    { 
+      id: 'cm-1', 
+      defaultRate: 10, 
+      posRate: 5, 
+      minimumPayoutAmount: 10000, 
+      payoutSchedule: 'weekly', 
+      autoPayoutEnabled: false, 
+      maxAutoPayoutAmount: 500000, 
+      sellerAutoApproval: { enabled: false, minScore: 70, criteria: { emailVerified: 30, phoneProvided: 20, storeNameSet: 20, storeDescriptionSet: 15, profilePhotoSet: 15 } },
+      createdAt: '2026-01-01T00:00:00Z' 
+    }
   ],
   payouts: [
     { id: 'py-1', payoutId: 'PAY-2026-001', amount: 840000, grossAmount: 900000, platformFee: 60000, paymentMethod: 'mobile_money', status: 'completed', sellerId: 'u-2', createdAt: '2026-05-24T17:00:00Z' }
   ],
   site_settings: [
-    { id: 'ss-1', siteName: 'Impressa E-Commerce', tagline: 'Connecting local shops to online buyers', contactEmail: 'info@impressa.rw', contactPhone: '+250788000000', commissionRate: 10, createdAt: '2026-01-01T00:00:00Z' }
+    {
+      id: 'ss-1',
+      siteName: 'Kuri Macye',
+      logo: 'https://logo.clearbit.com/impressa.rw',
+      tagline: 'Your Marketplace',
+      footerTagline: 'Your premium destination for quality products. Curated collections, exclusive deals, and exceptional service.',
+      contactEmail: 'ishfabzele2@gmail.com',
+      contactPhone: '+250 789 079 978',
+      contactAddress: 'Building near Gicumbi district office (Eudiose Building)',
+      googleMapsQuery: 'Gicumbi district office',
+      socialLinks: { facebook: 'https://facebook.com/kurimacye', twitter: 'https://twitter.com/kurimacye', instagram: 'https://instagram.com/kurimacye', linkedin: 'https://linkedin.com/company/kurimacye' },
+      trustBadges: [
+        { icon: 'truck', order: 0, title: 'Fast Doorstep Delivery', isActive: true, description: 'Reliable shipping across Rwanda' },
+        { icon: 'shield', order: 1, title: 'Mobile Money & Card Payments', isActive: true, description: 'MTN MoMo, Airtel Money & Card secure checkout' },
+        { icon: 'undo', order: 2, title: 'Easy Returns', isActive: true, description: '30-day policy' },
+        { icon: 'headset', order: 3, title: '24/7 Support', isActive: true, description: 'Always here to help' }
+      ],
+      createdAt: '2026-01-01T00:00:00Z'
+    }
   ],
   subscribers: [
     { id: 'sub-1', email: 'newsletter@ubakatech.com', isActive: true, createdAt: '2026-02-01T08:00:00Z' }
@@ -898,7 +926,25 @@ const mockDataStore = {
     { id: 'rp-1', type: 'VAT Audit PDF', format: 'pdf', aiSummary: 'Compiled tax statement for Q1 2026.', timestamp: '2026-04-15T12:00:00Z' }
   ],
   settings: [
-    { id: 'ss-1', siteName: 'Impressa E-Commerce', tagline: 'Connecting local shops to online buyers', contactEmail: 'info@impressa.rw', contactPhone: '+250788000000', commissionRate: 10, createdAt: '2026-01-01T00:00:00Z' }
+    {
+      id: 'ss-1',
+      siteName: 'Kuri Macye',
+      logo: 'https://logo.clearbit.com/impressa.rw',
+      tagline: 'Your Marketplace',
+      footerTagline: 'Your premium destination for quality products. Curated collections, exclusive deals, and exceptional service.',
+      contactEmail: 'ishfabzele2@gmail.com',
+      contactPhone: '+250 789 079 978',
+      contactAddress: 'Building near Gicumbi district office (Eudiose Building)',
+      googleMapsQuery: 'Gicumbi district office',
+      socialLinks: { facebook: 'https://facebook.com/kurimacye', twitter: 'https://twitter.com/kurimacye', instagram: 'https://instagram.com/kurimacye', linkedin: 'https://linkedin.com/company/kurimacye' },
+      trustBadges: [
+        { icon: 'truck', order: 0, title: 'Fast Doorstep Delivery', isActive: true, description: 'Reliable shipping across Rwanda' },
+        { icon: 'shield', order: 1, title: 'Mobile Money & Card Payments', isActive: true, description: 'MTN MoMo, Airtel Money & Card secure checkout' },
+        { icon: 'undo', order: 2, title: 'Easy Returns', isActive: true, description: '30-day policy' },
+        { icon: 'headset', order: 3, title: '24/7 Support', isActive: true, description: 'Always here to help' }
+      ],
+      createdAt: '2026-01-01T00:00:00Z'
+    }
   ]
 };
 

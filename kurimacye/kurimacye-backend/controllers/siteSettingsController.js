@@ -1,7 +1,7 @@
-﻿import prisma from "../prisma.js";
+import prisma from "../prisma.js";
 
 /**
- * âš™ï¸ Helper to get or create settings
+ * ⚙️ Helper to get or create settings
  */
 const getSettingsHelper = async () => {
     let settings = await prisma.siteSettings.findFirst();
@@ -16,8 +16,6 @@ const getSettingsHelper = async () => {
                     { icon: 'undo', title: 'Easy Returns', description: '30-day policy', isActive: true, order: 2 },
                     { icon: 'headset', title: '24/7 Support', description: 'Always here to help', isActive: true, order: 3 }
                 ],
-                sellerAutoApproval: { enabled: false, minScore: 70, criteria: {} },
-                payoutSettings: { autoPayoutEnabled: false, frequency: 'weekly', minimumAmount: 10000, payoutDay: 1, maxAutoPayoutAmount: 500000 },
                 socialLinks: { facebook: '', twitter: '', instagram: '', linkedin: '' }
             }
         });
@@ -26,7 +24,7 @@ const getSettingsHelper = async () => {
 };
 
 /**
- * âš™ï¸ Get site settings (public - for frontend)
+ * ⚙️ Get site settings (public - for frontend)
  */
 export const getPublicSettings = async (req, res, next) => {
     try {
@@ -59,7 +57,7 @@ export const getPublicSettings = async (req, res, next) => {
 };
 
 /**
- * âš™ï¸ Get all site settings (admin)
+ * ⚙️ Get all site settings (admin)
  */
 export const getAllSettings = async (req, res, next) => {
     try {
@@ -75,7 +73,7 @@ export const getAllSettings = async (req, res, next) => {
 };
 
 /**
- * âš™ï¸ Update trust badges
+ * ⚙️ Update trust badges
  */
 export const updateTrustBadges = async (req, res, next) => {
     try {
@@ -104,7 +102,7 @@ export const updateTrustBadges = async (req, res, next) => {
 };
 
 /**
- * âš™ï¸ Update general site settings
+ * ⚙️ Update general site settings
  */
 export const updateGeneralSettings = async (req, res, next) => {
     try {
@@ -140,7 +138,7 @@ export const updateGeneralSettings = async (req, res, next) => {
 
 
 /**
- * âš™ï¸ Update footer settings
+ * ⚙️ Update footer settings
  */
 export const updateFooterSettings = async (req, res, next) => {
     try {
@@ -178,7 +176,7 @@ export const updateFooterSettings = async (req, res, next) => {
 };
 
 /**
- * âš™ï¸ Reset trust badges to default
+ * ⚙️ Reset trust badges to default
  */
 export const resetTrustBadges = async (req, res, next) => {
     try {
@@ -205,96 +203,3 @@ export const resetTrustBadges = async (req, res, next) => {
         next(error);
     }
 };
-
-/**
- * âš™ï¸ Update seller auto-approval settings
- */
-export const updateSellerAutoApproval = async (req, res, next) => {
-    try {
-        const { enabled, minScore, criteria } = req.body;
-        const settings = await getSettingsHelper();
-
-        const current = settings.sellerAutoApproval || {};
-        const updated = await prisma.siteSettings.update({
-            where: { id: settings.id },
-            data: {
-                sellerAutoApproval: {
-                    enabled: enabled !== undefined ? enabled : current.enabled,
-                    minScore: minScore !== undefined ? Math.max(0, Math.min(100, minScore)) : current.minScore,
-                    criteria: criteria ? { ...(current.criteria || {}), ...criteria } : (current.criteria || {})
-                }
-            }
-        });
-
-        res.json({
-            success: true,
-            message: "Seller auto-approval settings updated",
-            data: updated.sellerAutoApproval
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-/**
- * âš™ï¸ Update payout settings
- */
-export const updatePayoutSettings = async (req, res, next) => {
-    try {
-        const { autoPayoutEnabled, frequency, minimumAmount, payoutDay, maxAutoPayoutAmount } = req.body;
-        const settings = await getSettingsHelper();
-
-        const current = settings.payoutSettings || {};
-        const updated = await prisma.siteSettings.update({
-            where: { id: settings.id },
-            data: {
-                payoutSettings: {
-                    autoPayoutEnabled: autoPayoutEnabled !== undefined ? autoPayoutEnabled : current.autoPayoutEnabled,
-                    frequency: frequency !== undefined ? frequency : current.frequency,
-                    minimumAmount: minimumAmount !== undefined ? Math.max(0, minimumAmount) : current.minimumAmount,
-                    payoutDay: payoutDay !== undefined ? Math.max(1, Math.min(7, payoutDay)) : current.payoutDay,
-                    maxAutoPayoutAmount: maxAutoPayoutAmount !== undefined ? Math.max(0, maxAutoPayoutAmount) : current.maxAutoPayoutAmount
-                }
-            }
-        });
-
-        res.json({
-            success: true,
-            message: "Payout settings updated",
-            data: updated.payoutSettings
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-/**
- * âš™ï¸ Update commission rate
- */
-export const updateCommissionRate = async (req, res, next) => {
-    try {
-        const { commissionRate } = req.body;
-
-        if (commissionRate === undefined || commissionRate < 0 || commissionRate > 100) {
-            return res.status(400).json({
-                success: false,
-                message: "Commission rate must be between 0 and 100"
-            });
-        }
-
-        const settings = await getSettingsHelper();
-        const updated = await prisma.siteSettings.update({
-            where: { id: settings.id },
-            data: { commissionRate: Number(commissionRate) }
-        });
-
-        res.json({
-            success: true,
-            message: "Commission rate updated",
-            data: { commissionRate: updated.commissionRate }
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-

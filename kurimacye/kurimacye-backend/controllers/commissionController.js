@@ -15,33 +15,58 @@ export const getCommissionSettings = async (req, res, next) => {
     }
 };
 
-/**
- * ✅ Update commission settings (admin)
- */
 export const updateCommissionSettings = async (req, res, next) => {
     try {
-        const { defaultRate, posRate, minimumPayoutAmount, payoutSchedule, payoutMethods, categoryRates } = req.body;
+        const { 
+            defaultRate, 
+            posRate, 
+            minimumPayoutAmount, 
+            payoutSchedule, 
+            payoutMethods, 
+            categoryRates,
+            sellerRates,
+            autoPayoutEnabled,
+            maxAutoPayoutAmount,
+            sellerAutoApproval
+        } = req.body;
 
         const currentSettings = await prisma.commissionSettings.findFirst();
         
+        let autoApprovalObj = sellerAutoApproval;
+        if (typeof autoApprovalObj === 'string' && autoApprovalObj.trim() !== '') {
+            try {
+                autoApprovalObj = JSON.parse(autoApprovalObj);
+            } catch (e) {
+                // Keep as string if parsing fails
+            }
+        }
+
         const settings = await prisma.commissionSettings.upsert({
             where: { id: currentSettings?.id || 'default' },
             update: {
-                defaultRate,
-                posRate,
-                minimumPayoutAmount,
+                defaultRate: defaultRate !== undefined ? Number(defaultRate) : undefined,
+                posRate: posRate !== undefined ? Number(posRate) : undefined,
+                minimumPayoutAmount: minimumPayoutAmount !== undefined ? Number(minimumPayoutAmount) : undefined,
                 payoutSchedule,
                 payoutMethods,
                 categoryRates,
+                sellerRates,
+                autoPayoutEnabled: autoPayoutEnabled !== undefined ? (autoPayoutEnabled === true || autoPayoutEnabled === 'true') : undefined,
+                maxAutoPayoutAmount: maxAutoPayoutAmount !== undefined ? Number(maxAutoPayoutAmount) : undefined,
+                sellerAutoApproval: autoApprovalObj !== undefined ? autoApprovalObj : undefined,
                 updatedBy: req.user.id
             },
             create: {
-                defaultRate: defaultRate || 10,
-                posRate: posRate || 5,
-                minimumPayoutAmount: minimumPayoutAmount || 10000,
+                defaultRate: defaultRate !== undefined ? Number(defaultRate) : 10,
+                posRate: posRate !== undefined ? Number(posRate) : 5,
+                minimumPayoutAmount: minimumPayoutAmount !== undefined ? Number(minimumPayoutAmount) : 10000,
                 payoutSchedule: payoutSchedule || 'weekly',
                 payoutMethods: payoutMethods || ['mobile_money'],
                 categoryRates: categoryRates || {},
+                sellerRates: sellerRates || {},
+                autoPayoutEnabled: autoPayoutEnabled === true || autoPayoutEnabled === 'true',
+                maxAutoPayoutAmount: maxAutoPayoutAmount !== undefined ? Number(maxAutoPayoutAmount) : 500000,
+                sellerAutoApproval: autoApprovalObj || { enabled: false, minScore: 70, criteria: {} },
                 updatedBy: req.user.id
             }
         });

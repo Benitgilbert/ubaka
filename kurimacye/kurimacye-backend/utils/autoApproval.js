@@ -40,7 +40,7 @@ export const calculateSellerScore = (user, criteria) => {
  */
 export const checkAutoApproval = async (user) => {
     try {
-        const settings = await prisma.siteSettings.findFirst();
+        const settings = await prisma.commissionSettings.findFirst();
         const autoApproval = settings?.sellerAutoApproval || {};
 
         if (!autoApproval.enabled) {

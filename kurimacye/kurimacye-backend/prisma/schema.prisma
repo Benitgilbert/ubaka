@@ -684,9 +684,6 @@ model SiteSettings {
   googleMapsQuery   String?
   socialLinks       Json?    // { facebook, twitter, instagram, linkedin }
   trustBadges       Json?    // Array of { icon, title, description, isActive, order }
-  sellerAutoApproval Json?   // { enabled, minScore, criteria }
-  payoutSettings     Json?   // { autoPayoutEnabled, frequency, minimumAmount, payoutDay, maxAutoPayoutAmount }
-  commissionRate    Float    @default(10)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -914,6 +911,9 @@ model CommissionSettings {
   payoutMethods       String[] @default(["mobile_money", "bank_transfer"])
   categoryRates       Json?    // Map of categoryId to rate
   sellerRates         Json?    // Map of sellerId to rate
+  autoPayoutEnabled   Boolean  @default(false)
+  maxAutoPayoutAmount Float    @default(500000)
+  sellerAutoApproval  Json?    // { enabled, minScore, criteria }
   updatedBy           String?
   updatedAt           DateTime @updatedAt
 }

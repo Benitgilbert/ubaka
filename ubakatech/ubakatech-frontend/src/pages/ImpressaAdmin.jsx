@@ -45,7 +45,12 @@ import {
   FileSpreadsheet,
   ArrowLeft,
   Laptop,
-  Smartphone
+  Smartphone,
+  ArrowUp,
+  ArrowDown,
+  Shield,
+  Headset,
+  Undo
 } from 'lucide-react';
 
 const ALL_TABS = [
@@ -178,14 +183,22 @@ const FORM_SCHEMAS = {
     { name: 'defaultRate', label: 'Online Commission Rate (%)', type: 'number', required: true },
     { name: 'posRate', label: 'POS Commission Rate (%)', type: 'number', required: true },
     { name: 'minimumPayoutAmount', label: 'Minimum Payout Amount (RWF)', type: 'number', required: true },
-    { name: 'payoutSchedule', label: 'Payout Schedule Frequency', type: 'select', options: ['daily', 'weekly', 'monthly'], required: true }
+    { name: 'payoutSchedule', label: 'Payout Schedule Frequency', type: 'select', options: ['daily', 'weekly', 'monthly'], required: true },
+    { name: 'autoPayoutEnabled', label: 'Enable Automated Payouts', type: 'checkbox' },
+    { name: 'maxAutoPayoutAmount', label: 'Max Auto Payout Amount (RWF)', type: 'number' },
+    { name: 'sellerAutoApproval', label: 'Seller Auto Approval Config', type: 'textarea' }
   ],
   site_settings: [
     { name: 'siteName', label: 'Website Name', type: 'text', required: true },
     { name: 'tagline', label: 'Slogan Tagline', type: 'text' },
+    { name: 'logo', label: 'Logo Image URL', type: 'text' },
+    { name: 'footerTagline', label: 'Footer Description / Tagline', type: 'textarea' },
     { name: 'contactEmail', label: 'Support Email', type: 'email', required: true },
     { name: 'contactPhone', label: 'Support Phone', type: 'text' },
-    { name: 'commissionRate', label: 'Platform Fee commissionRate (%)', type: 'number', required: true }
+    { name: 'contactAddress', label: 'Contact Physical Address', type: 'text' },
+    { name: 'googleMapsQuery', label: 'Google Maps Search Query', type: 'text' },
+    { name: 'socialLinks', label: 'Social Media Links', type: 'social_links' },
+    { name: 'trustBadges', label: 'Trust Badges', type: 'trust_badges' }
   ],
   delivery: [
     { name: 'name', label: 'Zone Name', type: 'text', required: true },
@@ -196,10 +209,396 @@ const FORM_SCHEMAS = {
   settings: [
     { name: 'siteName', label: 'Website Name', type: 'text', required: true },
     { name: 'tagline', label: 'Slogan Tagline', type: 'text' },
+    { name: 'logo', label: 'Logo Image URL', type: 'text' },
+    { name: 'footerTagline', label: 'Footer Description / Tagline', type: 'textarea' },
     { name: 'contactEmail', label: 'Support Email', type: 'email', required: true },
     { name: 'contactPhone', label: 'Support Phone', type: 'text' },
-    { name: 'commissionRate', label: 'Platform Fee commissionRate (%)', type: 'number', required: true }
+    { name: 'contactAddress', label: 'Contact Physical Address', type: 'text' },
+    { name: 'googleMapsQuery', label: 'Google Maps Search Query', type: 'text' },
+    { name: 'socialLinks', label: 'Social Media Links', type: 'social_links' },
+    { name: 'trustBadges', label: 'Trust Badges', type: 'trust_badges' }
   ]
+};
+
+const BadgeIcon = ({ name, className }) => {
+  switch (name) {
+    case 'truck': return <Truck className={className} />;
+    case 'shield': return <Shield className={className} />;
+    case 'undo': return <Undo className={className} />;
+    case 'headset': return <Headset className={className} />;
+    case 'percent': return <Percent className={className} />;
+    case 'tag': return <Tag className={className} />;
+    case 'gift': return <Gift className={className} />;
+    case 'check-circle': return <CheckCircle className={className} />;
+    default: return <HelpCircle className={className} />;
+  }
+};
+
+const FacebookIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
+const TwitterIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+  </svg>
+);
+
+const InstagramIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const LinkedinIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+    <rect width="4" height="12" x="2" y="9"/>
+    <circle cx="4" cy="4" r="2"/>
+  </svg>
+);
+
+const SocialLinksEditor = ({ value, onChange }) => {
+  const links = value || { facebook: '', twitter: '', instagram: '', linkedin: '' };
+  
+  const updateLink = (platform, val) => {
+    onChange({ ...links, [platform]: val });
+  };
+
+  return (
+    <div className="space-y-3.5 p-4 bg-slate-950/40 rounded-xl border border-slate-850">
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <FacebookIcon className="w-4 h-4 text-blue-500" />
+          Facebook Link URL
+        </label>
+        <input
+          type="text"
+          value={links.facebook || ''}
+          onChange={(e) => updateLink('facebook', e.target.value)}
+          placeholder="https://facebook.com/username"
+          className="w-full px-3 py-2 bg-slate-905 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550 transition-colors"
+        />
+      </div>
+      
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <TwitterIcon className="w-4 h-4 text-sky-400" />
+          Twitter / X Link URL
+        </label>
+        <input
+          type="text"
+          value={links.twitter || ''}
+          onChange={(e) => updateLink('twitter', e.target.value)}
+          placeholder="https://twitter.com/username"
+          className="w-full px-3 py-2 bg-slate-905 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550 transition-colors"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <InstagramIcon className="w-4 h-4 text-pink-500" />
+          Instagram Link URL
+        </label>
+        <input
+          type="text"
+          value={links.instagram || ''}
+          onChange={(e) => updateLink('instagram', e.target.value)}
+          placeholder="https://instagram.com/username"
+          className="w-full px-3 py-2 bg-slate-905 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550 transition-colors"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <LinkedinIcon className="w-4 h-4 text-blue-600" />
+          LinkedIn Link URL
+        </label>
+        <input
+          type="text"
+          value={links.linkedin || ''}
+          onChange={(e) => updateLink('linkedin', e.target.value)}
+          placeholder="https://linkedin.com/company/username"
+          className="w-full px-3 py-2 bg-slate-905 border border-slate-800 rounded-lg text-slate-200 text-xs focus:outline-none focus:border-purple-550 transition-colors"
+        />
+      </div>
+    </div>
+  );
+};
+
+const TrustBadgesEditor = ({ value, onChange }) => {
+  const badges = Array.isArray(value) ? value : [];
+
+  const updateBadgeField = (index, field, val) => {
+    const updated = [...badges];
+    updated[index] = { ...updated[index], [field]: val };
+    onChange(updated);
+  };
+
+  const addBadge = () => {
+    onChange([
+      ...badges,
+      {
+        icon: 'truck',
+        title: 'New Trust Badge',
+        description: 'Description of the service benefit.',
+        isActive: true,
+        order: badges.length
+      }
+    ]);
+  };
+
+  const removeBadge = (index) => {
+    const updated = badges.filter((_, i) => i !== index).map((b, i) => ({ ...b, order: i }));
+    onChange(updated);
+  };
+
+  const moveBadge = (index, direction) => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === badges.length - 1) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const updated = [...badges];
+    const temp = updated[index];
+    updated[index] = updated[targetIndex];
+    updated[targetIndex] = temp;
+    
+    const ordered = updated.map((b, i) => ({ ...b, order: i }));
+    onChange(ordered);
+  };
+
+  const availableIcons = ['truck', 'shield', 'undo', 'headset', 'percent', 'tag', 'gift', 'check-circle'];
+
+  return (
+    <div className="space-y-4 p-4 bg-slate-950/40 rounded-xl border border-slate-850">
+      <div className="flex justify-between items-center">
+        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Active Trust Badges ({badges.length})</span>
+        <button
+          type="button"
+          onClick={addBadge}
+          className="px-2.5 py-1 bg-purple-650 hover:bg-purple-550 border border-purple-600 hover:border-purple-500 text-white rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+        >
+          <Plus className="w-3 h-3" /> Add Badge
+        </button>
+      </div>
+
+      {badges.length === 0 ? (
+        <div className="text-center py-6 border border-dashed border-slate-800 rounded-xl">
+          <p className="text-[10px] text-slate-500">No trust badges configured. Click Add Badge to start.</p>
+        </div>
+      ) : (
+        <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+          {badges.map((badge, index) => (
+            <div key={index} className="p-3 bg-slate-900 border border-slate-800 rounded-lg space-y-3 relative group">
+              <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <BadgeIcon name={badge.icon} className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="text-[10px] font-bold text-purple-400">Badge #{index + 1}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    onClick={() => moveBadge(index, 'up')}
+                    className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                  >
+                    <ArrowUp className="w-3 h-3" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === badges.length - 1}
+                    onClick={() => moveBadge(index, 'down')}
+                    className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                  >
+                    <ArrowDown className="w-3 h-3" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeBadge(index)}
+                    className="p-1 text-red-400 hover:text-red-350 hover:bg-red-500/10 rounded cursor-pointer transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-slate-500 uppercase">Icon Graphic</label>
+                  <select
+                    value={badge.icon || 'truck'}
+                    onChange={(e) => updateBadgeField(index, 'icon', e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-300 text-xs focus:outline-none focus:border-purple-550"
+                  >
+                    {availableIcons.map(ic => (
+                      <option key={ic} value={ic}>{ic}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-slate-500 uppercase">Badge Title</label>
+                  <input
+                    type="text"
+                    value={badge.title || ''}
+                    onChange={(e) => updateBadgeField(index, 'title', e.target.value)}
+                    placeholder="e.g. Free Delivery"
+                    className="w-full px-2.5 py-1.5 bg-slate-955 border border-slate-800 rounded-lg text-slate-300 text-xs focus:outline-none focus:border-purple-550"
+                  />
+                </div>
+
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-[9px] font-bold text-slate-500 uppercase">Benefit Description</label>
+                  <input
+                    type="text"
+                    value={badge.description || ''}
+                    onChange={(e) => updateBadgeField(index, 'description', e.target.value)}
+                    placeholder="e.g. On orders over 50,000 Rwf"
+                    className="w-full px-2.5 py-1.5 bg-slate-955 border border-slate-800 rounded-lg text-slate-300 text-xs focus:outline-none focus:border-purple-550"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 mt-1 sm:col-span-2 select-none">
+                  <input
+                    type="checkbox"
+                    checked={badge.isActive !== false}
+                    onChange={(e) => updateBadgeField(index, 'isActive', e.target.checked)}
+                    className="w-4.5 h-4.5 rounded text-purple-600 bg-slate-955 border-slate-850 focus:ring-purple-550"
+                  />
+                  <span className="text-[10px] font-bold text-slate-400">Display badge active</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SellerAutoApprovalEditor = ({ value, onChange }) => {
+  const autoApproval = value || { enabled: false, minScore: 70, criteria: { emailVerified: 30, phoneProvided: 20, storeNameSet: 20, storeDescriptionSet: 15, profilePhotoSet: 15 } };
+  
+  const updateField = (key, val) => {
+    onChange({ ...autoApproval, [key]: val });
+  };
+
+  const updateCriteriaField = (criterion, val) => {
+    const scoreVal = parseInt(val) || 0;
+    onChange({
+      ...autoApproval,
+      criteria: {
+        ...(autoApproval.criteria || { emailVerified: 30, phoneProvided: 20, storeNameSet: 20, storeDescriptionSet: 15, profilePhotoSet: 15 }),
+        [criterion]: scoreVal
+      }
+    });
+  };
+
+  const criteria = autoApproval.criteria || { emailVerified: 30, phoneProvided: 20, storeNameSet: 20, storeDescriptionSet: 15, profilePhotoSet: 15 };
+
+  return (
+    <div className="space-y-4 p-4 bg-slate-950/40 rounded-xl border border-slate-850">
+      <div className="flex items-center gap-3 select-none">
+        <input
+          type="checkbox"
+          checked={!!autoApproval.enabled}
+          onChange={(e) => updateField('enabled', e.target.checked)}
+          className="w-4.5 h-4.5 rounded border-slate-800 text-purple-600 bg-slate-950 cursor-pointer focus:ring-purple-550"
+        />
+        <div className="flex flex-col">
+          <span className="text-xs font-bold text-slate-200">Enable Auto-Approval on Application</span>
+          <span className="text-[10px] text-slate-500">Automatically activate pending sellers based on profile details weight score.</span>
+        </div>
+      </div>
+
+      {autoApproval.enabled && (
+        <div className="space-y-4 pt-3 border-t border-slate-800/80">
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                Minimum Eligibility Target Score
+              </label>
+              <span className="text-xs font-black text-purple-400">{autoApproval.minScore || 70}%</span>
+            </div>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              value={autoApproval.minScore || 70}
+              onChange={(e) => updateField('minScore', parseInt(e.target.value))}
+              className="w-full accent-purple-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-900 pb-1">Completeness Weight Weights (%)</span>
+            
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="space-y-1 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                <label className="text-[9px] text-slate-450 font-bold block">Email Verified</label>
+                <input
+                  type="number"
+                  value={criteria.emailVerified ?? 30}
+                  onChange={(e) => updateCriteriaField('emailVerified', e.target.value)}
+                  className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-slate-300 text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="space-y-1 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                <label className="text-[9px] text-slate-450 font-bold block">Phone Registered</label>
+                <input
+                  type="number"
+                  value={criteria.phoneProvided ?? 20}
+                  onChange={(e) => updateCriteriaField('phoneProvided', e.target.value)}
+                  className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-slate-300 text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="space-y-1 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                <label className="text-[9px] text-slate-450 font-bold block">Store Name Set</label>
+                <input
+                  type="number"
+                  value={criteria.storeNameSet ?? 20}
+                  onChange={(e) => updateCriteriaField('storeNameSet', e.target.value)}
+                  className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-slate-300 text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="space-y-1 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800">
+                <label className="text-[9px] text-slate-450 font-bold block">Description Provided</label>
+                <input
+                  type="number"
+                  value={criteria.storeDescriptionSet ?? 15}
+                  onChange={(e) => updateCriteriaField('storeDescriptionSet', e.target.value)}
+                  className="w-full px-2 py-1 bg-slate-950 border border-slate-800 rounded text-slate-300 text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="space-y-1 bg-slate-900/50 p-2.5 rounded-lg border border-slate-800 col-span-2">
+                <label className="text-[9px] text-slate-455 font-bold block">Store Logo / Profile Photo Uploaded</label>
+                <input
+                  type="number"
+                  value={criteria.profilePhotoSet ?? 15}
+                  onChange={(e) => updateCriteriaField('profilePhotoSet', e.target.value)}
+                  className="w-full px-2.5 py-1 bg-slate-955 border border-slate-800 rounded text-slate-300 text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+            </div>
+            
+            <div className="text-[9px] text-slate-500 flex justify-between px-1.5 border-t border-slate-900 pt-2">
+              <span>Combined check weights sum:</span>
+              <span className="font-bold text-slate-400">
+                {Object.values(criteria).reduce((a, b) => a + (parseInt(b) || 0), 0)}%
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const DeliveryFormEditor = ({ formData, setFormData }) => {
@@ -1603,16 +2002,14 @@ const ImpressaAdmin = () => {
 
     let submitData = { ...formData };
     try {
-      if (selectedFeature === 'delivery') {
-        if (typeof submitData.regions === 'string') {
-          submitData.regions = JSON.parse(submitData.regions || '[]');
-        }
-        if (typeof submitData.methods === 'string') {
-          submitData.methods = JSON.parse(submitData.methods || '[]');
+      const jsonFields = ['socialLinks', 'trustBadges', 'regions', 'methods', 'categoryRates', 'sellerRates'];
+      for (const field of jsonFields) {
+        if (submitData[field] && typeof submitData[field] === 'string') {
+          submitData[field] = JSON.parse(submitData[field]);
         }
       }
     } catch (err) {
-      setMsg({ type: 'error', text: 'Invalid JSON format in Regions or Methods. Please enter a valid JSON array.' });
+      setMsg({ type: 'error', text: 'Invalid JSON format in settings fields. Please verify JSON syntax.' });
       return;
     }
 
@@ -1646,6 +2043,10 @@ const ImpressaAdmin = () => {
     fields.forEach(f => {
       if (selectedFeature === 'delivery' && (f.name === 'regions' || f.name === 'methods')) {
         initialForm[f.name] = [];
+      } else if (f.name === 'socialLinks') {
+        initialForm[f.name] = { facebook: '', twitter: '', instagram: '', linkedin: '' };
+      } else if (f.name === 'trustBadges') {
+        initialForm[f.name] = [];
       } else {
         initialForm[f.name] = f.type === 'checkbox' ? false : '';
       }
@@ -1671,6 +2072,19 @@ const ImpressaAdmin = () => {
           }
         }
         formVals[f.name] = Array.isArray(val) ? val : [];
+      } else if (f.name === 'socialLinks' || f.name === 'trustBadges') {
+        if (typeof val === 'string' && val.trim() !== '') {
+          try {
+            val = JSON.parse(val);
+          } catch (e) {
+            val = null;
+          }
+        }
+        if (f.name === 'socialLinks') {
+          formVals[f.name] = val || { facebook: '', twitter: '', instagram: '', linkedin: '' };
+        } else if (f.name === 'trustBadges') {
+          formVals[f.name] = Array.isArray(val) ? val : [];
+        }
       } else {
         if (val !== undefined && typeof val === 'object' && val !== null) {
           val = JSON.stringify(val, null, 2);
@@ -2088,7 +2502,14 @@ const ImpressaAdmin = () => {
                     <table className="w-full text-left border-collapse select-text">
                       <thead className="bg-slate-950/80 sticky top-0 border-b border-slate-850 z-10">
                         <tr>
-                          {Object.keys(filteredData[0]).filter(key => key !== 'id').map(key => (
+                          {Object.keys(filteredData[0]).filter(key => {
+                            if (key === 'id') return false;
+                            const schemaKeys = (FORM_SCHEMAS[selectedFeature] || []).map(f => f.name);
+                            if (schemaKeys.length > 0) {
+                              return schemaKeys.includes(key) || key === 'createdAt' || key === 'updatedAt';
+                            }
+                            return true;
+                          }).map(key => (
                             <th key={key} className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">{key}</th>
                           ))}
                           <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Actions</th>
@@ -2097,7 +2518,14 @@ const ImpressaAdmin = () => {
                       <tbody className="divide-y divide-slate-850/50">
                         {filteredData.map((record) => (
                           <tr key={record.id} className="hover:bg-slate-900/30 transition-colors">
-                            {Object.entries(record).filter(([key]) => key !== 'id').map(([key, val]) => (
+                            {Object.entries(record).filter(([key]) => {
+                              if (key === 'id') return false;
+                              const schemaKeys = (FORM_SCHEMAS[selectedFeature] || []).map(f => f.name);
+                              if (schemaKeys.length > 0) {
+                                return schemaKeys.includes(key) || key === 'createdAt' || key === 'updatedAt';
+                              }
+                              return true;
+                            }).map(([key, val]) => (
                               <td key={key} className="px-5 py-3 text-xs text-slate-300 font-medium whitespace-nowrap max-w-xs truncate">
                                 {renderCellContent(key, val)}
                               </td>
@@ -2205,7 +2633,17 @@ const ImpressaAdmin = () => {
                       {field.label} {field.required && <span className="text-red-500">*</span>}
                     </label>
                     
-                    {field.type === 'select' ? (
+                    {field.name === 'socialLinks' ? (
+                      <SocialLinksEditor
+                        value={formData[field.name]}
+                        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+                      />
+                    ) : field.name === 'trustBadges' ? (
+                      <TrustBadgesEditor
+                        value={formData[field.name]}
+                        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+                      />
+                    ) : field.type === 'select' ? (
                       <select
                          value={formData[field.name] || ''}
                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
