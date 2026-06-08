@@ -103,7 +103,7 @@ async function main() {
   const pricing = [
     {
       name: 'Starter MVP Suite',
-      price: '$2,500',
+      price: '2,500,000 Frw',
       description: 'Perfect for validating new business concepts or deploying clean web-based workflows.',
       features: [
         'Tailored UI/UX & Responsive Web Layouts',
@@ -117,7 +117,7 @@ async function main() {
     },
     {
       name: 'Enterprise Commerce Suite',
-      price: '$6,000',
+      price: '6,000,000 Frw',
       description: 'Full-scale commerce and operational software for established local firms.',
       features: [
         'Advanced Multi-vendor Sync & Catalogs',
@@ -167,7 +167,7 @@ async function main() {
   const retainers = [
     {
       name: 'Standard Technical Retainer',
-      price: '$400/mo',
+      price: '400,000 Frw/mo',
       description: 'Ensuring your systems run smoothly, securely, and without downtime after launch.',
       features: [
         '24/7 Automated Server Health Monitoring',
@@ -182,7 +182,7 @@ async function main() {
     },
     {
       name: 'Active Dev & Support Retainer',
-      price: '$1,200/mo',
+      price: '1,200,000 Frw/mo',
       description: 'Continuous improvements and new feature deployments for growing platforms.',
       features: [
         'Everything in the Standard Technical Retainer',

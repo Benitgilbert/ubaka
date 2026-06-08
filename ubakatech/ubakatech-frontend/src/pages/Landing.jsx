@@ -141,7 +141,7 @@ const TEAM_PROFILES = [
 const PRICING_PACKAGES = [
   {
     name: 'Starter MVP Suite',
-    price: '$2,500',
+    price: '2,500,000 Frw',
     description: 'Perfect for validating new business concepts or deploying clean web-based workflows.',
     features: [
       'Tailored UI/UX & Responsive Web Layouts',
@@ -154,7 +154,7 @@ const PRICING_PACKAGES = [
   },
   {
     name: 'Enterprise Commerce Suite',
-    price: '$6,000',
+    price: '6,000,000 Frw',
     description: 'Full-scale commerce and operational software for established local firms.',
     features: [
       'Advanced Multi-vendor Sync & Catalogs',
@@ -186,7 +186,7 @@ const PRICING_PACKAGES = [
 const RETAINER_PACKAGES = [
   {
     name: 'Standard Technical Retainer',
-    price: '$400/mo',
+    price: '400,000 Frw/mo',
     description: 'Ensuring your systems run smoothly, securely, and without downtime after launch.',
     features: [
       '24/7 Automated Server Health Monitoring',
@@ -199,7 +199,7 @@ const RETAINER_PACKAGES = [
   },
   {
     name: 'Active Dev & Support Retainer',
-    price: '$1,200/mo',
+    price: '1,200,000 Frw/mo',
     description: 'Continuous improvements and new feature deployments for growing platforms.',
     features: [
       'Everything in the Standard Technical Retainer',
@@ -1218,7 +1218,7 @@ const Landing = ({ onEnterPortal }) => {
                           setIntakeForm({
                             ...intakeForm,
                             serviceType: pkg.name.includes('MVP') ? 'E-Commerce Marketplace' : pkg.name.includes('Commerce') ? 'Point of Sale (POS) System' : 'ERP / Custom Database',
-                            budget: pkg.price === 'Custom / Contact Us' ? 'Above 12M RWF' : pkg.price.includes('2,500') ? '1.5M - 3M RWF' : '6M - 12M RWF'
+                            budget: pkg.price === 'Custom / Contact Us' ? 'Above 12M RWF' : pkg.price.includes('2,500,000') ? '1.5M - 3M RWF' : '6M - 12M RWF'
                           });
                           setActiveTab('intake');
                         }}
