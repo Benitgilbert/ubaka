@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import prisma from '../config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -216,3 +217,72 @@ export const applyJob = async (req, res) => {
     return res.status(500).json({ error: 'Failed to submit application. Please try again.' });
   }
 };
+
+// Handler to get public team members
+export const getTeam = async (req, res) => {
+  try {
+    const team = await prisma.employee.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        title: true,
+        focus: true,
+        avatar: true,
+        department: true,
+        location: true
+      }
+    });
+    return res.json(team);
+  } catch (err) {
+    console.error('[PublicController] Failed to fetch team members:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve team members.' });
+  }
+};
+
+// Handler to get capabilities services
+export const getServices = async (req, res) => {
+  try {
+    const services = await prisma.service.findMany();
+    return res.json(services);
+  } catch (err) {
+    console.error('[PublicController] Failed to fetch services:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve services.' });
+  }
+};
+
+// Handler to get pricing packages
+export const getPricing = async (req, res) => {
+  try {
+    const pricing = await prisma.pricingPackage.findMany();
+    return res.json(pricing);
+  } catch (err) {
+    console.error('[PublicController] Failed to fetch pricing packages:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve pricing packages.' });
+  }
+};
+
+// Handler to get retainer packages
+export const getRetainers = async (req, res) => {
+  try {
+    const retainers = await prisma.retainerPackage.findMany();
+    return res.json(retainers);
+  } catch (err) {
+    console.error('[PublicController] Failed to fetch retainer packages:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve retainer packages.' });
+  }
+};
+
+// Handler to get FAQ list
+export const getFaqs = async (req, res) => {
+  try {
+    const faqs = await prisma.faq.findMany({
+      orderBy: { order: 'asc' }
+    });
+    return res.json(faqs);
+  } catch (err) {
+    console.error('[PublicController] Failed to fetch FAQs:', err.message);
+    return res.status(500).json({ error: 'Failed to retrieve FAQs.' });
+  }
+};
+

@@ -6,10 +6,28 @@ export const BACKEND_URL = (() => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return 'https://api.ubakatech.co.rw';
+  if (import.meta.env.DEV) {
+    if (typeof window !== 'undefined') {
+      return `http://${window.location.hostname}:5000`;
+    }
+    return 'http://localhost:5000';
   }
-  return 'http://localhost:5000';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const isLocal = 
+      hostname === 'localhost' || 
+      hostname === '127.0.0.1' || 
+      hostname.startsWith('192.168.') || 
+      hostname.startsWith('10.') || 
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+      hostname.endsWith('.local') ||
+      hostname.endsWith('.lan');
+      
+    if (isLocal) {
+      return `http://${hostname}:5000`;
+    }
+  }
+  return 'https://api.ubakatech.co.rw';
 })();
 
 export const API_BASE_URL = `${BACKEND_URL}/api`;

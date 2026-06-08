@@ -32,6 +32,187 @@ import {
   Check
 } from 'lucide-react';
 
+const ProjectIcon = ({ name, className }) => {
+  switch (name) {
+    case 'Smartphone': return <Smartphone className={className} />;
+    case 'Globe': return <Globe className={className} />;
+    case 'Home': return <Home className={className} />;
+    case 'Heart': return <Heart className={className} />;
+    case 'Cpu': return <Cpu className={className} />;
+    default: return <Layers className={className} />;
+  }
+};
+
+const RetainerIcon = ({ name, className }) => {
+  switch (name) {
+    case 'ShieldCheck': return <ShieldCheck className={className} />;
+    case 'Activity': return <Activity className={className} />;
+    default: return <ShieldCheck className={className} />;
+  }
+};
+
+const ServiceIcon = ({ name, className }) => {
+  switch (name) {
+    case 'Cpu': return <Cpu className={className} />;
+    case 'Smartphone': return <Smartphone className={className} />;
+    case 'ShieldCheck': return <ShieldCheck className={className} />;
+    default: return <Cpu className={className} />;
+  }
+};
+
+const getTeamMemberGradient = (memb, idx) => {
+  if (memb.bgGradient) return memb.bgGradient;
+  const gradients = [
+    'from-purple-500 to-indigo-500',
+    'from-rose-500 to-orange-500',
+    'from-emerald-500 to-teal-500',
+    'from-blue-500 to-cyan-500',
+    'from-amber-500 to-pink-500'
+  ];
+  return gradients[idx % gradients.length];
+};
+
+// Static Fallbacks for Dynamic Content (to ensure 100% uptime if database is unseeded/offline)
+const FAQ_DATA = [
+  {
+    q: 'Do you design MTN Mobile Money and Airtel Money integrations?',
+    a: 'Yes, we integrate local mobile money payment options seamlessly. We understand that in Rwanda, MTN MoMo and Airtel Money are how most people run their daily lives. We make it easy for your customers to check out and for you to track payments instantly.'
+  },
+  {
+    q: 'Is your point-of-sale system RRA EBM v2 tax compliant?',
+    a: 'Absolutely. We handle all the compliance details so you don\'t have to. We connect your platform directly with the Rwanda Revenue Authority (RRA) EBM invoicing system. When an item is sold, it registers with the tax gateway automatically, keeping your business legal and audit-ready.'
+  },
+  {
+    q: 'Can you build offline-first applications for rural areas?',
+    a: 'Yes. Internet connections in upcountry areas like Gicumbi can fluctuate. We build systems that cache data on the user\'s phone or computer. Cashiers can continue registering sales offline, and the system automatically syncs up when the network returns.'
+  },
+  {
+    q: 'What is your typical software development lifecycle timeline?',
+    a: 'Most custom software takes between 4 to 12 weeks from our first conversation to launch. We don\'t hide in a room coding for months—every two weeks, we show you working features to get your feedback and make sure we are building exactly what you envisioned.'
+  },
+  {
+    q: 'Do you offer ongoing technical maintenance after product launch?',
+    a: 'Yes, we stay by your side after launch. We monitor servers to prevent crashes, run secure database backups daily, and provide quick support when you have questions or want to add new updates.'
+  }
+];
+
+const SERVICES_LIST = [
+  {
+    icon: 'Cpu',
+    title: 'Custom Software Engineering',
+    desc: 'We build digital tools that solve your exact business needs. Whether you need a web portal, mobile app, or a secure server database, we write clean, fast code that fits your operations like a custom-made suit.',
+    features: ['Custom Web Platforms & Dashboards', 'Fast Mobile Apps (Android/iOS)', 'Secure Database Architecture', 'API Development & Integrations']
+  },
+  {
+    icon: 'Smartphone',
+    title: 'Thoughtful Product UI/UX Design',
+    desc: 'We design screens that make sense to the people using them. We sit down with real users—like market traders and commuters—to design layouts with clean visual patterns, readable fonts, and clear touch targets.',
+    features: ['User Research & Field Usability Testing', 'Interactive Screen Prototypes', 'Fast & Light Layout Renders', 'High-Contrast Mobile Optimization']
+  },
+  {
+    icon: 'ShieldCheck',
+    title: 'Local Payments & Compliance',
+    desc: 'We bridge the gap between your software and local regulations. We make it simple for you to accept Mobile Money payments and automatically file VAT transactions with the RRA EBM system.',
+    features: ['RRA EBM Invoicing Integration', 'MTN MoMo & Airtel Money Checkouts', 'Automated Daily Sales Reconciliation', 'Audit-Ready Balance Sheet PDF Exports']
+  }
+];
+
+const TEAM_PROFILES = [
+  {
+    name: 'Gilbert Benit',
+    role: 'Founder & Lead Systems Developer',
+    focus: 'A developer who believes code should serve people. You\'ll find him testing databases, talking with local shop owners, or looking for ways to speed up cashier screens.',
+    bgGradient: 'from-purple-500 to-indigo-500'
+  },
+  {
+    name: 'Elsa Keza',
+    role: 'Head of Product Experience & Design',
+    focus: 'A designer who spends time in the field. She designs interfaces that anyone can use easily, even under the bright Gicumbi sun on a small smartphone screen.',
+    bgGradient: 'from-rose-500 to-orange-500'
+  },
+  {
+    name: 'David Mugisha',
+    role: 'Principal Backend Systems Architect',
+    focus: 'Our backend and server architect. He makes sure your databases stay secure and up, ensuring scans and payments go through instantly.',
+    bgGradient: 'from-emerald-500 to-teal-500'
+  }
+];
+
+const PRICING_PACKAGES = [
+  {
+    name: 'Starter MVP Suite',
+    price: '$2,500',
+    description: 'Perfect for validating new business concepts or deploying clean web-based workflows.',
+    features: [
+      'Tailored UI/UX & Responsive Web Layouts',
+      'Secure User Authentications & Audits',
+      'Relational Database Setup (PostgreSQL)',
+      'Basic Mobile Money Payments Checkout',
+      '2 Weeks Post-Launch Deployment Support'
+    ],
+    badge: 'Popular for Startups'
+  },
+  {
+    name: 'Enterprise Commerce Suite',
+    price: '$6,000',
+    description: 'Full-scale commerce and operational software for established local firms.',
+    features: [
+      'Advanced Multi-vendor Sync & Catalogs',
+      'Automated MTN MoMo & Airtel Payments API',
+      'RRA EBM v2 Tax Compliance Integration',
+      'Audit-Ready PDF Balance Sheet Exports',
+      'Dedicated Admin Dashboard & User Management',
+      '4 Weeks Post-Launch Deployment Support'
+    ],
+    badge: 'Best Value for Enterprises',
+    popular: true
+  },
+  {
+    name: 'Custom Co-Design & AI Suite',
+    price: 'Custom / Contact Us',
+    description: 'Specialized systems requiring hardware, heavy computation, or AI algorithms.',
+    features: [
+      'Offline-First Sync for Rural Terminals',
+      'TensorFlow.js / MediaPipe Neural-nets Integration',
+      'WebSocket Real-Time Multi-channel Feeds',
+      'Custom React Native iOS & Android Apps',
+      'Continuous Integration & Deployment Pipeline Setup',
+      'Extended Dedicated Support'
+    ],
+    badge: 'Tailored R&D'
+  }
+];
+
+const RETAINER_PACKAGES = [
+  {
+    name: 'Standard Technical Retainer',
+    price: '$400/mo',
+    description: 'Ensuring your systems run smoothly, securely, and without downtime after launch.',
+    features: [
+      '24/7 Automated Server Health Monitoring',
+      'Encrypted Daily Database Backups',
+      'Regular Security & Dependency Patches',
+      'Up to 5 Hours of Bug Fixes & Small Updates',
+      'Response within 24 Hours Guarantee'
+    ],
+    icon: 'ShieldCheck'
+  },
+  {
+    name: 'Active Dev & Support Retainer',
+    price: '$1,200/mo',
+    description: 'Continuous improvements and new feature deployments for growing platforms.',
+    features: [
+      'Everything in the Standard Technical Retainer',
+      'Up to 25 Hours of Dedicated Developer Time',
+      'Continuous Feature Rollouts & Deployments',
+      'Monthly Database Optimization Reviews',
+      'Priority Response within 8 Hours'
+    ],
+    icon: 'Activity',
+    popular: true
+  }
+];
+
 const Landing = ({ onEnterPortal }) => {
   // Navigation State: 'home', 'portfolio', 'services', 'careers', 'contact', 'intake'
   const [activeTab, setActiveTab] = useState('home');
@@ -42,6 +223,23 @@ const Landing = ({ onEnterPortal }) => {
   // Careers state
   const [careersList, setCareersList] = useState([]);
   const [loadingCareers, setLoadingCareers] = useState(true);
+
+  // Projects state
+  const [projectsList, setProjectsList] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
+  // Dynamic homepage elements state initialized with static fallbacks
+  const [teamList, setTeamList] = useState(TEAM_PROFILES);
+  const [loadingTeam, setLoadingTeam] = useState(true);
+  const [servicesList, setServicesList] = useState(SERVICES_LIST);
+  const [loadingServices, setLoadingServices] = useState(true);
+  const [pricingList, setPricingList] = useState(PRICING_PACKAGES);
+  const [loadingPricing, setLoadingPricing] = useState(true);
+  const [retainersList, setRetainersList] = useState(RETAINER_PACKAGES);
+  const [loadingRetainers, setLoadingRetainers] = useState(true);
+  const [faqsList, setFaqsList] = useState(FAQ_DATA);
+  const [loadingFaqs, setLoadingFaqs] = useState(true);
+
   const [selectedJob, setSelectedJob] = useState(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applyForm, setApplyForm] = useState({
@@ -191,6 +389,245 @@ const Landing = ({ onEnterPortal }) => {
     fetchJobs();
   }, []);
 
+  // Fetch Showcase Projects from Backend
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        const res = await fetch(`${BACKEND_URL}/api/projects/public/showcase`);
+        if (res.ok) {
+          const data = await res.json();
+          setProjectsList(data);
+        } else {
+          throw new Error('Failed to fetch projects');
+        }
+      } catch (err) {
+        console.warn('Projects API offline. Using fallback static projects list.', err.message);
+        // Fallback static list matching backend definition
+        setProjectsList([
+          {
+            id: 'proj-impressa-id',
+            name: 'Kuri Macye',
+            slug: 'impressa',
+            status: 'active',
+            repositoryUrl: 'https://github.com/Benitgilbert/impressa.git',
+            liveUrl: 'https://kurimacye.vercel.app',
+            tagline: 'Premium Multivendor E-Commerce Marketplace',
+            shortDesc: 'Empowering local sellers and micro-businesses through a modern digital marketplace. Connecting vendors to customers across Rwanda.',
+            iconName: 'Smartphone',
+            gradient: 'from-purple-500 via-indigo-500 to-blue-500',
+            shadow: 'shadow-purple-500/10',
+            stats: [
+              { label: 'Active Vendors', value: '1,200+' },
+              { label: 'Weekly Transactions', value: '7.4M RWF' },
+              { label: 'Rwandan Regions Active', value: '5 Provinces' },
+              { label: 'System Uptime', value: '99.98%' }
+            ],
+            details: {
+              mission: 'To empower Rwandan SMEs and local vendors by connecting them to customers through a vibrant digital marketplace. No vendor is left behind.',
+              tech: ['React 19', 'Node.js Express', 'Supabase', 'PostgreSQL', 'Prisma ORM'],
+              features: [
+                'Premium multivendor marketplace connecting local sellers to buyers.',
+                'Multi-vendor inventory synchronization and attributes catalog.',
+                'Secure credit tracking system ("Abonne tracking") for loyal local customers.',
+                'Audit-ready financial report PDF generation.'
+              ]
+            }
+          },
+          {
+            id: 'proj-gesture-to-speech-id',
+            name: 'Gesture to Speech',
+            slug: 'gesture-to-speech',
+            status: 'development',
+            repositoryUrl: 'https://github.com/Benitgilbert/gesture-to-speech.git',
+            liveUrl: null,
+            tagline: 'Rwandan Sign Language (RSL) Translation System',
+            shortDesc: 'Breaking daily communication barriers for deaf students and workers with real-time gesture-to-speech translation.',
+            iconName: 'Heart',
+            gradient: 'from-rose-500 to-orange-500',
+            shadow: 'shadow-rose-500/10',
+            stats: [
+              { label: 'Vocabulary signs', value: '12,000+' },
+              { label: 'Translation Latency', value: '120ms' },
+              { label: 'Model Accuracy', value: '98.4%' },
+              { label: 'Schools Implemented', value: '8 centers' }
+            ],
+            details: {
+              mission: 'Providing digital accessibility tools that enable seamless communication between Deaf signers and non-signing members of the community.',
+              tech: ['TensorFlow.js', 'Python FastAPI', 'MediaPipe', 'WebRTC Streamer', 'React'],
+              features: [
+                'High-speed video frame hand and body pose tracking.',
+                'Local dataset mapping Kinyarwanda dialects and RSL idioms.',
+                'Voice synthesis engine supporting Kinyarwanda and English audio playback.',
+                'Offline capability for school computers with low connectivity.'
+              ]
+            }
+          },
+          {
+            id: 'proj-linker-id',
+            name: 'Linker',
+            slug: 'linker',
+            status: 'testing',
+            repositoryUrl: 'https://github.com/Benitgilbert/linker.git',
+            liveUrl: null,
+            tagline: 'Smart Commuter Bus Booking Portal',
+            shortDesc: 'Removing commuting stress and waiting lines through a digitized real-time booking and scheduling system.',
+            iconName: 'Globe',
+            gradient: 'from-emerald-500 to-teal-500',
+            shadow: 'shadow-emerald-500/10',
+            stats: [
+              { label: 'Daily Tickets Booked', value: '1,850+' },
+              { label: 'Active Routes Mapped', value: '18 lines' },
+              { label: 'Partner Operators', value: '5 agencies' },
+              { label: 'Bus Terminal Sync', value: 'Real-time' }
+            ],
+            details: {
+              mission: 'Transforming public transportation in Kigali and upcountry routes, replacing unorganized queuing with clean, scheduled seat bookings.',
+              tech: ['React Native', 'Redis Queue', 'PostgreSQL', 'Socket.io', 'Twilio Gateway'],
+              features: [
+                'React-time bus seat selection and live bus location tracker.',
+                'Instant mobile ticket generation via SMS & dynamic QR Codes.',
+                'Automated route load balancing for fleet managers.',
+                'Mobile Money (MoMo) integration for instant payment checkout.'
+              ]
+            }
+          },
+          {
+            id: 'proj-homland-id',
+            name: 'Homland',
+            slug: 'homland',
+            status: 'planning',
+            repositoryUrl: 'https://github.com/Benitgilbert/homland.git',
+            liveUrl: null,
+            tagline: 'Virtual Real-Estate & Direct Rental Portal',
+            shortDesc: 'Helping tenants meet property owners directly, verifying spaces via virtual tours to eliminate broker scams.',
+            iconName: 'Home',
+            gradient: 'from-blue-500 to-cyan-500',
+            shadow: 'shadow-blue-500/10',
+            stats: [
+              { label: 'Verified Properties', value: '2,400+' },
+              { label: 'Active Owners', value: '650+' },
+              { label: 'Broker Fee Savings', value: '100%' },
+              { label: 'Virtual Tours Loaded', value: '1,500+' }
+            ],
+            details: {
+              mission: 'Creating a highly transparent rental market where university students and families can confidently rent houses, apartments, and offices without broker exploitation.',
+              tech: ['Vite React', 'Three.js 3D Viewer', 'Cloudinary', 'Node.js', 'PostgreSQL'],
+              features: [
+                '180° and 360° virtual property walk-throughs.',
+                'Direct in-app messaging between landlord and prospective tenants.',
+                'Standardized digital lease drafting and rent payment tracking.',
+                'Direct validation system (Ubaka Tech staff physically inspect listed listings).'
+              ]
+            }
+          }
+        ]);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  // Fetch Dynamic Homepage Content from Database API
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        setLoadingTeam(true);
+        const res = await fetch(`${BACKEND_URL}/api/public/team`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setTeamList(data);
+          }
+        }
+      } catch (err) {
+        console.warn('Team API offline. Using fallback static profiles.', err.message);
+      } finally {
+        setLoadingTeam(false);
+      }
+    };
+
+    const fetchServices = async () => {
+      try {
+        setLoadingServices(true);
+        const res = await fetch(`${BACKEND_URL}/api/public/services`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setServicesList(data);
+          }
+        }
+      } catch (err) {
+        console.warn('Services API offline. Using fallback static services.', err.message);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    const fetchPricing = async () => {
+      try {
+        setLoadingPricing(true);
+        const res = await fetch(`${BACKEND_URL}/api/public/pricing`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setPricingList(data);
+          }
+        }
+      } catch (err) {
+        console.warn('Pricing API offline. Using fallback static packages.', err.message);
+      } finally {
+        setLoadingPricing(false);
+      }
+    };
+
+    const fetchRetainers = async () => {
+      try {
+        setLoadingRetainers(true);
+        const res = await fetch(`${BACKEND_URL}/api/public/retainers`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setRetainersList(data);
+          }
+        }
+      } catch (err) {
+        console.warn('Retainers API offline. Using fallback static retainers.', err.message);
+      } finally {
+        setLoadingRetainers(false);
+      }
+    };
+
+    const fetchFaqs = async () => {
+      try {
+        setLoadingFaqs(true);
+        const res = await fetch(`${BACKEND_URL}/api/public/faqs`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            // Map the db keys {question, answer} to shape UI expects {q, a}
+            const mapped = data.map(faq => ({
+              q: faq.question,
+              a: faq.answer
+            }));
+            setFaqsList(mapped);
+          }
+        }
+      } catch (err) {
+        console.warn('FAQs API offline. Using fallback static FAQs.', err.message);
+      } finally {
+        setLoadingFaqs(false);
+      }
+    };
+
+    fetchTeam();
+    fetchServices();
+    fetchPricing();
+    fetchRetainers();
+    fetchFaqs();
+  }, []);
+
   const handleSecretClick = () => {
     // Hidden Easter-egg gateway: clicking the brand logo 5 times opens the portal login
     const newCount = secretCounter + 1;
@@ -329,73 +766,7 @@ const Landing = ({ onEnterPortal }) => {
     }
   };
 
-  // FAQ List (Human-first explanations)
-  const FAQ_DATA = [
-    {
-      q: 'Do you design MTN Mobile Money and Airtel Money integrations?',
-      a: 'Yes, we integrate local mobile money payment options seamlessly. We understand that in Rwanda, MTN MoMo and Airtel Money are how most people run their daily lives. We make it easy for your customers to check out and for you to track payments instantly.'
-    },
-    {
-      q: 'Is your point-of-sale system RRA EBM v2 tax compliant?',
-      a: 'Absolutely. We handle all the compliance details so you don\'t have to. We connect your platform directly with the Rwanda Revenue Authority (RRA) EBM invoicing system. When an item is sold, it registers with the tax gateway automatically, keeping your business legal and audit-ready.'
-    },
-    {
-      q: 'Can you build offline-first applications for rural areas?',
-      a: 'Yes. Internet connections in upcountry areas like Gicumbi can fluctuate. We build systems that cache data on the user\'s phone or computer. Cashiers can continue registering sales offline, and the system automatically syncs up when the network returns.'
-    },
-    {
-      q: 'What is your typical software development lifecycle timeline?',
-      a: 'Most custom software takes between 4 to 12 weeks from our first conversation to launch. We don\'t hide in a room coding for months—every two weeks, we show you working features to get your feedback and make sure we are building exactly what you envisioned.'
-    },
-    {
-      q: 'Do you offer ongoing technical maintenance after product launch?',
-      a: 'Yes, we stay by your side after launch. We monitor servers to prevent crashes, run secure database backups daily, and provide quick support when you have questions or want to add new updates.'
-    }
-  ];
 
-  // Core Capabilities details (Humanized)
-  const SERVICES_LIST = [
-    {
-      icon: Cpu,
-      title: 'Custom Software Engineering',
-      desc: 'We build digital tools that solve your exact business needs. Whether you need a web portal, mobile app, or a secure server database, we write clean, fast code that fits your operations like a custom-made suit.',
-      features: ['Custom Web Platforms & Dashboards', 'Fast Mobile Apps (Android/iOS)', 'Secure Database Architecture', 'API Development & Integrations']
-    },
-    {
-      icon: Smartphone,
-      title: 'Thoughtful Product UI/UX Design',
-      desc: 'We design screens that make sense to the people using them. We sit down with real users—like market traders and commuters—to design layouts with clean visual patterns, readable fonts, and clear touch targets.',
-      features: ['User Research & Field Usability Testing', 'Interactive Screen Prototypes', 'Fast & Light Layout Renders', 'High-Contrast Mobile Optimization']
-    },
-    {
-      icon: ShieldCheck,
-      title: 'Local Payments & Compliance',
-      desc: 'We bridge the gap between your software and local regulations. We make it simple for you to accept Mobile Money payments and automatically file VAT transactions with the RRA EBM system.',
-      features: ['RRA EBM Invoicing Integration', 'MTN MoMo & Airtel Money Checkouts', 'Automated Daily Sales Reconciliation', 'Audit-Ready Balance Sheet PDF Exports']
-    }
-  ];
-
-  // Team profiles (Humanized)
-  const TEAM_PROFILES = [
-    {
-      name: 'Gilbert Benit',
-      role: 'Founder & Lead Systems Developer',
-      focus: 'A developer who believes code should serve people. You\'ll find him testing databases, talking with local shop owners, or looking for ways to speed up cashier screens.',
-      bgGradient: 'from-purple-500 to-indigo-500'
-    },
-    {
-      name: 'Elsa Keza',
-      role: 'Head of Product Experience & Design',
-      focus: 'A designer who spends time in the field. She designs interfaces that anyone can use easily, even under the bright Gicumbi sun on a small smartphone screen.',
-      bgGradient: 'from-rose-500 to-orange-500'
-    },
-    {
-      name: 'David Mugisha',
-      role: 'Principal Backend Systems Architect',
-      focus: 'Our backend and server architect. He makes sure your databases stay secure and up, ensuring scans and payments go through instantly.',
-      bgGradient: 'from-emerald-500 to-teal-500'
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 font-sans relative overflow-hidden flex flex-col justify-between selection:bg-purple-600/30">
@@ -432,7 +803,7 @@ const Landing = ({ onEnterPortal }) => {
         <nav className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 p-1 bg-gray-900/30 border border-gray-900 rounded-full backdrop-blur-md max-w-full">
           {[
             { id: 'home', label: 'Home' },
-            { id: 'portfolio', label: 'Case Studies' },
+            { id: 'portfolio', label: 'Projects' },
             { id: 'services', label: 'Services' },
             { id: 'careers', label: 'Careers' },
             { id: 'contact', label: 'Contact' }
@@ -537,7 +908,7 @@ const Landing = ({ onEnterPortal }) => {
                   onClick={() => setActiveTab('portfolio')}
                   className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-6 rounded-2xl text-xs transition-all shadow-lg shadow-purple-500/10 hover:scale-102 active:scale-99 flex items-center gap-2 cursor-pointer"
                 >
-                  Explore Case Studies
+                  Explore Projects
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button 
@@ -568,7 +939,7 @@ const Landing = ({ onEnterPortal }) => {
                   {/* Embedded Badge */}
                   <div className="absolute bottom-9 left-9 right-9 p-4 rounded-xl bg-gray-950/80 border border-gray-850 backdrop-blur-md flex items-center justify-between">
                     <div>
-                      <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Featured Case Study</div>
+                      <div className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Featured Project</div>
                       <div className="text-xs font-black text-white mt-1">Kuri Macye E-Commerce</div>
                     </div>
                     <button
@@ -584,186 +955,158 @@ const Landing = ({ onEnterPortal }) => {
           </div>
         )}
 
-        {/* ================= PORTFOLIO / CASE STUDIES TAB ================= */}
+        {/* ================= PROJECTS TAB ================= */}
         {activeTab === 'portfolio' && (
           <div className="space-y-12 w-full animate-fade-in-up">
             {/* Header info */}
             <div className="text-center space-y-3 max-w-2xl mx-auto">
-              <span className="text-[9px] font-black uppercase tracking-widest text-purple-400 bg-purple-950/30 px-3 py-1 rounded-full border border-purple-500/15">Case Studies</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-purple-400 bg-purple-950/30 px-3 py-1 rounded-full border border-purple-500/15">Projects</span>
               <h3 className="text-3xl font-black text-white">Real Software, Real Impact</h3>
               <p className="text-gray-400 text-xs md:text-sm">
-                We focus on building software that solves actual challenges. Here is a deep dive into the flagship platform we designed, built, and launched.
+                We focus on building software that solves actual challenges. Here are the active and upcoming digital solutions in our pipeline.
               </p>
             </div>
 
-            {/* FLAGSHIP CASE STUDY: Kuri Macye */}
-            <div className="glass-panel rounded-3xl p-6 md:p-8 grid lg:grid-cols-12 gap-8 relative overflow-hidden border border-purple-500/10 shadow-xl shadow-purple-950/5">
-              {/* background flow */}
-              <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
-
-              {/* Details Column */}
-              <div className="lg:col-span-7 space-y-6 text-left flex flex-col justify-between">
-                <div className="space-y-4">
-                  {/* Badge */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                      <CheckCircle className="w-3 h-3" /> Deployed & Active
-                    </span>
-                    <span className="text-xs font-bold text-gray-500 font-mono">Completed Flagship</span>
-                  </div>
-
-                  {/* Title */}
-                  <div>
-                    <h4 className="text-3xl font-black text-white">Kuri Macye E-Commerce</h4>
-                    <p className="text-xs text-purple-400 font-semibold tracking-wide uppercase mt-1">Premium Multivendor Retail & POS Platform</p>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Kuri Macye is a multivendor e-commerce platform that connects local shopkeepers to buyers across Rwanda. We sat down with local vendors to build a system that manages their store inventory online while keeping daily cashier cash operations completely stress-free.
-                  </p>
-
-                  {/* Core Completed Modules Grid */}
-                  <div className="space-y-3">
-                    <h5 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Built Features for Real People</h5>
-                    <div className="grid sm:grid-cols-2 gap-3 text-xs text-gray-400">
-                      <div className="flex gap-2.5 items-start bg-gray-950/40 p-3 rounded-xl border border-gray-900">
-                        <Smartphone className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-gray-300 block">POS Cashier Interface</strong>
-                          A simple screen built for cashiers, making drawer checkout and shifts cash counting stress-free.
-                        </div>
-                      </div>
-                      <div className="flex gap-2.5 items-start bg-gray-950/40 p-3 rounded-xl border border-gray-900">
-                        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-gray-300 block">RRA EBM Compliance</strong>
-                          Automatically registers VAT receipts with the RRA, keeping your shop legal without extra paperwork.
-                        </div>
-                      </div>
-                      <div className="flex gap-2.5 items-start bg-gray-950/40 p-3 rounded-xl border border-gray-900">
-                        <Users className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-gray-300 block">Loyal Customer Credit</strong>
-                          Digitizes the traditional way local shops give credit ("Abonné") to trust-worthy regular buyers.
-                        </div>
-                      </div>
-                      <div className="flex gap-2.5 items-start bg-gray-950/40 p-3 rounded-xl border border-gray-900">
-                        <FileText className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="text-gray-300 block">One-Click PDF Reports</strong>
-                          Instantly creates simple daily sales reports and PDFs so you always know how much your business earned.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Technologies tag list */}
-                  <div className="flex flex-wrap gap-2 items-center pt-2">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mr-1">Stack:</span>
-                    {['React 19', 'Vite', 'Node.js Express', 'Supabase Postgres', 'Prisma ORM', 'Socket.io'].map((t, idx) => (
-                      <span key={idx} className="px-2.5 py-1 bg-gray-950 border border-gray-900 rounded-lg text-[10px] font-bold text-purple-300 font-mono">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bottom link */}
-                <div className="pt-4 border-t border-gray-900/60 flex items-center justify-between gap-4">
-                  <div className="flex gap-6">
-                    <div>
-                      <div className="text-[9px] text-gray-500 uppercase font-bold">Volume Handled</div>
-                      <div className="text-base font-black text-white font-mono mt-0.5">14.2M+ RWF</div>
-                    </div>
-                    <div>
-                      <div className="text-[9px] text-gray-500 uppercase font-bold">Active Merchants</div>
-                      <div className="text-base font-black text-white font-mono mt-0.5">1,200+ Stores</div>
-                    </div>
-                  </div>
-                  <a 
-                    href="https://kurimacye.vercel.app" 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="bg-white text-gray-950 font-bold py-2.5 px-5 rounded-xl text-xs transition-all shadow-md hover:scale-102 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    Launch Live Platform
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
+            {loadingProjects ? (
+              <div className="text-center py-12">
+                <span className="text-xs text-gray-500 uppercase tracking-widest animate-pulse">Loading Projects...</span>
               </div>
+            ) : (
+              <>
+                {/* Active Projects (Flagship Showcase) */}
+                {projectsList.filter(p => p.status === 'active').map((prod) => (
+                  <div key={prod.id} className="glass-panel rounded-3xl p-6 md:p-8 grid lg:grid-cols-12 gap-8 relative overflow-hidden border border-purple-500/10 shadow-xl shadow-purple-950/5 text-left">
+                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-              {/* Visual Panel Column */}
-              <div className="lg:col-span-5 flex flex-col justify-center bg-gray-950/40 border border-gray-900 rounded-2xl p-4 relative overflow-hidden group">
-                <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 relative border border-gray-850">
-                  <img 
-                    src="/workspace_hero.png" 
-                    alt="Kuri Macye App Mockup" 
-                    className="w-full h-full object-cover select-none pointer-events-none group-hover:scale-102 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-950/50 to-transparent" />
-                </div>
-                <div className="mt-3 text-left">
-                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Ecosystem View</span>
-                  <div className="text-xs font-bold text-gray-300 mt-1">Multi-Vendor Store Dashboard layout</div>
-                </div>
-              </div>
-            </div>
+                    {/* Details Column */}
+                    <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        {/* Badge */}
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+                            <CheckCircle className="w-3 h-3" /> Deployed & Active
+                          </span>
+                          <span className="text-xs font-bold text-gray-500 font-mono">Flagship Solution</span>
+                        </div>
 
-            {/* CONCEPTUAL PROJECTS PIPELINE SECTION */}
-            <div className="space-y-6">
-              <div className="text-left space-y-2">
-                <h4 className="text-lg font-black text-white">Conceptual Co-Design Pipeline</h4>
-                <p className="text-xs text-gray-500">
-                  We actively run community co-design surveys. Below are upcoming software systems currently undergoing initial R&D planning.
-                </p>
-              </div>
+                        {/* Title */}
+                        <div>
+                          <h4 className="text-3xl font-black text-white">{prod.name}</h4>
+                          <p className="text-xs text-purple-400 font-semibold tracking-wide uppercase mt-1">{prod.tagline}</p>
+                        </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                {[
-                  {
-                    title: 'Gesture to Speech',
-                    tagline: 'Rwandan Sign Language (RSL) Translator',
-                    desc: 'A camera-based video parser translating RSL hand coordinates to Kinyarwanda/English speech synthesis in real time.',
-                    stack: ['TensorFlow.js', 'FastAPI', 'MediaPipe'],
-                    status: 'Community Co-Design Survey'
-                  },
-                  {
-                    title: 'Linker Bus Booking',
-                    tagline: 'Commuter Bus terminal Ticketing',
-                    desc: 'Digital seat reservations and queuing optimizer matching bus operators to local rural routes with SMS payment triggers.',
-                    stack: ['React Native', 'Redis Queue', 'Twilio'],
-                    status: 'Planning / Requirement Gathering'
-                  },
-                  {
-                    title: 'Homland Real Estate',
-                    tagline: 'Verified Rental & Property tours',
-                    desc: 'Connecting property owners directly to university students, utilizing 360 virtual tours and verified lists to eliminate broker scams.',
-                    stack: ['Three.js', 'Node.js', 'PostgreSQL'],
-                    status: 'Prototype Wireframing'
-                  }
-                ].map((concept, idx) => (
-                  <div key={idx} className="bg-gray-900/10 border border-gray-900 rounded-2xl p-5 hover:border-gray-800 transition-all flex flex-col justify-between h-[210px] text-left">
-                    <div className="space-y-2.5">
-                      <div className="flex justify-between items-start gap-3">
-                        <h5 className="font-extrabold text-white text-sm">{concept.title}</h5>
-                        <span className="text-[8.5px] font-bold px-2 py-0.5 rounded bg-purple-950/20 text-purple-400 border border-purple-500/10 uppercase tracking-wide">
-                          R&D Lab
-                        </span>
+                        {/* Description */}
+                        <p className="text-gray-300 text-xs md:text-sm leading-relaxed">
+                          {prod.shortDesc}
+                        </p>
+
+                        {/* Features List */}
+                        {prod.details?.features && (
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Core Features Built</h5>
+                            <div className="grid sm:grid-cols-2 gap-3 text-xs text-gray-400">
+                              {prod.details.features.map((feat, fIdx) => (
+                                <div key={fIdx} className="flex gap-2.5 items-start bg-gray-950/40 p-3 rounded-xl border border-gray-900">
+                                  <ProjectIcon name={prod.iconName} className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                                  <span className="leading-snug">{feat}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tech Stack Tags */}
+                        {prod.details?.tech && (
+                          <div className="flex flex-wrap gap-2 items-center pt-2">
+                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mr-1">Stack:</span>
+                            {prod.details.tech.map((t, tIdx) => (
+                              <span key={tIdx} className="px-2.5 py-1 bg-gray-950 border border-gray-900 rounded-lg text-[10px] font-bold text-purple-300 font-mono">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{concept.tagline}</div>
-                      <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">{concept.desc}</p>
+
+                      {/* Bottom Links / Stats */}
+                      <div className="pt-4 border-t border-gray-900/60 flex items-center justify-between gap-4">
+                        {prod.stats && (
+                          <div className="flex gap-6">
+                            {prod.stats.slice(0, 2).map((stat, sIdx) => (
+                              <div key={sIdx}>
+                                <div className="text-[9px] text-gray-500 uppercase font-bold">{stat.label}</div>
+                                <div className="text-base font-black text-white font-mono mt-0.5">{stat.value}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {prod.liveUrl && (
+                          <a 
+                            href={prod.liveUrl} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="bg-white text-gray-950 font-bold py-2.5 px-5 rounded-xl text-xs transition-all shadow-md hover:scale-102 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                          >
+                            Launch Live Platform
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="pt-3 border-t border-gray-900/40 flex justify-between items-center text-[10px] text-gray-500">
-                      <span className="font-mono">{concept.stack.join(' • ')}</span>
-                      <span className="font-semibold text-gray-400">{concept.status}</span>
+                    {/* Visual Panel Column */}
+                    <div className="lg:col-span-5 flex flex-col justify-center bg-gray-950/40 border border-gray-900 rounded-2xl p-4 relative overflow-hidden group">
+                      <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 relative border border-gray-850">
+                        <img 
+                          src="/workspace_hero.png" 
+                          alt={`${prod.name} Mockup`} 
+                          className="w-full h-full object-cover select-none pointer-events-none group-hover:scale-102 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-950/50 to-transparent" />
+                      </div>
+                      <div className="mt-3 text-left">
+                        <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Ecosystem View</span>
+                        <div className="text-xs font-bold text-gray-300 mt-1">{prod.name} System Dashboard Layout</div>
+                      </div>
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
 
+                {/* Conceptual Pipeline Grid */}
+                <div className="space-y-6">
+                  <div className="text-left space-y-2">
+                    <h4 className="text-lg font-black text-white">Upcoming Project Pipeline</h4>
+                    <p className="text-xs text-gray-500">
+                      We actively run community design phases. Below are software systems currently in the active development and planning pipeline.
+                    </p>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-6 text-left">
+                    {projectsList.filter(p => p.status !== 'active').map((prod) => (
+                      <div key={prod.id} className="bg-gray-900/10 border border-gray-900 rounded-2xl p-5 hover:border-gray-800 transition-all flex flex-col justify-between h-[230px]">
+                        <div className="space-y-2.5">
+                          <div className="flex justify-between items-start gap-3">
+                            <h5 className="font-extrabold text-white text-sm">{prod.name}</h5>
+                            <span className="text-[8.5px] font-bold px-2 py-0.5 rounded bg-purple-950/20 text-purple-400 border border-purple-500/10 uppercase tracking-wide">
+                              {prod.status.toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{prod.tagline}</div>
+                          <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">{prod.shortDesc}</p>
+                        </div>
+
+                        <div className="pt-3 border-t border-gray-900/40 flex justify-between items-center text-[10px] text-gray-500">
+                          <span className="font-mono truncate mr-2">
+                            {prod.details?.tech ? prod.details.tech.slice(0, 3).join(' • ') : 'Custom Architecture'}
+                          </span>
+                          <span className="font-semibold text-gray-400 shrink-0 capitalize">{prod.status} Phase</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -781,14 +1124,13 @@ const Landing = ({ onEnterPortal }) => {
 
             {/* Grid of services */}
             <div className="grid md:grid-cols-3 gap-8">
-              {SERVICES_LIST.map((serv, idx) => {
-                const Icon = serv.icon;
+              {servicesList.map((serv, idx) => {
                 return (
                   <div key={idx} className="bg-gray-900/20 hover:bg-gray-900/40 border border-gray-900 rounded-3xl p-6 text-left flex flex-col justify-between transition-all duration-300 relative group hover:-translate-y-1 hover:border-purple-500/20">
                     <div className="space-y-4">
                       {/* Icon */}
                       <div className="w-12 h-12 rounded-2xl bg-purple-950/30 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
-                        <Icon className="w-6 h-6" />
+                        <ServiceIcon name={serv.icon} className="w-6 h-6" />
                       </div>
                       
                       {/* Title */}
@@ -816,6 +1158,200 @@ const Landing = ({ onEnterPortal }) => {
                 );
               })}
             </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-900/60 my-12" />
+
+            {/* Baseline Service Pricing Section */}
+            <div className="space-y-8 text-left">
+              <div className="space-y-3">
+                <span className="text-[9px] font-black uppercase tracking-widest text-purple-400 bg-purple-950/30 px-3 py-1 rounded-full border border-purple-500/15">Transparent Pricing</span>
+                <h3 className="text-2xl font-black text-white">Flat Fee Service Packages</h3>
+                <p className="text-gray-400 text-xs md:text-sm max-w-2xl leading-relaxed">
+                  We build custom software with clear, honest upfront pricing. Choose a package that fits your operational stage.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8 items-stretch">
+                {pricingList.map((pkg, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`bg-gray-900/15 border rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 relative ${
+                      pkg.popular 
+                        ? 'border-purple-500/40 shadow-xl shadow-purple-950/10 md:scale-[1.03] bg-gray-900/20' 
+                        : 'border-gray-900 hover:border-gray-800'
+                    }`}
+                  >
+                    {pkg.popular && (
+                      <div className="absolute top-0 right-6 -translate-y-1/2 bg-purple-600 text-white font-bold text-[9px] uppercase tracking-wider px-3.5 py-1 rounded-full shadow-lg shadow-purple-500/20">
+                        Most Requested
+                      </div>
+                    )}
+                    
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <span className="text-[9px] font-bold text-purple-400 uppercase tracking-wider block">{pkg.badge}</span>
+                        <h4 className="text-lg font-black text-white">{pkg.name}</h4>
+                        <p className="text-xs text-gray-500 leading-relaxed font-medium">{pkg.description}</p>
+                      </div>
+
+                      <div className="flex items-baseline gap-1.5 py-2">
+                        <span className="text-2xl md:text-3xl font-black text-white font-mono">{pkg.price}</span>
+                        {pkg.price !== 'Custom / Contact Us' && <span className="text-[10px] text-gray-500 font-bold uppercase">starting rate</span>}
+                      </div>
+
+                      <div className="border-t border-gray-900/60 pt-4">
+                        <ul className="space-y-2.5">
+                          {pkg.features.map((feat, fidx) => (
+                            <li key={fidx} className="flex gap-2 items-start text-xs text-gray-300 font-medium leading-tight">
+                              <Check className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                              <span>{feat}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="pt-6">
+                      <button 
+                        onClick={() => {
+                          setIntakeForm({
+                            ...intakeForm,
+                            serviceType: pkg.name.includes('MVP') ? 'E-Commerce Marketplace' : pkg.name.includes('Commerce') ? 'Point of Sale (POS) System' : 'ERP / Custom Database',
+                            budget: pkg.price === 'Custom / Contact Us' ? 'Above 12M RWF' : pkg.price.includes('2,500') ? '1.5M - 3M RWF' : '6M - 12M RWF'
+                          });
+                          setActiveTab('intake');
+                        }}
+                        className={`w-full py-3 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+                          pkg.popular 
+                            ? 'bg-purple-600 text-white hover:bg-purple-500 shadow-md shadow-purple-500/10' 
+                            : 'bg-gray-950 border border-gray-850 hover:border-gray-800 text-gray-300 hover:text-white'
+                        }`}
+                      >
+                        Request Scope Draft
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-900/60 my-12" />
+
+            {/* Ongoing Retainers Section */}
+            <div className="space-y-8 text-left">
+              <div className="space-y-3">
+                <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-950/30 px-3 py-1 rounded-full border border-indigo-500/15">Post-Launch Alignment</span>
+                <h3 className="text-2xl font-black text-white">Monthly Maintenance Retainers</h3>
+                <p className="text-gray-400 text-xs md:text-sm max-w-2xl leading-relaxed">
+                  Avoid downtime and technical debt. Secure dedicated development hours and server monitoring resources on a recurring monthly contract.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 items-stretch max-w-4xl">
+                {retainersList.map((pkg, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`bg-gray-900/15 border rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 relative ${
+                      pkg.popular 
+                        ? 'border-indigo-500/40 shadow-xl shadow-indigo-950/10 bg-gray-900/20' 
+                        : 'border-gray-900 hover:border-gray-800'
+                    }`}
+                  >
+                    {pkg.popular && (
+                      <div className="absolute top-0 right-6 -translate-y-1/2 bg-indigo-600 text-white font-bold text-[9px] uppercase tracking-wider px-3.5 py-1 rounded-full shadow-lg shadow-indigo-500/20">
+                        Best Retainer Value
+                      </div>
+                    )}
+                    
+                    <div className="space-y-5">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
+                          pkg.popular 
+                            ? 'bg-indigo-950/40 border-indigo-500/20 text-indigo-400' 
+                            : 'bg-gray-950 border-gray-850 text-gray-500'
+                        }`}>
+                          <RetainerIcon name={pkg.icon} className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-extrabold text-white">{pkg.name}</h4>
+                          <span className="text-[10px] text-gray-500 font-medium">Ongoing SLA Plan</span>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-gray-400 leading-relaxed font-medium">{pkg.description}</p>
+
+                      <div className="text-xl font-black text-white font-mono py-1">
+                        {pkg.price}
+                      </div>
+
+                      <div className="border-t border-gray-900/60 pt-4">
+                        <ul className="space-y-2">
+                          {pkg.features.map((feat, fidx) => (
+                            <li key={fidx} className="flex gap-2 items-start text-xs text-gray-300 font-medium leading-tight">
+                              <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                              <span>{feat}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="pt-6">
+                      <button 
+                        onClick={() => {
+                          setIntakeForm({
+                            ...intakeForm,
+                            serviceType: 'Custom API Integrations',
+                            description: `Requesting monthly maintenance alignment: ${pkg.name}.`
+                          });
+                          setActiveTab('intake');
+                        }}
+                        className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
+                          pkg.popular 
+                            ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-md shadow-indigo-500/10' 
+                            : 'bg-gray-950 border border-gray-850 hover:border-gray-800 text-gray-300 hover:text-white'
+                        }`}
+                      >
+                        Subscribe Retainer SLA
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-900/60 my-12" />
+
+            {/* 100% Code Ownership Guarantee Card */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-purple-950/10 via-slate-900 to-indigo-950/10 border border-purple-500/10 rounded-3xl p-6 md:p-8 text-left shadow-lg">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/5 rounded-full blur-[80px] pointer-events-none" />
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                <div className="space-y-3 max-w-xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
+                    <ShieldCheck className="w-3.5 h-3.5" /> 100% IP & Source Code Ownership
+                  </div>
+                  <h4 className="text-lg md:text-xl font-black text-white">No Lock-in. You Own Everything.</h4>
+                  <p className="text-gray-400 text-xs leading-relaxed font-medium">
+                    We believe that when you pay for software, you should own it. Upon project delivery and milestone completion, <strong>100% of the Intellectual Property (IP), git repositories, databases, and deployment access are transferred directly to your organization</strong>. No monthly platform licensing fees, no vendor lock-in.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 bg-gray-950/50 border border-gray-900 rounded-2xl p-4 shrink-0 w-full md:w-auto text-xs text-gray-400 font-medium">
+                  <div className="flex items-center gap-2 text-white font-bold mb-1">
+                    <CheckCircle className="w-4 h-4 text-emerald-400" /> Transfer Checklist
+                  </div>
+                  <div className="flex items-center gap-2"><Check className="w-3 h-3 text-purple-400" /> Full Git Repository Ownership</div>
+                  <div className="flex items-center gap-2"><Check className="w-3 h-3 text-purple-400" /> All Rights to Proprietary Code</div>
+                  <div className="flex items-center gap-2"><Check className="w-3 h-3 text-purple-400" /> Direct Database Ownership</div>
+                  <div className="flex items-center gap-2"><Check className="w-3 h-3 text-purple-400" /> Direct Hosting & Domain Controls</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-900/60 my-12" />
 
             {/* Teaser CTA */}
             <div className="glass-panel rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between border border-gray-900 max-w-3xl mx-auto gap-4">
@@ -958,9 +1494,9 @@ const Landing = ({ onEnterPortal }) => {
               <div className="space-y-4 pt-6 border-t border-gray-900">
                 <h4 className="text-xs font-black text-gray-500 uppercase tracking-widest">Our Leadership Focus</h4>
                 <div className="space-y-3">
-                  {TEAM_PROFILES.map((memb, idx) => (
+                  {teamList.map((memb, idx) => (
                     <div key={idx} className="flex gap-3 items-start bg-gray-900/10 p-3.5 rounded-2xl border border-gray-900">
-                      <div className={`w-8 h-8 rounded-full bg-gradient-to-tr ${memb.bgGradient} flex items-center justify-center font-bold text-[10px] text-white shrink-0`}>
+                      <div className={`w-8 h-8 rounded-full bg-gradient-to-tr ${getTeamMemberGradient(memb, idx)} flex items-center justify-center font-bold text-[10px] text-white shrink-0`}>
                         {memb.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div>
@@ -985,7 +1521,7 @@ const Landing = ({ onEnterPortal }) => {
               </div>
 
               <div className="space-y-3">
-                {FAQ_DATA.map((faq, idx) => (
+                {faqsList.map((faq, idx) => (
                   <div key={idx} className="bg-gray-900/10 border border-gray-900 rounded-2xl overflow-hidden">
                     <button
                       onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
@@ -1499,7 +2035,7 @@ const Landing = ({ onEnterPortal }) => {
 
           {/* Portfolio Links */}
           <div className="col-span-1 md:col-span-2 space-y-3">
-            <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Case Studies</h5>
+            <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Projects</h5>
             <ul className="space-y-2 text-xs font-medium">
               <li>
                 <a 

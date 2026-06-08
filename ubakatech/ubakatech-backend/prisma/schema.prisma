@@ -74,6 +74,7 @@ model Employee {
   roleId        String?
   role          Role?       @relation(fields: [roleId], references: [id])
   title         String?     // e.g. "Lead React Dev", "UX/UI Designer"
+  focus         String?     // e.g. Bio or highlight focus statement
   avatar        String?     // URL or color code
   department    String?     // e.g. "Engineering", "Product", "HR"
   location      String?     // e.g. "Remote", "Kigali", "Nairobi"
@@ -343,3 +344,44 @@ model TimeEntry {
   @@index([employeeId])
   @@index([projectId])
 }
+
+model Service {
+  id        String   @id @default(uuid())
+  title     String   @unique
+  desc      String
+  icon      String
+  features  String[]
+  createdAt DateTime @default(now())
+}
+
+model PricingPackage {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  price       String
+  description String
+  badge       String?
+  popular     Boolean  @default(false)
+  features    String[]
+  createdAt   DateTime @default(now())
+}
+
+model RetainerPackage {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  price       String
+  description String
+  badge       String?
+  popular     Boolean  @default(false)
+  icon        String
+  features    String[]
+  createdAt   DateTime @default(now())
+}
+
+model Faq {
+  id        String   @id @default(uuid())
+  question  String   @unique
+  answer    String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
