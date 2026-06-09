@@ -304,9 +304,12 @@ export const debugDb = async (req, res) => {
       servicesCount: count
     });
   } catch (err) {
+    const dbUrl = process.env.DATABASE_URL || 'not set';
+    const maskedUrl = dbUrl.replace(/:([^@]+)@/, ':****@');
     return res.status(500).json({
       success: false,
       message: 'Database check failed',
+      maskedUrl,
       error: err.message,
       stack: err.stack,
       env: process.env.NODE_ENV,
