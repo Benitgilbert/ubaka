@@ -13,6 +13,32 @@ const CONNECTION_LIMIT = parseInt(process.env.DB_CONNECTION_LIMIT || '1', 10);
 let connectionUrl = process.env.DATABASE_URL;
 if (connectionUrl) {
   try {
+    // Sanitize credentials part to handle unencoded special characters (like literal '@' in passwords)
+    const lastAt = connectionUrl.lastIndexOf('@');
+    if (lastAt !== -1) {
+      const credentialsPart = connectionUrl.substring(0, lastAt);
+      const hostPart = connectionUrl.substring(lastAt); // includes the '@'
+      
+      const protocolEnd = credentialsPart.indexOf('://') + 3;
+      if (protocolEnd > 2) {
+        const userPassPart = credentialsPart.substring(protocolEnd);
+        const colonIdx = userPassPart.indexOf(':');
+        if (colonIdx !== -1) {
+          const username = userPassPart.substring(0, colonIdx);
+          const password = userPassPart.substring(colonIdx + 1);
+          
+          // Safely decode first, then encode to avoid double-encoding % characters
+          const safePassword = encodeURIComponent(decodeURIComponent(password));
+          
+          connectionUrl = credentialsPart.substring(0, protocolEnd) + username + ':' + safePassword + hostPart;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[Database] Failed to sanitize credentials in DATABASE_URL:', err.message);
+  }
+
+  try {
     // Normalise connection parameters safely using string checks
     if (!connectionUrl.includes('schema=')) {
       const sep = connectionUrl.includes('?') ? '&' : '?';
