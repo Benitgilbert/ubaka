@@ -13,28 +13,35 @@ const CONNECTION_LIMIT = parseInt(process.env.DB_CONNECTION_LIMIT || '1', 10);
 let connectionUrl = process.env.DATABASE_URL;
 if (connectionUrl) {
   try {
-    // Normalise protocol for standard URL parser
-    const urlObj = new URL(connectionUrl.replace('postgresql://', 'http://').replace('postgres://', 'http://'));
-    let changed = false;
-    
-    if (!urlObj.searchParams.has('schema')) {
-      urlObj.searchParams.set('schema', 'ubakatech');
-      changed = true;
+    // Normalise connection parameters safely using string checks
+    if (!connectionUrl.includes('schema=')) {
+      const sep = connectionUrl.includes('?') ? '&' : '?';
+      connectionUrl = `${connectionUrl}${sep}schema=ubakatech`;
     }
-    if (!urlObj.searchParams.has('sslaccept')) {
-      urlObj.searchParams.set('sslaccept', 'accept_invalid_certs');
-      changed = true;
+    if (!connectionUrl.includes('sslaccept=')) {
+      const sep = connectionUrl.includes('?') ? '&' : '?';
+      connectionUrl = `${connectionUrl}${sep}sslaccept=accept_invalid_certs`;
     }
-    if (!urlObj.searchParams.has('sslmode')) {
-      urlObj.searchParams.set('sslmode', 'require');
-      changed = true;
+    if (!connectionUrl.includes('sslmode=')) {
+      const sep = connectionUrl.includes('?') ? '&' : '?';
+      connectionUrl = `${connectionUrl}${sep}sslmode=require`;
     }
     
-    if (changed) {
-      connectionUrl = urlObj.toString().replace('http://', 'postgresql://');
+    // Force connection_limit to default pooler limits for free tiers
+    if (!connectionUrl.includes('connection_limit=')) {
+      const sep = connectionUrl.includes('?') ? '&' : '?';
+      connectionUrl = `${connectionUrl}${sep}connection_limit=${CONNECTION_LIMIT}`;
+    } else {
+      // replace existing connection_limit with CONNECTION_LIMIT
+      connectionUrl = connectionUrl.replace(/connection_limit=\d+/, `connection_limit=${CONNECTION_LIMIT}`);
+    }
+    
+    if (!connectionUrl.includes('pool_timeout=')) {
+      const sep = connectionUrl.includes('?') ? '&' : '?';
+      connectionUrl = `${connectionUrl}${sep}pool_timeout=20`;
     }
   } catch (err) {
-    console.error('[Database] Failed to normalise DATABASE_URL:', err.message);
+    console.error('[Database] Failed to normalise DATABASE_URL string:', err.message);
   }
 }
 
