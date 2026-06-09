@@ -24,7 +24,7 @@ const StarIcon = ({ className }) => (
 
 const StoreIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-3 h-3"} aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V21m-9-9l9-9 9 9m-16.5 0h15" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-9v9m16.5-9v9m-16.5-9h16.5M2.25 9l1.35-4.72A.75.75 0 0 1 4.32 3.75h15.36a.75.75 0 0 1 .72.53L21.75 9m-19.5 0h19.5M5.25 14.25a3 3 0 0 0 6 0m0 0a3 3 0 0 0 6 0m-12 0H18" />
   </svg>
 );
 

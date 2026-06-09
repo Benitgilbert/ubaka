@@ -67,7 +67,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        outfit: ['Outfit', 'sans-serif'],
+        outfit: ['Inter', 'sans-serif'],
       },
       keyframes: {
         slideUp: {

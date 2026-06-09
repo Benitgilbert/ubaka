@@ -21,40 +21,58 @@ const ArrowRightIcon = ({ className }) => (
 );
 
 const HeartIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
-    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001Z" />
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={className || "w-6 h-6"} aria-hidden="true">
+    <path fill="currentColor" fillOpacity="0.15" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
   </svg>
 );
 
 const StarIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
-    <path d="M12 .587l3.668 7.431 8.2 1.191-5.934 5.784 1.4 8.168L12 18.897l-7.334 3.857 1.4-8.168L.132 9.209l8.2-1.191L12 .587z" />
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={className || "w-6 h-6"} aria-hidden="true">
+    <path fill="currentColor" fillOpacity="0.15" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
   </svg>
 );
 
 const ShieldIcon = ({ className, title }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className || "w-4 h-4"} aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={className || "w-6 h-6"} aria-hidden="true">
     {title && <title>{title}</title>}
-    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 15l-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z" />
+    <path fill="currentColor" fillOpacity="0.15" d="M12 22s8-4 8-10V5l-8-3v20z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M9 11l2 2 4-4" />
   </svg>
 );
 
 const TruckIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM19.5 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 5.25h16.5c1.05 0 1.95.82 2.1 1.86l1.35 9.49c.15 1.04-.6 1.9-1.65 1.9H2.25M2.25 5.25v13.5M2.25 18.75h3M8.25 18.75h8.25M19.5 18.75h1.5" />
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={className || "w-6 h-6"} aria-hidden="true">
+    <path fill="currentColor" fillOpacity="0.15" d="M3 4h11v11H3z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M14 4H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11V4z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M14 8h5.586a1 1 0 0 1 .707.293l2.414 2.414a1 1 0 0 1 .293.707V15a1 1 0 0 1-1 1h-8V8z" />
+    <path stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" opacity="0.6" d="M17 8l2.5 2.5H15V8z" />
+    <circle cx="6.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth={2} />
+    <circle cx="6.5" cy="18.5" r="0.75" fill="currentColor" />
+    <circle cx="17.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth={2} />
+    <circle cx="17.5" cy="18.5" r="0.75" fill="currentColor" />
   </svg>
 );
 
 const UndoIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={className || "w-6 h-6"} aria-hidden="true">
+    <path fill="currentColor" fillOpacity="0.15" d="M12 8a5 5 0 0 1 5 5v3h-3l4 4 4-4h-3v-3a8 8 0 0 0-8-8 8 8 0 0 0-6.2 3.1L7.3 9.4A5 5 0 0 1 12 8z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M4 14v-4h4" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M4 10a8 8 0 1 1 3.54 6.64" />
+    <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.3" />
   </svg>
 );
 
 const HeadsetIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 0-14.228 0M2.25 12.013c0-1.782.721-3.395 1.886-4.56l-.001.002A8.955 8.955 0 0 1 12 4.5c2.485 0 4.735 1.009 6.365 2.64l-.001-.001.002-.002A8.953 8.953 0 0 1 20.25 12.013M2.25 12.013H4.5c.621 0 1.125.504 1.125 1.125v3.375c0 .621-.504 1.125-1.125 1.125H3.375a1.125 1.125 0 0 1-1.125-1.125V12.013Zm18 0h-2.25c-.621 0-1.125.504-1.125 1.125v3.375c0 .621.504 1.125 1.125 1.125h1.125a1.125 1.125 0 0 0 1.125-1.125V12.013Z" />
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className={className || "w-6 h-6"} aria-hidden="true">
+    <path fill="currentColor" fillOpacity="0.15" d="M12 3a9 9 0 0 0-9 9v3h2v-3a7 7 0 0 1 14 0v3h2v-3a9 9 0 0 0-9-9z" />
+    <path stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M3 14v-2a9 9 0 0 1 18 0v2" />
+    <rect x="2" y="13" width="3" height="6" rx="1.5" stroke="currentColor" strokeWidth={2} fill="currentColor" fillOpacity="0.2" />
+    <rect x="19" y="13" width="3" height="6" rx="1.5" stroke="currentColor" strokeWidth={2} fill="currentColor" fillOpacity="0.2" />
+    <path stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" d="M20 18.5c-2 2-5 2.5-7 2.5" />
+    <circle cx="12.5" cy="21" r="1" fill="currentColor" />
   </svg>
 );
 
@@ -67,7 +85,7 @@ const PrintIcon = ({ className }) => (
 
 const StoreIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V21m-9-9l9-9 9 9m-16.5 0h15" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-9v9m16.5-9v9m-16.5-9h16.5M2.25 9l1.35-4.72A.75.75 0 0 1 4.32 3.75h15.36a.75.75 0 0 1 .72.53L21.75 9m-19.5 0h19.5M5.25 14.25a3 3 0 0 0 6 0m0 0a3 3 0 0 0 6 0m-12 0H18" />
   </svg>
 );
 
@@ -709,14 +727,14 @@ export default function Home() {
                 { icon: 'truck', title: t('home.features.delivery.title'), description: t('home.features.delivery.description') }
               ]).map((badge, idx) => {
                 const iconMap = {
-                  truck: <TruckIcon className="text-2xl" />,
-                  shield: <ShieldIcon className="text-2xl" />,
-                  undo: <UndoIcon className="text-2xl" />,
-                  headset: <HeadsetIcon className="text-2xl" />,
-                  clock: <HeadsetIcon className="text-2xl" />,
-                  star: <StarIcon className="text-2xl" />,
-                  check: <ShieldIcon className="text-2xl" />,
-                  heart: <HeartIcon className="text-2xl" />
+                  truck: <TruckIcon className="w-6 h-6" />,
+                  shield: <ShieldIcon className="w-6 h-6" />,
+                  undo: <UndoIcon className="w-6 h-6" />,
+                  headset: <HeadsetIcon className="w-6 h-6" />,
+                  clock: <HeadsetIcon className="w-6 h-6" />,
+                  star: <StarIcon className="w-6 h-6" />,
+                  check: <ShieldIcon className="w-6 h-6" />,
+                  heart: <HeartIcon className="w-6 h-6" />
                 };
                 const featureKeyMap = {
                   star: 'vendors',
@@ -727,12 +745,12 @@ export default function Home() {
                 const key = featureKeyMap[badge.icon];
 
                 return (
-                  <div key={badge.id || idx} className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-terracotta-50 dark:bg-charcoal-700 rounded-xl flex items-center justify-center text-terracotta-500 dark:text-terracotta-400">
-                      {iconMap[badge.icon] || <ShieldIcon className="text-2xl" />}
+                  <div key={badge.id || idx} className="flex items-center gap-4 group p-3 rounded-2xl hover:bg-cream-50 dark:hover:bg-charcoal-700/20 transition-all duration-300">
+                    <div className="w-12 h-12 bg-terracotta-50 dark:bg-charcoal-700/50 rounded-xl flex items-center justify-center text-terracotta-500 dark:text-terracotta-400 group-hover:scale-110 group-hover:bg-terracotta-500 group-hover:text-white dark:group-hover:bg-terracotta-500/20 dark:group-hover:text-terracotta-300 transition-all duration-300 shadow-sm group-hover:shadow-md">
+                      {iconMap[badge.icon] || <ShieldIcon className="w-6 h-6" />}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-charcoal-800 dark:text-cream-100">
+                      <h4 className="font-semibold text-charcoal-800 dark:text-cream-100 group-hover:text-terracotta-600 dark:group-hover:text-terracotta-400 transition-colors duration-200">
                         {key ? t(`home.features.${key}.title`) : badge.title}
                       </h4>
                       <p className="text-sm text-charcoal-500 dark:text-charcoal-400">
