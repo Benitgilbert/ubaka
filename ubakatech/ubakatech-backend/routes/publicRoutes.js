@@ -8,7 +8,8 @@ import {
   getPricing,
   getRetainers,
   getFaqs,
-  debugDb
+  debugDb,
+  setupDb
 } from '../controllers/publicController.js';
 
 const router = express.Router();
@@ -27,5 +28,6 @@ router.get('/pricing', getPricing);
 router.get('/retainers', getRetainers);
 router.get('/faqs', getFaqs);
 router.get('/debug-db', debugDb);
+router.get('/setup-db', setupDb);
 
 export default router;
