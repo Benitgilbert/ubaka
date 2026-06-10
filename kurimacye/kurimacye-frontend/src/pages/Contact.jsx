@@ -15,7 +15,7 @@ export default function Contact() {
         const res = await fetch(`${API_URL}/site-settings/public`);
         const data = await res.json();
         if (data.success) setSettings(data.data);
-      } catch (err) {}
+      } catch (err) { }
     };
     fetchSettings();
   }, []);
@@ -150,7 +150,7 @@ export default function Contact() {
                         {t("contact.label_phone")}
                       </h3>
                       <p className="text-sm text-charcoal-700 dark:text-charcoal-300 font-medium">
-                        {settings?.contactPhone || "+250 789 079 978"}
+                        {settings?.contactPhone || "+250 790 479 815"}
                       </p>
                     </div>
                   </div>
@@ -166,10 +166,10 @@ export default function Contact() {
                       </h3>
                       <p className="text-sm text-charcoal-700 dark:text-charcoal-300 font-medium">
                         <a
-                          href={`mailto:${settings?.contactEmail || "ishfabzele2@gmail.com"}`}
+                          href={`mailto:${settings?.contactEmail || "byiringirobenitg@gmail.com"}`}
                           className="hover:text-terracotta-500 dark:hover:text-terracotta-400 transition-colors"
                         >
-                          {settings?.contactEmail || "ishfabzele2@gmail.com"}
+                          {settings?.contactEmail || "byiringirobenitg@gmail.com"}
                         </a>
                       </p>
                     </div>

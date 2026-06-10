@@ -52,8 +52,8 @@ export default function LandingFooter() {
   const { t } = useTranslation();
   const [footerData, setFooterData] = useState({
     footerTagline: 'Your premium destination for quality products. Curated collections, exclusive deals, and exceptional service.',
-    contactEmail: 'ishfabzele2@gmail.com',
-    contactPhone: '+250 789 079 978',
+    contactEmail: 'byiringirobenitg@gmail.com',
+    contactPhone: '+250 790 479 815',
     contactAddress: 'Building near Gicumbi distict office (Eudiose Building)',
     siteName: 'Kuri Macye',
     logo: '/logo.png',

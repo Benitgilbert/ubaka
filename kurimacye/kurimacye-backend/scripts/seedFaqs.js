@@ -32,8 +32,8 @@ const faqs = [
   {
     question: "How can I contact customer support?",
     questionRw: "Nakumana na serivisi y'inkunga ite?",
-    answer: "You can reach our support team via email at ishfabzele2@gmail.com or by calling +250 789 079 978 during business hours.",
-    answerRw: "Ushobora kugera ku tsinda ryacu kuri imeli: ishfabzele2@gmail.com cyangwa uhamagare +250 789 079 978 mu masaha y'akazi.",
+    answer: "You can reach our support team via email at byiringirobenitg@gmail.com or by calling +250 790 479 815 during business hours.",
+    answerRw: "Ushobora kugera ku tsinda ryacu kuri imeli: byiringirobenitg@gmail.com cyangwa uhamagare +250 790 479 815 mu masaha y'akazi.",
     order: 5
   },
   {
@@ -47,7 +47,7 @@ const faqs = [
 
 async function seed() {
   console.log("Starting FAQ seeding...");
-  
+
   // Clear existing FAQs first to avoid duplicates
   await prisma.faq.deleteMany({});
   console.log("Cleared existing FAQs.");

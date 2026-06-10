@@ -186,7 +186,7 @@ To become a seller on Kuri Macye, you must:
 ## 15. CONTACT INFORMATION
 
 For questions about these terms:
-- Email: ishfabzele2@gmail.com
+- Email: byiringirobenitg@gmail.com
 - Phone: +250 XXX XXX XXX
 - Address: Gicumbi, Byumba
 

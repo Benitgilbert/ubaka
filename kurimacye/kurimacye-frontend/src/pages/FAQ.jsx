@@ -126,24 +126,21 @@ const FAQ = () => {
                       className="w-full flex items-center justify-between text-left px-6 py-4 group transition-all"
                       onClick={() => toggleAccordion(index)}
                     >
-                      <span className={`text-sm font-bold pr-4 transition-colors leading-snug ${
-                        activeIndex === index
+                      <span className={`text-sm font-bold pr-4 transition-colors leading-snug ${activeIndex === index
                           ? 'text-terracotta-500 dark:text-terracotta-400'
                           : 'text-charcoal-800 dark:text-white group-hover:text-terracotta-500 dark:group-hover:text-terracotta-400'
-                      }`}>
+                        }`}>
                         {question}
                       </span>
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${
-                        activeIndex === index
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${activeIndex === index
                           ? 'bg-terracotta-500 text-white rotate-180'
                           : 'bg-cream-100 dark:bg-charcoal-700 text-charcoal-500 dark:text-charcoal-400'
-                      }`}>
+                        }`}>
                         <FaChevronDown className="text-xs" />
                       </div>
                     </button>
-                    <div className={`overflow-hidden transition-all duration-400 ease-in-out ${
-                      activeIndex === index ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
-                    }`}>
+                    <div className={`overflow-hidden transition-all duration-400 ease-in-out ${activeIndex === index ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
                       <p className="text-sm text-charcoal-600 dark:text-charcoal-400 leading-relaxed px-6 pb-5 pt-0 border-l-4 border-terracotta-400/30 ml-6">
                         {answer}
                       </p>
@@ -169,7 +166,7 @@ const FAQ = () => {
                 {t('faq.btn_contact')}
               </Link>
               <a
-                href="mailto:ishfabzele2@gmail.com"
+                href="mailto:byiringirobenitg@gmail.com"
                 className="w-full sm:w-auto px-8 py-2.5 bg-terracotta-600/50 text-white rounded-xl font-bold text-sm hover:bg-terracotta-700 transition-all border border-white/20 active:scale-95 text-center"
               >
                 {t('faq.btn_email')}
