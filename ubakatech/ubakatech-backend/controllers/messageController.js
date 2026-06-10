@@ -1,5 +1,8 @@
 import prisma from '../config/db.js';
 
+const dmCreationLocks = new Set();
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Get all rooms the current employee is a member of
 export const getRooms = async (req, res) => {
   const employeeId = req.user.id;
@@ -234,47 +237,110 @@ export const createRoom = async (req, res) => {
         return res.status(400).json({ error: 'Target member ID is required for direct chat' });
       }
 
-      // Check if a direct room already exists
-      const existingRooms = await prisma.chatRoom.findMany({
-        where: {
-          isGroup: false,
-          AND: [
-            { members: { some: { employeeId: creatorId } } },
-            { members: { some: { employeeId: targetId } } }
-          ]
-        },
-        include: {
-          members: {
-            include: {
-              employee: {
-                select: {
-                  id: true,
-                  name: true,
-                  avatar: true,
-                  email: true,
-                  title: true
+      const pairKey = [creatorId, targetId].sort().join('_');
+      while (dmCreationLocks.has(pairKey)) {
+        await delay(100);
+      }
+      dmCreationLocks.add(pairKey);
+
+      try {
+        // Check if a direct room already exists
+        const existingRooms = await prisma.chatRoom.findMany({
+          where: {
+            isGroup: false,
+            AND: [
+              { members: { some: { employeeId: creatorId } } },
+              { members: { some: { employeeId: targetId } } }
+            ]
+          },
+          include: {
+            members: {
+              include: {
+                employee: {
+                  select: {
+                    id: true,
+                    name: true,
+                    avatar: true,
+                    email: true,
+                    title: true
+                  }
                 }
               }
             }
           }
+        });
+
+        const exactRoom = existingRooms.find(r => r.members.length === 2 || (creatorId === targetId && r.members.length === 1));
+
+        if (exactRoom) {
+          const targetMember = exactRoom.members.find(m => m.employeeId !== creatorId) || exactRoom.members[0];
+          const formattedRoom = {
+            id: exactRoom.id,
+            name: creatorId === targetId ? "Saved Messages" : targetMember.employee.name,
+            avatar: creatorId === targetId ? req.user.avatar : targetMember.employee.avatar,
+            isGroup: false,
+            isEncrypted: false,
+            encryptionValidation: null,
+            createdAt: exactRoom.createdAt,
+            updatedAt: exactRoom.updatedAt,
+            createdById: exactRoom.createdById,
+            members: exactRoom.members.map(m => ({
+              id: m.employee?.id || m.employeeId,
+              name: m.employee?.name || "Unknown Member",
+              avatar: m.employee?.avatar || null,
+              email: m.employee?.email || "",
+              title: m.employee?.title || "",
+              role: m.role
+            })),
+            lastMessage: null,
+            unreadCount: 0
+          };
+          return res.json(formattedRoom);
         }
-      });
 
-      const exactRoom = existingRooms.find(r => r.members.length === 2 || (creatorId === targetId && r.members.length === 1));
+        const uniqueMemberIds = creatorId === targetId ? [creatorId] : [creatorId, targetId];
 
-      if (exactRoom) {
-        const targetMember = exactRoom.members.find(m => m.employeeId !== creatorId) || exactRoom.members[0];
+        const room = await prisma.chatRoom.create({
+          data: {
+            isGroup: false,
+            isEncrypted: false,
+            createdById: creatorId,
+            members: {
+              create: uniqueMemberIds.map(empId => ({
+                employeeId: empId,
+                role: 'member'
+              }))
+            }
+          },
+          include: {
+            members: {
+              include: {
+                employee: {
+                  select: {
+                    id: true,
+                    name: true,
+                    avatar: true,
+                    email: true,
+                    title: true
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        const targetMember = room.members.find(m => m.employeeId !== creatorId) || room.members[0];
         const formattedRoom = {
-          id: exactRoom.id,
-          name: creatorId === targetId ? "Saved Messages" : targetMember.employee.name,
-          avatar: creatorId === targetId ? req.user.avatar : targetMember.employee.avatar,
+          id: room.id,
+          name: creatorId === targetId ? "Saved Messages" : (targetMember.employee?.name || "Unknown Member"),
+          avatar: creatorId === targetId ? req.user.avatar : (targetMember.employee?.avatar || null),
           isGroup: false,
           isEncrypted: false,
           encryptionValidation: null,
-          createdAt: exactRoom.createdAt,
-          updatedAt: exactRoom.updatedAt,
-          createdById: exactRoom.createdById,
-          members: exactRoom.members.map(m => ({
+          createdAt: room.createdAt,
+          updatedAt: room.updatedAt,
+          createdById: room.createdById,
+          members: room.members.map(m => ({
             id: m.employee?.id || m.employeeId,
             name: m.employee?.name || "Unknown Member",
             avatar: m.employee?.avatar || null,
@@ -285,70 +351,17 @@ export const createRoom = async (req, res) => {
           lastMessage: null,
           unreadCount: 0
         };
-        return res.json(formattedRoom);
-      }
 
-      const uniqueMemberIds = creatorId === targetId ? [creatorId] : [creatorId, targetId];
-
-      const room = await prisma.chatRoom.create({
-        data: {
-          isGroup: false,
-          isEncrypted: false,
-          createdById: creatorId,
-          members: {
-            create: uniqueMemberIds.map(empId => ({
-              employeeId: empId,
-              role: 'member'
-            }))
-          }
-        },
-        include: {
-          members: {
-            include: {
-              employee: {
-                select: {
-                  id: true,
-                  name: true,
-                  avatar: true,
-                  email: true,
-                  title: true
-                }
-              }
-            }
-          }
+        if (req.io) {
+          uniqueMemberIds.forEach(memberId => {
+            req.io.to(`user_${memberId}`).emit('room_created', formattedRoom);
+          });
         }
-      });
 
-      const targetMember = room.members.find(m => m.employeeId !== creatorId) || room.members[0];
-      const formattedRoom = {
-        id: room.id,
-        name: creatorId === targetId ? "Saved Messages" : (targetMember.employee?.name || "Unknown Member"),
-        avatar: creatorId === targetId ? req.user.avatar : (targetMember.employee?.avatar || null),
-        isGroup: false,
-        isEncrypted: false,
-        encryptionValidation: null,
-        createdAt: room.createdAt,
-        updatedAt: room.updatedAt,
-        createdById: room.createdById,
-        members: room.members.map(m => ({
-          id: m.employee?.id || m.employeeId,
-          name: m.employee?.name || "Unknown Member",
-          avatar: m.employee?.avatar || null,
-          email: m.employee?.email || "",
-          title: m.employee?.title || "",
-          role: m.role
-        })),
-        lastMessage: null,
-        unreadCount: 0
-      };
-
-      if (req.io) {
-        uniqueMemberIds.forEach(memberId => {
-          req.io.to(`user_${memberId}`).emit('room_created', formattedRoom);
-        });
+        return res.status(201).json(formattedRoom);
+      } finally {
+        dmCreationLocks.delete(pairKey);
       }
-
-      return res.status(201).json(formattedRoom);
     }
   } catch (err) {
     console.error("Error in createRoom:", err.message);

@@ -39,6 +39,7 @@ const Chat = () => {
   const [contacts, setContacts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [startingDM, setStartingDM] = useState(false);
 
   // Room Decryption Key State
   const [roomKeys, setRoomKeys] = useState({}); // Stores key per roomId to trigger re-renders
@@ -309,6 +310,8 @@ const Chat = () => {
 
   // Initiate direct chat (DM)
   const handleStartDM = async (contact) => {
+    if (startingDM) return;
+    setStartingDM(true);
     setSearchQuery('');
     setSearchResults([]);
     try {
@@ -334,6 +337,8 @@ const Chat = () => {
       }
     } catch (err) {
       console.error("Error creating DM room:", err);
+    } finally {
+      setStartingDM(false);
     }
   };
 
