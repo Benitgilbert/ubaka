@@ -6,7 +6,6 @@ import TrendingProductsSidebar from "../components/TrendingProductsSidebar";
 import SEO from "../components/SEO";
 
 function ForgotPassword() {
-  const step = "request";
   const [form, setForm] = useState({ email: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,85 +34,94 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+    <div className="h-screen flex overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
       <SEO title="Reset Password" noindex={true} />
       {/* Left Side - Trending Products Sidebar */}
       <TrendingProductsSidebar />
 
       {/* Right Side - Forgot Password Form */}
-      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 lg:px-20 bg-white dark:bg-slate-950 relative overflow-hidden">
-        {/* Animated Background Blobs */}
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-violet-100 dark:bg-violet-900/10 rounded-full blur-3xl opacity-50 animate-blob"></div>
-        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-100 dark:bg-indigo-900/10 rounded-full blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+      <div className="flex-1 flex flex-col h-full bg-white dark:bg-slate-950 relative overflow-hidden">
+        {/* Animated Background Blobs clipped */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-3xl"></div>
+        </div>
 
-        <div className="w-full max-w-md relative z-10">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm font-black text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 mb-12 transition-colors uppercase tracking-widest group">
+        {/* Fixed Top Navigation Bar */}
+        <div className="w-full px-8 py-6 flex items-center justify-between shrink-0 z-20">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold hover:text-violet-600 dark:hover:text-violet-400 transition-colors group"
+          >
             <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Home
           </Link>
+        </div>
 
-          <div className="mb-10">
-            <h2 className="text-4xl font-black text-gray-900 dark:text-white mb-3 tracking-tighter">
-              {step === "request" ? "Reset Password" : "Set New Password"}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 font-medium">
-              {step === "request"
-                ? "Enter your email to receive a reset code."
-                : "Enter the code sent to your email and your new password."}
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-2xl flex items-center gap-3 text-red-600 dark:text-red-400 font-bold animate-shake">
-              <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
-                <FaEnvelope className="text-sm" />
+        {/* Form Centered Container with inner scrolling */}
+        <div className="flex-1 overflow-y-auto z-10 min-h-0 w-full">
+          <div className="min-h-full w-full flex flex-col justify-center items-center px-6 sm:px-10 lg:px-16 py-8">
+            <div className="w-full max-w-md space-y-4">
+              <div className="text-center lg:text-left">
+                <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-1">
+                  Reset Password
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">
+                  Enter your email to receive a reset link.
+                </p>
               </div>
-              <p className="text-sm">{error}</p>
-            </div>
-          )}
 
-          {success && (
-            <div className="mb-8 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl flex items-center gap-3 text-emerald-600 dark:text-emerald-400 font-bold">
-              <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0">
-                <FaKey className="text-sm" />
-              </div>
-              <p className="text-sm">{success}</p>
-            </div>
-          )}
-
-          <form className="space-y-6" onSubmit={handleRequest}>
-            <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">Email Address</label>
-              <div className="relative group">
-                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-violet-600 transition-colors">
-                  <FaEnvelope />
+              {error && (
+                <div className="p-3.5 bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 rounded-r-2xl flex items-start gap-3 animate-head-shake">
+                  <FaEnvelope className="text-red-500 mt-1 shrink-0" />
+                  <p className="text-xs sm:text-sm text-red-700 dark:text-red-400 font-bold leading-tight">{error}</p>
                 </div>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  className="block w-full pl-14 pr-6 py-4 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all font-bold"
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
+              )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-3 py-4 px-6 bg-violet-600 text-white rounded-2xl font-black text-lg hover:bg-violet-700 transition-all active:scale-[0.98] shadow-lg shadow-violet-200 dark:shadow-none disabled:opacity-50"
-            >
-              {loading ? <FaSpinner className="animate-spin text-2xl" /> : "Send Reset Link"}
-              {!loading && <FaArrowRight />}
-            </button>
+              {success && (
+                <div className="p-3.5 bg-emerald-50 dark:bg-emerald-900/10 border-l-4 border-emerald-500 rounded-r-2xl flex items-start gap-3">
+                  <FaKey className="text-emerald-500 mt-1 shrink-0" />
+                  <p className="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 font-bold leading-tight">{success}</p>
+                </div>
+              )}
 
-            <div className="text-center mt-8">
-              <Link to="/login" className="text-sm font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors flex items-center justify-center gap-2">
-                <FaArrowLeft className="text-xs" /> Back to Login
-              </Link>
+              <form className="space-y-4" onSubmit={handleRequest}>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-violet-600 transition-colors">
+                      <FaEnvelope />
+                    </div>
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      className="block w-full pl-12 pr-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all shadow-inner text-sm"
+                      placeholder="you@example.com"
+                      value={form.email}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-violet-600 text-white rounded-2xl font-black text-base hover:bg-violet-700 transition-all shadow-lg shadow-violet-600/10 dark:shadow-none active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed group"
+                  >
+                    {loading ? <FaSpinner className="animate-spin text-lg" /> : "Send Reset Link"}
+                    {!loading && <FaArrowRight className="group-hover:translate-x-1 transition-transform" />}
+                  </button>
+                </div>
+
+                <div className="text-center pt-2">
+                  <Link to="/login" className="text-xs font-black text-violet-600 dark:text-violet-400 hover:text-violet-500 transition-colors flex items-center justify-center gap-2">
+                    <FaArrowLeft className="text-xs" /> Back to Login
+                  </Link>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
