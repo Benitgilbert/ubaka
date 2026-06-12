@@ -21,7 +21,7 @@ export default function assetUrl(path) {
 
   // For backend-provided paths
   if (normalizedPath.startsWith("/uploads/")) {
-    const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL || "http://localhost:5000/api";
     // Ensure we don't end up with /api/uploads or double slashes
     const origin = apiUrl.replace(/\/api\/?$/, "");
     return `${origin}${normalizedPath}`;

@@ -231,7 +231,7 @@ function UserDashboard() {
               <div className="mb-6 text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600 text-2xl font-bold overflow-hidden">
                   {user?.profileImage ? (
-                    <img src={`${process.env.REACT_APP_API_URL?.replace(/\/api$/, '') || 'http://localhost:5000'}${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
+                    <img src={`${(process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')}${user.profileImage}`} alt={user.name} className="w-full h-full object-cover" />
                   ) : (
                     user?.name?.charAt(0).toUpperCase()
                   )}

@@ -11,7 +11,7 @@ export default function Contact() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL || "http://localhost:5000/api";
         const res = await fetch(`${API_URL}/site-settings/public`);
         const data = await res.json();
         if (data.success) setSettings(data.data);

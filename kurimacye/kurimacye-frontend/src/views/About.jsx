@@ -13,7 +13,7 @@ export default function About() {
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
         const response = await fetch(`${apiUrl}/auth/team`);
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -30,10 +30,10 @@ export default function About() {
   const getImageUrl = (path) => {
     if (!path) return '/images/default-avatar.png'; // Fallback image
     if (path.startsWith('http')) return path;
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     const baseUrl = apiUrl.replace(/\/api$/, '');
     if (path.startsWith('/uploads/')) return `${baseUrl}${path}`;
-    return process.env.PUBLIC_URL + path;
+    return (process.env.PUBLIC_URL || '') + path;
   };
 
   return (

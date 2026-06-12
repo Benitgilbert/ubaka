@@ -11,7 +11,7 @@ function LowStockWidget({ products = [], outOfStockCount = 0, loading }) {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
 
-        const baseUrl = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
         const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
 
         return `${baseUrl}${cleanPath}`;
