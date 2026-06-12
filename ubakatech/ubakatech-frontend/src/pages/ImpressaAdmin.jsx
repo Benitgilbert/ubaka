@@ -883,7 +883,7 @@ const DeliveryFormEditor = ({ formData, setFormData }) => {
 
 const renderCellContent = (key, val) => {
   // 0. Format Date / Timestamp columns nicely
-  if (key === 'date' || key === 'startTime' || key === 'endTime' || key === 'createdAt' || key === 'updatedAt') {
+  if (key === 'date' || key === 'startTime' || key === 'endTime' || key === 'createdAt' || key === 'updatedAt' || key === 'Requested Date') {
     if (!val) return '—';
     try {
       const d = new Date(val);
@@ -897,6 +897,48 @@ const renderCellContent = (key, val) => {
         });
       }
     } catch (e) {}
+  }
+
+  // 0.1 Format Payout ID as mono code
+  if (key === 'Payout ID') {
+    return <span className="font-mono text-purple-400 font-bold">{val}</span>;
+  }
+
+  // 0.2 Format RWF Currency values
+  if (key.includes('(RWF)') && typeof val === 'number') {
+    return <span className="font-mono font-bold text-slate-200">{val.toLocaleString()} RWF</span>;
+  }
+
+  // 0.3 Format Payout Payment details
+  if (key === 'Details' && val) {
+    try {
+      const details = typeof val === 'string' ? JSON.parse(val) : val;
+      if (details.mobileNumber) {
+        return (
+          <div className="flex flex-col text-[11px] leading-tight">
+            <span className="font-mono font-bold text-slate-200">{details.mobileNumber}</span>
+            <span className="text-slate-500 font-medium text-[9px] uppercase tracking-wider">{details.mobileName || 'Mobile Wallet'}</span>
+          </div>
+        );
+      }
+      if (details.accountNumber) {
+        return (
+          <div className="flex flex-col text-[11px] leading-tight">
+            <span className="font-mono font-bold text-slate-200">{details.bankName} - {details.accountNumber}</span>
+            <span className="text-slate-500 font-medium text-[9px] uppercase tracking-wider">{details.accountName || 'Bank Account'}</span>
+          </div>
+        );
+      }
+    } catch (e) {}
+  }
+
+  // 0.4 Format Payout Methods as simple badges
+  if (key === 'Method') {
+    return val === 'mobile_money' ? (
+      <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/15">MoMo</span>
+    ) : (
+      <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/15">Bank</span>
+    );
   }
 
   // 1. Handle regions column
@@ -977,14 +1019,14 @@ const renderCellContent = (key, val) => {
   }
 
   // 4. Handle generic statuses and severity
-  if (key === 'sellerStatus' || key === 'status' || key === 'severity') {
+  if (key === 'sellerStatus' || key === 'status' || key === 'severity' || key === 'Status') {
     const strVal = String(val).toLowerCase();
-    let colorClass = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
-    if (['active', 'resolved', 'low', 'approved'].includes(strVal)) {
+    let colorClass = 'bg-slate-500/10 text-slate-405 border-slate-500/20';
+    if (['active', 'resolved', 'low', 'approved', 'completed'].includes(strVal)) {
       colorClass = 'bg-emerald-500/10 text-emerald-405 border-emerald-500/20';
-    } else if (['pending', 'medium'].includes(strVal)) {
+    } else if (['pending', 'medium', 'processing'].includes(strVal)) {
       colorClass = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-    } else if (['rejected', 'voided', 'expired', 'high'].includes(strVal)) {
+    } else if (['rejected', 'voided', 'expired', 'high', 'cancelled'].includes(strVal)) {
       colorClass = 'bg-red-500/10 text-red-405 border-red-500/20';
     }
     return (

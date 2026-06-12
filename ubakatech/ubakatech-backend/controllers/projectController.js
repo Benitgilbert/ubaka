@@ -774,6 +774,22 @@ export const handleImpressaDataGet = async (req, res) => {
           GROUP BY t.id, u.name
           ORDER BY t."createdAt" DESC
         `;
+      } else if (feature === 'payouts') {
+        queryText = `
+          SELECT 
+            p.id, 
+            p."payoutId" as "Payout ID", 
+            s.name as "Seller Name", 
+            p.amount as "Net Amount (RWF)", 
+            p."platformFee" as "Fee (RWF)", 
+            p."paymentMethod" as "Method", 
+            p."paymentDetails" as "Details", 
+            p.status as "Status", 
+            p."createdAt" as "Requested Date"
+          FROM "Payout" p
+          LEFT JOIN "User" s ON p."sellerId" = s.id
+          ORDER BY p."createdAt" DESC
+        `;
       } else {
         queryText = `SELECT ${config.select} FROM "${config.table}"`;
         if (config.where) {
