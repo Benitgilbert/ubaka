@@ -54,7 +54,6 @@ import {
 } from 'lucide-react';
 
 const ALL_TABS = [
-  { id: 'shifts', label: 'Shifts Log', permission: 'manage_impressa_shifts', category: 'Overview', icon: Clock, desc: 'Track cashier drawer sessions and POS reconciliation.' },
   { id: 'finance', label: 'Finance Book', permission: 'manage_impressa_finance', category: 'Overview', icon: DollarSign, desc: 'View double-entry ledger accounts and transactions.' },
   { id: 'commissions', label: 'Commissions', permission: 'manage_impressa_commissions', category: 'Overview', icon: Percent, desc: 'Configure Online vs. POS checkout fee rates.' },
   { id: 'payouts', label: 'Merchant Payouts', permission: 'manage_impressa_payouts', category: 'Overview', icon: DollarSign, desc: 'Process payouts and withdrawals to seller MoMo/Bank.' },
@@ -883,6 +882,23 @@ const DeliveryFormEditor = ({ formData, setFormData }) => {
 };
 
 const renderCellContent = (key, val) => {
+  // 0. Format Date / Timestamp columns nicely
+  if (key === 'date' || key === 'startTime' || key === 'endTime' || key === 'createdAt' || key === 'updatedAt') {
+    if (!val) return '—';
+    try {
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+    } catch (e) {}
+  }
+
   // 1. Handle regions column
   if (key === 'regions') {
     let regions = [];
@@ -1797,6 +1813,7 @@ const ImpressaAdmin = () => {
   const [formData, setFormData] = useState({});
   const [deleteConfirm, setDeleteConfirm] = useState(null); // record id | null
   const [isDeletePending, setIsDeletePending] = useState(false);
+  const [expandedRows, setExpandedRows] = useState({});
 
   const userPermissions = user?.permissions || [];
 
@@ -1806,6 +1823,7 @@ const ImpressaAdmin = () => {
   // Sync Data on Tab Switch
   useEffect(() => {
     if (selectedFeature) {
+      setExpandedRows({});
       fetchTabData();
     }
   }, [selectedFeature, token]);
@@ -2164,7 +2182,7 @@ const ImpressaAdmin = () => {
               type="text"
               value={hubSearchQuery}
               onChange={(e) => setHubSearchQuery(e.target.value)}
-              placeholder="Search e-commerce tools (e.g. Coupons, Shifts)..."
+              placeholder="Search e-commerce tools (e.g. Coupons, Sellers)..."
               className="w-full bg-slate-900/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 outline-none focus:border-purple-500/50 transition-colors placeholder-slate-500"
             />
           </div>
@@ -2502,8 +2520,9 @@ const ImpressaAdmin = () => {
                     <table className="w-full text-left border-collapse select-text">
                       <thead className="bg-slate-950/80 sticky top-0 border-b border-slate-850 z-10">
                         <tr>
+                          {selectedFeature === 'finance' && <th className="w-10 px-5 py-3"></th>}
                           {Object.keys(filteredData[0]).filter(key => {
-                            if (key === 'id') return false;
+                            if (key === 'id' || key === 'entries') return false;
                             const schemaKeys = (FORM_SCHEMAS[selectedFeature] || []).map(f => f.name);
                             if (schemaKeys.length > 0) {
                               return schemaKeys.includes(key) || key === 'createdAt' || key === 'updatedAt';
@@ -2516,42 +2535,99 @@ const ImpressaAdmin = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-850/50">
-                        {filteredData.map((record) => (
-                          <tr key={record.id} className="hover:bg-slate-900/30 transition-colors">
-                            {Object.entries(record).filter(([key]) => {
-                              if (key === 'id') return false;
-                              const schemaKeys = (FORM_SCHEMAS[selectedFeature] || []).map(f => f.name);
-                              if (schemaKeys.length > 0) {
-                                return schemaKeys.includes(key) || key === 'createdAt' || key === 'updatedAt';
-                              }
-                              return true;
-                            }).map(([key, val]) => (
-                              <td key={key} className="px-5 py-3 text-xs text-slate-300 font-medium whitespace-nowrap max-w-xs truncate">
-                                {renderCellContent(key, val)}
-                              </td>
-                            ))}
-                            <td className="px-5 py-3 text-center">
-                              <div className="flex items-center justify-center gap-2">
-                                {FORM_SCHEMAS[selectedFeature] && (
-                                  <button 
-                                    onClick={() => openEditModal(record)}
-                                    className="p-1.5 text-slate-450 hover:text-purple-400 bg-slate-950 hover:bg-purple-500/10 border border-slate-850 hover:border-purple-500/35 rounded-lg transition-all cursor-pointer"
-                                    title="Edit record"
-                                  >
-                                    <Edit2 className="w-3.5 h-3.5" />
-                                  </button>
+                        {filteredData.map((record) => {
+                          const isExpanded = expandedRows[record.id];
+                          const hasEntries = selectedFeature === 'finance' && record.entries && record.entries.length > 0;
+                          const displayedFields = Object.entries(record).filter(([key]) => {
+                            if (key === 'id' || key === 'entries') return false;
+                            const schemaKeys = (FORM_SCHEMAS[selectedFeature] || []).map(f => f.name);
+                            if (schemaKeys.length > 0) {
+                              return schemaKeys.includes(key) || key === 'createdAt' || key === 'updatedAt';
+                            }
+                            return true;
+                          });
+                          
+                          return (
+                            <React.Fragment key={record.id}>
+                              <tr className="hover:bg-slate-900/30 transition-colors">
+                                {selectedFeature === 'finance' && (
+                                  <td className="px-5 py-3 text-center">
+                                    {hasEntries ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => setExpandedRows(prev => ({ ...prev, [record.id]: !prev[record.id] }))}
+                                        className="p-1 rounded text-purple-400 hover:bg-purple-500/10 transition-colors cursor-pointer"
+                                      >
+                                        <span className="text-sm font-bold block w-4 h-4 leading-none select-none">
+                                          {isExpanded ? '▼' : '▶'}
+                                        </span>
+                                      </button>
+                                    ) : (
+                                      <span className="text-slate-600 block w-4 h-4 leading-none">-</span>
+                                    )}
+                                  </td>
                                 )}
-                                <button 
-                                  onClick={() => handleGenericDelete(record.id)}
-                                  className="p-1.5 text-slate-455 hover:text-red-400 bg-slate-950 hover:bg-red-500/10 border border-slate-850 hover:border-red-500/35 rounded-lg transition-all cursor-pointer"
-                                  title="Delete record"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
+                                {displayedFields.map(([key, val]) => (
+                                  <td key={key} className="px-5 py-3 text-xs text-slate-300 font-medium whitespace-nowrap max-w-xs truncate">
+                                    {renderCellContent(key, val)}
+                                  </td>
+                                ))}
+                                <td className="px-5 py-3 text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                    {FORM_SCHEMAS[selectedFeature] && (
+                                      <button 
+                                        onClick={() => openEditModal(record)}
+                                        className="p-1.5 text-slate-455 hover:text-purple-400 bg-slate-950 hover:bg-purple-500/10 border border-slate-850 hover:border-purple-500/35 rounded-lg transition-all cursor-pointer"
+                                        title="Edit record"
+                                      >
+                                        <Edit2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                    <button 
+                                      onClick={() => handleGenericDelete(record.id)}
+                                      className="p-1.5 text-slate-455 hover:text-red-400 bg-slate-955 hover:bg-red-500/10 border border-slate-850 hover:border-red-500/35 rounded-lg transition-all cursor-pointer"
+                                      title="Delete record"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                              
+                              {isExpanded && hasEntries && (
+                                <tr className="bg-slate-950/40 border-y border-slate-850">
+                                  <td colSpan={displayedFields.length + 2} className="px-8 py-4">
+                                    <div className="space-y-2 max-w-2xl">
+                                      <div className="text-[10px] font-bold text-slate-450 uppercase tracking-widest border-b border-slate-800 pb-1 mb-2">
+                                        Journal Ledger Entries
+                                      </div>
+                                      <div className="grid grid-cols-12 gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2">
+                                        <div className="col-span-3">Account Code</div>
+                                        <div className="col-span-5">Account Name</div>
+                                        <div className="col-span-2 text-right">Debit (RWF)</div>
+                                        <div className="col-span-2 text-right">Credit (RWF)</div>
+                                      </div>
+                                      <div className="divide-y divide-slate-850/80">
+                                        {record.entries.map((entry) => (
+                                          <div key={entry.id} className="grid grid-cols-12 gap-2 py-2 text-xs px-2 text-slate-355 hover:bg-slate-900/20 rounded">
+                                            <div className="col-span-3 font-mono text-purple-400 font-bold">{entry.accountCode}</div>
+                                            <div className="col-span-5">{entry.accountName}</div>
+                                            <div className="col-span-2 text-right font-mono text-emerald-400 font-bold">
+                                              {entry.debit > 0 ? entry.debit.toLocaleString() : '—'}
+                                            </div>
+                                            <div className="col-span-2 text-right font-mono text-amber-500 font-bold">
+                                              {entry.credit > 0 ? entry.credit.toLocaleString() : '—'}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -2645,7 +2721,7 @@ const ImpressaAdmin = () => {
                       />
                     ) : field.type === 'select' ? (
                       <select
-                         value={formData[field.name] || ''}
+                         value={formData[field.name] ?? ''}
                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                          required={field.required}
                          className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-850 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-550 focus:bg-slate-950 transition-colors"
@@ -2657,7 +2733,7 @@ const ImpressaAdmin = () => {
                       </select>
                     ) : field.type === 'textarea' ? (
                       <textarea
-                        value={formData[field.name] || ''}
+                        value={formData[field.name] ?? ''}
                         onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                         required={field.required}
                         placeholder={`Enter ${field.label}...`}
@@ -2676,7 +2752,7 @@ const ImpressaAdmin = () => {
                     ) : (
                       <input
                         type={field.type}
-                        value={formData[field.name] || ''}
+                        value={formData[field.name] ?? ''}
                         onChange={(e) => setFormData({ ...formData, [field.name]: field.type === 'number' ? Number(e.target.value) : e.target.value })}
                         required={field.required}
                         placeholder={`Enter ${field.label}...`}

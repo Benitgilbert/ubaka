@@ -744,14 +744,46 @@ export const handleImpressaDataGet = async (req, res) => {
 
   if (process.env.IMPRESSA_DATABASE_URL) {
     try {
-      let queryText = `SELECT ${config.select} FROM "${config.table}"`;
-      if (config.where) {
-        queryText += ` WHERE ${config.where}`;
-      }
-      
-      const tablesWithCreatedAt = ['User', 'Violation', 'SellerReport', 'Order', 'Product', 'Shift', 'Category', 'Attribute', 'Review', 'Ticket', 'ChatLog', 'ClientAbonne', 'Coupon', 'GiftCard', 'GiftCardProduct', 'FlashSale', 'Banner', 'Testimonial', 'Blog', 'BrandPartner', 'Transaction', 'Payout', 'Subscriber', 'ShippingZone', 'TaxRate', 'ReportLog', 'EmailTemplate'];
-      if (tablesWithCreatedAt.includes(config.table)) {
-        queryText += ` ORDER BY "createdAt" DESC`;
+      let queryText = '';
+      if (feature === 'finance') {
+        queryText = `
+          SELECT 
+            t.id, 
+            t.date, 
+            t.description, 
+            t.reference, 
+            t.type, 
+            t."createdAt",
+            u.name as "createdBy",
+            COALESCE(
+              json_agg(
+                json_build_object(
+                  'id', e.id,
+                  'debit', e.debit,
+                  'credit', e.credit,
+                  'accountCode', a.code,
+                  'accountName', a.name
+                )
+              ) FILTER (WHERE e.id IS NOT NULL), 
+              '[]'::json
+            ) as entries
+          FROM "Transaction" t
+          LEFT JOIN "User" u ON t."createdById" = u.id
+          LEFT JOIN "TransactionEntry" e ON t.id = e."transactionId"
+          LEFT JOIN "Account" a ON e."accountId" = a.id
+          GROUP BY t.id, u.name
+          ORDER BY t."createdAt" DESC
+        `;
+      } else {
+        queryText = `SELECT ${config.select} FROM "${config.table}"`;
+        if (config.where) {
+          queryText += ` WHERE ${config.where}`;
+        }
+        
+        const tablesWithCreatedAt = ['User', 'Violation', 'SellerReport', 'Order', 'Product', 'Shift', 'Category', 'Attribute', 'Review', 'Ticket', 'ChatLog', 'ClientAbonne', 'Coupon', 'GiftCard', 'GiftCardProduct', 'FlashSale', 'Banner', 'Testimonial', 'Blog', 'BrandPartner', 'Transaction', 'Payout', 'Subscriber', 'ShippingZone', 'TaxRate', 'ReportLog', 'EmailTemplate'];
+        if (tablesWithCreatedAt.includes(config.table)) {
+          queryText += ` ORDER BY "createdAt" DESC`;
+        }
       }
       
       const realData = await queryImpressa(queryText);
