@@ -14,8 +14,8 @@ import ProductCard from "../components/ProductCard";
 import SEO from "../components/SEO";
 
 // Custom SVG Icons to replace react-icons/fa (saves bundle size on the homepage)
-const ArrowRightIcon = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={className || "w-4 h-4"} aria-hidden="true">
+const ArrowRightIcon = ({ className = "w-4 h-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className={`shrink-0 ${className}`} aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
   </svg>
 );
@@ -303,11 +303,11 @@ export default function Home() {
                 {t('home.hero.description')}
               </p>
               
-              <div className="flex flex-wrap gap-2">
-                <Link to="/shop" className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 hover:from-terracotta-600 hover:to-terracotta-700 text-white px-4 py-2 rounded-full font-bold text-sm transition-all shadow-lg shadow-terracotta-500/25 hover:shadow-terracotta-500/40 flex items-center gap-2 active:scale-95">
-                  {t('home.hero.cta_shop')} <ArrowRightIcon className="text-xs" />
+              <div className="flex flex-wrap items-center gap-3">
+                <Link to="/shop" className="bg-gradient-to-r from-terracotta-500 to-terracotta-600 hover:from-terracotta-600 hover:to-terracotta-700 text-white px-5 py-2.5 rounded-full font-bold text-sm transition-all shadow-lg shadow-terracotta-500/25 hover:shadow-terracotta-500/40 flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap">
+                  {t('home.hero.cta_shop')} <ArrowRightIcon className="w-3.5 h-3.5" />
                 </Link>
-                <Link to="/daily-deals" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-bold text-sm transition-all backdrop-blur-md border border-white/20 active:scale-95">
+                <Link to="/daily-deals" className="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-full font-bold text-sm transition-all backdrop-blur-md border border-white/20 flex items-center justify-center active:scale-95 whitespace-nowrap">
                   {t('home.hero.cta_deals')}
                 </Link>
               </div>
@@ -328,8 +328,8 @@ export default function Home() {
                 <h2 className="text-xl font-bold text-charcoal-800 dark:text-white">{t('home.categories.title')}</h2>
                 <p className="text-xs text-charcoal-500 dark:text-charcoal-400">{t('home.categories.description')}</p>
               </div>
-              <Link to="/shop" aria-label="View all categories" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 text-sm font-semibold flex items-center gap-1">
-                {t('home.categories.view_all')} <ArrowRightIcon className="text-xs" />
+              <Link to="/shop" aria-label="View all categories" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 text-sm font-semibold flex items-center gap-1 whitespace-nowrap">
+                {t('home.categories.view_all')} <ArrowRightIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -509,8 +509,8 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-charcoal-800 dark:text-white mb-2">{t('home.featured.title')}</h2>
                 <p className="text-charcoal-500 dark:text-charcoal-400">{t('home.featured.description')}</p>
               </div>
-              <Link to="/shop?sort=featured" aria-label="View all featured products" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1">
-                {t('home.trending.view_all')} <ArrowRightIcon className="text-sm" />
+              <Link to="/shop?sort=featured" aria-label="View all featured products" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1 whitespace-nowrap">
+                {t('home.trending.view_all')} <ArrowRightIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -587,8 +587,8 @@ export default function Home() {
                 <p className="text-blue-100 text-base mb-6 opacity-75 max-w-lg font-medium">
                   {t('home.print.description')}
                 </p>
-                <Link to="/print-portal" className="inline-flex items-center gap-2 bg-white text-indigo-950 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:bg-blue-50 transition-all active:scale-95">
-                  {t('home.print.cta')} <ArrowRightIcon className="text-sm" />
+                <Link to="/print-portal" className="inline-flex items-center justify-center gap-2 bg-white text-indigo-950 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:bg-blue-50 transition-all active:scale-95 whitespace-nowrap">
+                  {t('home.print.cta')} <ArrowRightIcon className="w-4 h-4" />
                 </Link>
               </div>
               <div className="w-full md:w-64 aspect-video md:aspect-square bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-6 flex items-center justify-center relative group">
@@ -613,8 +613,8 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-charcoal-800 dark:text-white mb-2">{t('home.trending.title')}</h2>
                 <p className="text-charcoal-500 dark:text-charcoal-400">{t('home.trending.description')}</p>
               </div>
-              <Link to="/shop?sort=trending" aria-label="View all trending products" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1">
-                {t('home.trending.view_all')} <ArrowRightIcon className="text-sm" />
+              <Link to="/shop?sort=trending" aria-label="View all trending products" className="text-terracotta-700 dark:text-terracotta-400 hover:text-terracotta-800 dark:hover:text-terracotta-300 font-semibold flex items-center gap-1 whitespace-nowrap">
+                {t('home.trending.view_all')} <ArrowRightIcon className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -777,8 +777,8 @@ export default function Home() {
                   <span className="flex items-center gap-1"><CheckCircleIcon className="text-terracotta-400"/> Daily Payouts</span>
                   <span className="flex items-center gap-1"><CheckCircleIcon className="text-terracotta-400"/> Seller Support</span>
                 </div>
-                <Link to="/become-seller" className="inline-flex items-center gap-2 bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-8 py-4 rounded-xl font-bold hover:from-terracotta-600 hover:to-terracotta-700 transition shadow-lg hover:shadow-xl hover:-translate-y-1">
-                  Start Selling Today <ArrowRightIcon />
+                <Link to="/become-seller" className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-terracotta-500 to-terracotta-600 text-white px-8 py-4 rounded-xl font-bold hover:from-terracotta-600 hover:to-terracotta-700 transition shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
+                  Start Selling Today <ArrowRightIcon className="w-5 h-5" />
                 </Link>
               </div>
               <div className="relative z-10 hidden lg:block">

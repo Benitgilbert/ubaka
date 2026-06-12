@@ -20,24 +20,30 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle hash errors (like otp_expired)
+  // Handle hash errors (like otp_expired) or recovery redirect
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const errorCode = params.get('error_code');
       const errorDescription = params.get('error_description');
+      const type = params.get('type');
 
       if (errorCode === 'otp_expired') {
         setError("Your email link has expired. Please try signing in below; if your email isn't confirmed, we'll help you resend the link.");
       } else if (errorDescription) {
         setError(errorDescription.replace(/\+/g, ' '));
+      } else if (type === 'recovery') {
+        // Clear hash before redirecting to keep clean URL
+        window.history.replaceState(null, null, window.location.pathname);
+        navigate("/dashboard", { state: { showPasswordReset: true }, replace: true });
+        return;
       }
       
       // Clean up hash to avoid showing error on refresh
       window.history.replaceState(null, null, window.location.pathname);
     }
-  }, []);
+  }, [navigate]);
 
   const handleGoogleLogin = async () => {
     // Note: Google login via Supabase

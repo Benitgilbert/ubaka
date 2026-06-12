@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "../utils/supabaseClient";
 import api from "../utils/axiosInstance";
 import Header from "../components/Header";
 import { getProvinces, getDistricts, getSectors, getCells } from "../utils/locationHelpers";
@@ -15,6 +16,7 @@ function UserDashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Form states
   const [profileForm, setProfileForm] = useState({ name: "", email: "", password: "", profileImage: null });
@@ -85,6 +87,16 @@ function UserDashboard() {
     fetchData();
   }, [fetchData]);
 
+  useEffect(() => {
+    if (location.state?.showPasswordReset) {
+      setActiveTab("profile");
+      showSuccess("Please set your new password below.");
+      
+      // Clear location state to prevent toast on re-renders
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate, showSuccess]);
+
   const handleLogout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("refreshToken");
@@ -96,6 +108,14 @@ function UserDashboard() {
     e.preventDefault();
     setIsSaving(true);
     try {
+      // Update password in Supabase if provided
+      if (profileForm.password) {
+        const { error: authError } = await supabase.auth.updateUser({
+          password: profileForm.password
+        });
+        if (authError) throw authError;
+      }
+
       const formData = new FormData();
       formData.append("name", profileForm.name);
       formData.append("email", profileForm.email);
@@ -123,7 +143,7 @@ function UserDashboard() {
       showSuccess("Profile updated successfully!");
       fetchData(); // refresh
     } catch (error) {
-      showError("Failed to update profile.");
+      showError(error.message || "Failed to update profile.");
     } finally {
       setIsSaving(false);
     }
