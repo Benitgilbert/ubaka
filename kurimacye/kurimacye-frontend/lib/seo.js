@@ -24,6 +24,11 @@ export function buildMetadata({
     robots: noIndex
       ? { index: false, follow: false, nocache: true }
       : { index: true, follow: true },
+    icons: {
+      icon: "/icon.svg",
+      shortcut: "/icon.svg",
+      apple: "/icon.svg"
+    },
     openGraph: {
       title: normalizedTitle,
       description,
