@@ -321,7 +321,7 @@ export default function Home() {
 
 
         {/* Categories Section */}
-        <section className="pt-3 pb-8">
+        <section className="pt-3 pb-12">
           <div className="mx-auto max-w-7xl px-4">
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -338,7 +338,7 @@ export default function Home() {
                 {[...Array(6)].map((_, idx) => (
                   <div
                     key={idx}
-                    className="h-16 sm:h-20 rounded-xl bg-cream-200 dark:bg-charcoal-700 animate-pulse shadow-sm"
+                    className="h-24 sm:h-32 rounded-2xl bg-cream-200 dark:bg-charcoal-700 animate-pulse shadow-sm"
                   />
                 ))}
               </div>
@@ -348,7 +348,7 @@ export default function Home() {
                   <Link
                     to={`/shop?category=${encodeURIComponent(cat.name || cat.slug)}`}
                     key={cat.id || idx}
-                    className="group relative h-16 sm:h-20 rounded-xl overflow-hidden shadow-md"
+                    className="group relative h-24 sm:h-32 rounded-2xl overflow-hidden shadow-md"
                   >
                     <img src={cat.img} alt={cat.name} width="300" height="300" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className={`absolute inset-0 bg-gradient-to-t ${cat.color} opacity-60 group-hover:opacity-70 transition`}></div>
