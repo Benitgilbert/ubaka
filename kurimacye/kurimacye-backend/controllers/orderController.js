@@ -687,6 +687,7 @@ export const createPOSOrder = async (req, res) => {
     const { items, paymentMethod, storeLocation, clientId } = req.body;
     const userId = req.user.id;
     const userRole = req.user.role;
+    const effectiveSellerId = userRole === 'cashier' ? req.user.managedById : userId;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "Order must contain items" });
@@ -741,7 +742,6 @@ export const createPOSOrder = async (req, res) => {
         if (!product) throw new Error(`Product not found`);
         
         // Ownership check
-        const effectiveSellerId = userRole === 'cashier' ? req.user.managedById : userId;
         if (userRole === 'seller' && product.sellerId !== userId) {
           throw new Error(`You can only sell your own products: ${product.name}`);
         }

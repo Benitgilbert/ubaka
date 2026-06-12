@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import assetUrl from "../utils/assetUrl";
-import { FaSearch, FaShoppingCart, FaTrash, FaPlus, FaMinus, FaMoneyBillWave, FaMobileAlt, FaBoxOpen, FaStore, FaBarcode, FaTimes, FaCheckCircle, FaWallet } from "react-icons/fa";
+import { FaSearch, FaShoppingCart, FaTrash, FaPlus, FaMinus, FaMoneyBillWave, FaMobileAlt, FaBoxOpen, FaStore, FaBarcode, FaTimes, FaCheckCircle, FaWallet, FaSpinner } from "react-icons/fa";
 import Receipt from "../components/Receipt";
 
 // Beep sound for successful scan
@@ -70,7 +70,7 @@ export default function SellerPOS() {
     });
 
     const handleAbonneCheckout = async () => {
-        if (!selectedClient) return alert("Select a Client first");
+        if (!selectedClient) return toast.error("Select a Client first");
         if (cart.length === 0) return;
         
         setProcessing(true);
@@ -106,7 +106,7 @@ export default function SellerPOS() {
             setCart([]);
             queryClient.invalidateQueries(['pos-products', 'active-shift']);
         } catch (err) {
-            alert(err.response?.data?.message || "Failed to process sale");
+            toast.error(err.response?.data?.message || "Failed to process sale");
         } finally {
             setProcessing(false);
         }
@@ -294,7 +294,7 @@ export default function SellerPOS() {
             : Math.floor((selectedProductForVariation.stock || 0) / factor);
 
         if (availableInUnits <= 0) {
-            alert("Out of stock for this unit");
+            toast.error("Out of stock for this unit");
             return;
         }
 
@@ -331,7 +331,7 @@ export default function SellerPOS() {
         const availableInUnits = Math.floor(parentStock / factor);
 
         if (availableInUnits <= 0) {
-            alert("Out of stock for this unit");
+            toast.error("Out of stock for this unit");
             return;
         }
 
@@ -477,7 +477,7 @@ export default function SellerPOS() {
             setCart([]);
             queryClient.invalidateQueries(['pos-products', 'active-shift']);
         } catch (err) {
-            alert(err.response?.data?.message || "Failed to process sale");
+            toast.error(err.response?.data?.message || "Failed to process sale");
         } finally {
             if (method !== "mtn_momo" || (res && res.data && res.data.status !== "pending")) {
                 setProcessing(false);
@@ -512,7 +512,7 @@ export default function SellerPOS() {
                         clearInterval(interval);
                         setPendingOrder(null);
                         setProcessing(false);
-                        alert("Payment Failed. Please try again.");
+                        toast.error("Payment Failed. Please try again.");
                     }
                 } catch (err) {
                 }
@@ -527,7 +527,7 @@ export default function SellerPOS() {
     };
 
     const handleStartShift = async () => {
-        if (!startingAmount) return alert("Enter starting amount");
+        if (!startingAmount) return toast.error("Enter starting amount");
         try {
             const res = await api.post("/shifts/start", { startingDrawerAmount: Number(startingAmount) });
             if (res.data.success) {
@@ -535,12 +535,12 @@ export default function SellerPOS() {
                 setShowStartShiftModal(false);
             }
         } catch (err) {
-            alert(err.response?.data?.message || "Failed to start shift");
+            toast.error(err.response?.data?.message || "Failed to start shift");
         }
     };
 
     const handleCloseShift = async () => {
-        if (!actualAmount) return alert("Enter actual ending amount");
+        if (!actualAmount) return toast.error("Enter actual ending amount");
         try {
             const res = await api.post("/shifts/close", {
                 actualEndingDrawerAmount: Number(actualAmount),
@@ -555,13 +555,13 @@ export default function SellerPOS() {
                 queryClient.invalidateQueries(['active-shift']);
             }
         } catch (err) {
-            alert(err.response?.data?.message || "Failed to close shift");
+            toast.error(err.response?.data?.message || "Failed to close shift");
         }
     };
 
     const handleRecordExpense = async () => {
-        if (!expenseData.description || !expenseData.amount) return alert("Enter description and amount");
-        if (!activeShift) return alert("No active shift found");
+        if (!expenseData.description || !expenseData.amount) return toast.error("Enter description and amount");
+        if (!activeShift) return toast.error("No active shift found");
         if (savingExpense) return;
 
         setSavingExpense(true);
@@ -580,7 +580,7 @@ export default function SellerPOS() {
                 queryClient.invalidateQueries(['active-shift']); // Refresh shift stats
             }
         } catch (err) {
-            alert(err.response?.data?.message || "Failed to record expense");
+            toast.error(err.response?.data?.message || "Failed to record expense");
         } finally {
             setSavingExpense(false);
         }
@@ -1421,7 +1421,15 @@ export default function SellerPOS() {
                                         disabled={processing || cart.length === 0}
                                         className="col-span-2 flex items-center justify-center gap-2 py-4 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 transition-all disabled:opacity-50"
                                     >
-                                        <FaCheckCircle /> Process Abonné Sale
+                                        {processing ? (
+                                            <>
+                                                <FaSpinner className="animate-spin text-lg" /> Processing...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FaCheckCircle /> Process Abonné Sale
+                                            </>
+                                        )}
                                     </button>
                                 ) : (
                                     <>
@@ -1430,14 +1438,30 @@ export default function SellerPOS() {
                                             disabled={processing || cart.length === 0}
                                             className="flex items-center justify-center gap-2 py-3 px-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold shadow-lg shadow-green-600/20 transition-all disabled:opacity-50 disabled:grayscale"
                                         >
-                                            <FaMoneyBillWave /> {t('pos.cash')}
+                                            {processing ? (
+                                                <>
+                                                    <FaSpinner className="animate-spin text-lg" /> Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaMoneyBillWave /> {t('pos.cash')}
+                                                </>
+                                            )}
                                         </button>
                                         <button
                                             onClick={initiateMomoPayment}
                                             disabled={processing || cart.length === 0}
                                             className="flex items-center justify-center gap-2 py-3 px-4 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-bold shadow-lg shadow-yellow-500/20 transition-all disabled:opacity-50 disabled:grayscale"
                                         >
-                                            <FaMobileAlt /> {t('pos.momo')}
+                                            {processing ? (
+                                                <>
+                                                    <FaSpinner className="animate-spin text-lg" /> Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaMobileAlt /> {t('pos.momo')}
+                                                </>
+                                            )}
                                         </button>
                                     </>
                                 )}
@@ -1502,9 +1526,15 @@ export default function SellerPOS() {
                                             <button
                                                 onClick={handleAbonneCheckout}
                                                 disabled={processing}
-                                                className="flex-1 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black shadow-xl shadow-indigo-600/20 transition-all active:scale-[0.98] disabled:opacity-50"
+                                                className="flex-1 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black shadow-xl shadow-indigo-600/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                                             >
-                                                {processing ? 'Processing...' : 'Confirm Sale'}
+                                                {processing ? (
+                                                    <>
+                                                        <FaSpinner className="animate-spin text-lg" /> Processing...
+                                                    </>
+                                                ) : (
+                                                    "Confirm Sale"
+                                                )}
                                             </button>
                                         </div>
                                     </div>
