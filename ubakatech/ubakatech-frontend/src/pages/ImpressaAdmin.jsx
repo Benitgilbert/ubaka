@@ -1791,7 +1791,14 @@ const ImpressaAdmin = () => {
   const socket = useSocket();
   
   // Navigation State (null represents the Main Grid Hub Dashboard)
-  const [selectedFeature, setSelectedFeature] = useState(null);
+  const [selectedFeature, setSelectedFeature] = useState(() => {
+    const saved = localStorage.getItem('ubaka_selected_feature');
+    return (saved && saved !== 'null') ? saved : null;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ubaka_selected_feature', selectedFeature);
+  }, [selectedFeature]);
   
   // Custom states for Approvals/Tickets (Existing high-fidelity screens)
   const [approvals, setApprovals] = useState([]);

@@ -56,7 +56,13 @@ const LoadingScreen = ({ message = 'Loading...' }) => {
 const MainLayout = () => {
   const { user, loading, refreshUser } = useAuth();
   const socket = useSocket();
-  const [activePage, setActivePage] = useState('dashboard');
+  const [activePage, setActivePage] = useState(() => {
+    return localStorage.getItem('ubaka_active_page') || 'dashboard';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ubaka_active_page', activePage);
+  }, [activePage]);
 
   useEffect(() => {
     if (!socket) return;
