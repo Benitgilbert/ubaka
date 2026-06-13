@@ -6,7 +6,7 @@ import { formatRwf } from "../utils/currency";
 import api from "../utils/axiosInstance";
 import { getProvinces, getDistricts, getSectors, getCells } from "../utils/locationHelpers";
 import { useToast } from "../context/ToastContext";
-import { FaShoppingCart, FaCreditCard, FaMoneyBillWave, FaLock, FaTruck, FaMobileAlt, FaGift } from "react-icons/fa";
+import { FaShoppingCart, FaCreditCard, FaLock, FaTruck, FaGift } from "react-icons/fa";
 import LandingFooter from "../components/LandingFooter";
 import Header from "../components/Header";
 import assetUrl from "../utils/assetUrl";
@@ -87,7 +87,7 @@ export default function CheckoutPage() {
 
   const [taxData, setTaxData] = useState({ totalTax: 0, taxes: [] });
 
-  const [paymentMethod, setPaymentMethod] = useState("irembo_pay");
+  const [paymentMethod] = useState("irembo_pay");
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null); // 'pending', 'success', 'failed'
   const [fieldErrors, setFieldErrors] = useState({});
@@ -390,38 +390,7 @@ export default function CheckoutPage() {
       const publicId = orderRes.data.publicId; // Public ID for user-facing display
 
       // 2. Process Payment
-      if (paymentMethod === "mtn_momo") {
-        setPaymentStatus("awaiting_payment");
-        const payRes = await api.post("/payments/process", {
-          orderId,
-          paymentMethod: "mtn_momo",
-          phone: momoPhone
-        });
-
-        if (payRes.data.success) {
-          // Poll for status
-          const pollInterval = setInterval(async () => {
-            try {
-              const statusRes = await api.get(`/payments/status/${orderId}`);
-              const status = statusRes.data.status;
-
-              if (status === "completed" || status === "processing") {
-                clearInterval(pollInterval);
-                setPaymentStatus("success");
-                clearCart();
-                showSuccess("Order placed successfully!");
-                setTimeout(() => nav(`/order-success/${publicId}`), 1000);
-              } else if (status === "failed") {
-                clearInterval(pollInterval);
-                setPaymentStatus("failed");
-                setIsProcessing(false);
-                showError("Payment failed. Please try again."); // Failure toast
-              }
-            } catch (err) {
-            }
-          }, 3000); // Check every 3 seconds
-        }
-      } else if (paymentMethod === "irembo_pay") {
+      if (paymentMethod === "irembo_pay") {
         setPaymentStatus("awaiting_payment");
         const payRes = await api.post("/payments/process", {
           orderId,
