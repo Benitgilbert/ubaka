@@ -16,15 +16,27 @@ export function toAbsoluteAssetUrl(path) {
 
 export async function fetchApi(path, { revalidate = 60, tags } = {}) {
   const cleanedPath = path.startsWith("/") ? path : `/${path}`;
-  const res = await fetch(`${API_BASE_URL}${cleanedPath}`, {
-    next: { revalidate, tags }
-  });
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
 
-  if (!res.ok) {
-    throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+  try {
+    const res = await fetch(`${API_BASE_URL}${cleanedPath}`, {
+      next: { revalidate, tags },
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
   }
-
-  return res.json();
 }
 
 export async function safeFetchApi(path, options) {
