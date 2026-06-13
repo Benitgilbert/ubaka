@@ -217,11 +217,6 @@ const isTest = process.env.NODE_ENV === 'test';
 if (!isVercel && !isTest) {
   const startServer = async () => {
     try {
-      logger.info("Starting server initialization... URL: " + (process.env.DATABASE_URL || "NOT SET").replace(/:[^@]+@/, ":****@"));
-      await prisma.$connect();
-      logger.info("✅ Prisma connected to Supabase");
-      await seedEmailTemplates();
-
       const PORT = process.env.PORT || 5000;
       const server = app.listen(PORT, () => {
         logger.info(`🚀 Server running on port ${PORT}`);
@@ -230,6 +225,18 @@ if (!isVercel && !isTest) {
       server.on("error", (err) => {
         logger.error({ err }, "Server handle error");
       });
+
+      // Connect to DB and seed templates in the background (prevents startup timeout)
+      (async () => {
+        try {
+          logger.info("Connecting to database... URL: " + (process.env.DATABASE_URL || "NOT SET").replace(/:[^@]+@/, ":****@"));
+          await prisma.$connect();
+          logger.info("✅ Prisma connected to Supabase");
+          await seedEmailTemplates();
+        } catch (dbErr) {
+          logger.error({ err: dbErr }, "⚠️ Database connection or seeding failed during startup");
+        }
+      })();
 
       const gracefulShutdown = async (signal) => {
         logger.info(`${signal} received, shutting down...`);
